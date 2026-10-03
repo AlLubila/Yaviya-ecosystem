@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="YAVIYA, la marketplace locale qui rapproche acheteurs, vendeurs et livreurs en RDC." />
+    <meta name="theme-color" content="#14352d" />
+    <title>YAVIYA — Le meilleur du Congo, tout près de vous</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="announcement">
+      <span>Livraison offerte dès 80 000 FC</span>
+      <span class="announcement-center">Paiements sécurisés & vendeurs vérifiés</span>
+      <button id="countryButton" aria-label="Changer de pays">🇨🇩 RDC <span>⌄</span></button>
+    </div>
+
+    <header class="site-header">
+      <a class="logo" href="#" aria-label="Yaviya, accueil">YAVIYA<span>.</span></a>
+      <nav aria-label="Navigation principale">
+        <a href="#nouveautes">Nouveautés</a><a href="#categories">Catégories</a><a href="#artisans">Artisans</a><a href="#promos">Bons plans</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn search-toggle" aria-label="Rechercher">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        </button>
+        <button class="icon-btn" aria-label="Votre compte">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+        </button>
+        <button class="cart-button" id="cartButton" aria-label="Ouvrir le panier">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.3 11h10.8l2-7H7"></path><circle cx="9" cy="20" r="1"></circle><circle cx="18" cy="20" r="1"></circle></svg>
+          <span class="cart-count">0</span>
+        </button>
+        <button class="menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+      </div>
+    </header>
+
+    <div class="search-panel" aria-hidden="true">
+      <form id="searchForm"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input id="searchInput" type="search" placeholder="Rechercher un produit, une boutique…" aria-label="Recherche" /><button type="button" class="search-close" aria-label="Fermer">×</button></form>
+    </div>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span></span> Marketplace 100% locale</div>
+          <h1>Le meilleur du Congo, <em>tout près de vous.</em></h1>
+          <p>Découvrez des produits uniques, soutenez les talents locaux et faites-vous livrer simplement, partout à Kinshasa.</p>
+          <div class="hero-cta">
+            <a class="button primary" href="#nouveautes">Explorer le marché <span>→</span></a>
+            <a class="text-link" href="#artisans">Découvrir nos artisans <span>↗</span></a>
+          </div>
+          <div class="trust-row">
+            <div class="avatars"><span>JN</span><span>MK</span><span>+</span></div>
+            <div><strong>+2 500 clients</strong><small><b>★★★★★</b> 4,8/5 de satisfaction</small></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src="https://images.unsplash.com/photo-1709809081557-78f803ce93a0?auto=format&fit=crop&q=85&w=1600" alt="Créatrice congolaise portant une tenue colorée dans son atelier" />
+          <div class="hero-tag"><span>✦</span><div><small>Création locale</small><strong>Fait avec passion</strong></div></div>
+          <div class="hero-product"><span class="bag-icon">👜</span><div><small>Nouveau</small><strong>Sac Mobali</strong><p>35 000 FC</p></div></div>
+          <div class="scribble" aria-hidden="true">✦</div>
+        </div>
+      </section>
+
+      <section class="benefits" aria-label="Nos engagements">
+        <article><span>◉</span><div><strong>Vendeurs vérifiés</strong><small>Achetez en toute confiance</small></div></article>
+        <article><span>⌁</span><div><strong>Livraison rapide</strong><small>Dans tout Kinshasa</small></div></article>
+        <article><span>♙</span><div><strong>Paiement flexible</strong><small>Mobile Money ou à la livraison</small></div></article>
+        <article><span>↗</span><div><strong>Impact local</strong><small>Chaque achat soutient un talent</small></div></article>
+      </section>
+
+      <section class="section categories" id="categories">
+        <div class="section-heading"><div><span class="kicker">Pour tous les goûts</span><h2>Explorez nos univers</h2></div><a href="#nouveautes">Toutes les catégories <span>→</span></a></div>
+        <div class="category-grid">
+          <a href="#nouveautes" data-filter="Mode" class="category-card coral"><span class="category-icon">♢</span><div><strong>Mode & Style</strong><small>124 produits</small></div><b>→</b></a>
+          <a href="#nouveautes" data-filter="Beauté" class="category-card yellow"><span class="category-icon">✿</span><div><strong>Beauté & Bien-être</strong><small>86 produits</small></div><b>→</b></a>
+          <a href="#nouveautes" data-filter="Maison" class="category-card green"><span class="category-icon">⌂</span><div><strong>Maison & Déco</strong><small>98 produits</small></div><b>→</b></a>
+          <a href="#nouveautes" data-filter="Tech" class="category-card blue"><span class="category-icon">⌁</span><div><strong>Tech & Mobile</strong><small>72 produits</small></div><b>→</b></a>
+        </div>
+      </section>
+
+      <section class="section products-section" id="nouveautes">
+        <div class="section-heading"><div><span class="kicker">La sélection du moment</span><h2>Les pépites YAVIYA</h2></div><div class="product-tabs" role="tablist"><button class="active" data-tab="Tous">Tout voir</button><button data-tab="Nouveau">Nouveautés</button><button data-tab="Populaire">Populaires</button></div></div>
+        <div class="product-grid" id="productGrid"></div>
+        <button class="button outline" id="moreProducts">Voir plus de produits <span>↓</span></button>
+      </section>
+
+      <section class="story" id="artisans">
+        <div class="story-image"><img src="https://images.unsplash.com/photo-1601924994987-69e26d50dc26?auto=format&fit=crop&q=85&w=1200" alt="Artisane préparant ses créations avec soin" /><div class="story-stamp">YAVIYA<br /><b>LOCAL</b></div></div>
+        <div class="story-copy"><span class="kicker light">Plus qu'une marketplace</span><h2>Des histoires, du talent, <em>un avenir.</em></h2><p>Derrière chaque produit, il y a un visage, un savoir-faire et un rêve. YAVIYA donne aux créateurs et entrepreneurs locaux les outils pour grandir.</p><div class="stats"><div><strong>350+</strong><small>vendeurs locaux</small></div><div><strong>12</strong><small>communes livrées</small></div><div><strong>94%</strong><small>de clients satisfaits</small></div></div><a class="button cream" href="#nouveautes">Découvrir leur histoire <span>→</span></a></div>
+      </section>
+
+      <section class="newsletter" id="promos"><div><span class="kicker">Le bon plan du vendredi</span><h2>Des nouveautés dans votre poche.</h2><p>Recevez nos sélections locales et 10% sur votre première commande.</p></div><form id="newsletterForm"><label class="sr-only" for="email">Votre adresse e-mail</label><input id="email" type="email" required placeholder="votre@email.com" /><button type="submit">Je m'inscris <span>→</span></button><small>Pas de spam. Juste de belles découvertes.</small></form></section>
+    </main>
+
+    <footer><a class="logo footer-logo" href="#">YAVIYA<span>.</span></a><p>La marketplace locale qui nous rapproche.</p><div class="footer-links"><a href="#">À propos</a><a href="#">Aide</a><a href="#">Devenir vendeur</a><a href="#">Confidentialité</a></div><small>© 2026 YAVIYA. Fait avec ♥ à Kinshasa.</small></footer>
+
+    <aside class="cart-drawer" aria-hidden="true"><div class="cart-head"><h2>Votre panier</h2><button class="cart-close" aria-label="Fermer le panier">×</button></div><div class="cart-items"><div class="empty-cart"><span>🛍️</span><h3>Votre panier est vide</h3><p>Les pépites locales que vous aimez vous attendent.</p></div></div><div class="cart-total"><div><span>Sous-total</span><strong>0 FC</strong></div><button class="button primary">Commander <span>→</span></button></div></aside><div class="overlay"></div>
+    <div class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
