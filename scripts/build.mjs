@@ -2,5 +2,17 @@ import { cp, mkdir, rm } from 'node:fs/promises';
 
 await rm('dist', { recursive: true, force: true });
 await mkdir('dist', { recursive: true });
-for (const file of ['index.html', 'styles.css', 'app.js', 'catalog']) await cp(file, `dist/${file}`, { recursive: true });
-console.log('Build créé dans dist/.');
+for (const entry of [
+  'index.html',
+  'aide.html',
+  'confidentialite.html',
+  'congo.html',
+  'publicite.html',
+  'script.js',
+  'styles.css',
+  'assets'
+]) {
+  await cp(entry, `dist/${entry}`, { recursive: true });
+}
+
+console.log('Frontend YAVIYA complet créé dans dist/.');
