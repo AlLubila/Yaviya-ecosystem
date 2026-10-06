@@ -4301,3 +4301,86 @@ button:disabled {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+.independent-auth {
+  width: min(94vw, 480px);
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--line, #e4dfee);
+  border-radius: 18px;
+  padding: 28px;
+  color: #241638;
+  background: #fff;
+  box-shadow: 0 24px 80px #20102f40;
+}
+.independent-auth::backdrop {
+  background: #160b2b99;
+}
+.independent-auth .close {
+  float: right;
+  border: 0;
+  background: transparent;
+  font-size: 28px;
+  cursor: pointer;
+}
+.independent-auth .editor {
+  display: grid;
+  gap: 14px;
+}
+.independent-auth label {
+  display: grid;
+  gap: 7px;
+}
+.independent-auth input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #d7cfe4;
+  border-radius: 8px;
+}
+.independent-auth button,
+.independent-auth a {
+  min-height: 44px;
+}
+.independent-auth .auth-error {
+  color: #a32040;
+}
+.mfa-qr {
+  display: block;
+  width: 240px;
+  max-width: 100%;
+  height: auto;
+  margin: auto;
+}
+.mfa-secret,
+.mfa-codes {
+  font-family: monospace;
+}
+.mfa-codes {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 18px;
+  background: #f4effa;
+  border-radius: 10px;
+  font-size: 16px;
+}
+.mfa-content > button {
+  margin: 5px 0;
+  width: 100%;
+}
+.account-security {
+  white-space: nowrap;
+}
+
+header .header-actions {
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: flex-end;
+}
+@media (max-width: 650px) {
+  header .header-actions {
+    gap: 10px;
+    flex: 1 1 210px;
+  }
+}

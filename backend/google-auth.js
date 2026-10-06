@@ -1,6 +1,6 @@
 import { randomBytes, createHash, randomUUID } from "node:crypto";
 import { createRemoteJWKSet, jwtVerify } from "jose";
-import { startSession, passwordHash } from "./auth.js";
+import { passwordHash } from "./auth.js";
 const hash = (s) => createHash("sha256").update(s).digest("hex");
 const keys = createRemoteJWKSet(
   new URL("https://www.googleapis.com/oauth2/v3/certs"),
@@ -10,6 +10,7 @@ export async function googleAuth(
   db,
   config = process.env,
   fetcher = fetch,
+  verifyToken = jwtVerify,
 ) {
   const url = new URL(request.url),
     client = config.GOOGLE_CLIENT_ID,
@@ -114,7 +115,7 @@ export async function googleAuth(
       { error: "Connexion Google refusée" },
       { status: 401 },
     );
-  const { payload } = await jwtVerify(token.id_token, keys, {
+  const { payload } = await verifyToken(token.id_token, keys, {
     issuer: ["https://accounts.google.com", "accounts.google.com"],
     audience: client,
   });
@@ -143,7 +144,9 @@ export async function googleAuth(
     user = { id: randomUUID(), login: "google:" + payload.sub };
     await db.batch([
       db
-        .prepare("INSERT INTO auth_users VALUES (?,?,?,?)")
+        .prepare(
+          "INSERT INTO auth_users (id,login,password_hash,created_at) VALUES (?,?,?,?)",
+        )
         .bind(
           user.id,
           user.login,
@@ -155,9 +158,19 @@ export async function googleAuth(
         .bind(payload.sub, user.id),
     ]);
   }
-  const session = await startSession(request, db, user);
+  const { primaryAuthenticated } = await import("./two-factor.js");
+  const session = await primaryAuthenticated(request, db, user);
+  const authentication = await session.clone().json();
   const headers = new Headers(session.headers);
-  headers.set("Location", result.return_path);
+  headers.set(
+    "Location",
+    authentication.requiresTwoFactor
+      ? result.return_path +
+          (result.return_path.includes("?") ? "&" : "?") +
+          "mfa=1"
+      : result.return_path,
+  );
+  if (session.status !== 200) return session;
   headers.append("Set-Cookie", stateCookie(""));
   return new Response(null, { status: 302, headers });
 }

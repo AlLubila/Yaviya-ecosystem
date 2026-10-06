@@ -1,8 +1,8 @@
-# YAVIYA — nouvelle version complète (1.1.0)
+# YAVIYA — nouvelle version complète (1.2.0)
 
 Version complète indépendante issue de la version 31 de YAVIYA « Votre marché, à portée de main », avec les corrections d'achat immédiat, de connexion indépendante et de retour produit. Frontend, backend, API, migrations, tests et photos sont accessibles comme fichiers séparés dans le dépôt public. L'ancienne vitrine de huit produits est conservée dans `legacy-vitrine/` ; le build principal utilise désormais la version complète.
 
-[Rôle de chaque fichier](docs/FILES.md) · [Lancer et tester les parcours](docs/DEMO.md)
+[Double authentification](docs/TWO_FACTOR.md) · [Rôle de chaque fichier](docs/FILES.md) · [Lancer et tester les parcours](docs/DEMO.md)
 
 ## Ce qui est conservé
 
@@ -62,8 +62,12 @@ Cette installation est indépendante de ChatGPT : elle n'utilise ni sa connexion
 
 Les produits et boutiques initiaux sont illustratifs. Les paiements Mobile Money/carte, l'escrow financier, les reversements automatiques, les abonnements payants et l'envoi d'e-mails ne sont pas activés. Google est intégré au code, mais exige la configuration du client OAuth avant de fonctionner. La connexion indépendante n'ajoute pas de vérification e-mail/SMS ni de récupération automatique du mot de passe. Les paiements à réception et règlements manuels conservent leurs déclarations de suivi, sans transfert automatique de fonds. L'assistant reste celui du site original.
 
-Validation locale : syntaxe des sources, fichiers référencés, migrations, transactions atomiques, session/CSRF, isolation des profils, refus d'identité falsifiée, pièces privées, validation manuelle vendeur/livreur, création de produit, commande idempotente, acceptation, préparation, affectation livreur, preuve privée, réception et notes vendeur/livreur. La configuration et les ressources réelles Vercel/Turso doivent encore être activées et testées à distance. Aucun test visuel navigateur n'a encore été exécuté dans cet environnement.
+Validation locale : syntaxe des sources, fichiers référencés, migrations, transactions atomiques, session/CSRF, isolation des profils, refus d'identité falsifiée, pièces privées, validation manuelle vendeur/livreur, création de produit, commande idempotente, acceptation, préparation, affectation livreur, preuve privée, réception et notes vendeur/livreur. La configuration et les ressources réelles Vercel/Turso doivent encore être activées et testées à distance. Les formulaires 2FA sont testés avec jsdom contre le backend réel ; aucun test visuel dans un navigateur complet n’a été exécuté dans cet environnement.
 
 ## Connexion Google / Gmail
 
 Créer un client OAuth Google de type Web. Ajouter exactement GOOGLE_REDIRECT_URI aux URI autorisés, puis définir GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET et GOOGLE_REDIRECT_URI sur Vercel. Le secret reste côté serveur. Aucun accès Gmail ni lecture des messages : seuls openid, email et profile sont demandés. Les comptes Google sont séparés des comptes par mot de passe pour éviter un rattachement par e-mail non vérifié.
+
+## Double authentification
+
+Le bouton **Sécurité · 2FA** permet de configurer une application Authenticator, confirmer un premier code et télécharger 8 codes de secours. Les connexions par mot de passe et Google passent par le second facteur pour les comptes protégés. Configurer `MFA_ENCRYPTION_KEY` et appliquer la migration 0014 avant le déploiement. Les étapes, garanties et limites figurent dans [le guide 2FA](docs/TWO_FACTOR.md).

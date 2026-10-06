@@ -30,7 +30,7 @@ export async function passwordHash(
   });
   return `${salt}:${hash.toString("hex")}`;
 }
-async function passwordMatches(password, encoded) {
+export async function passwordMatches(password, encoded) {
   const computed = await passwordHash(password, encoded.split(":")[0]);
   const a = Buffer.from(computed),
     b = Buffer.from(encoded);
@@ -51,7 +51,7 @@ export async function authenticatedUser(request, db) {
   if (!/^[a-f0-9]{64}$/.test(token)) return null;
   return db
     .prepare(
-      "SELECT u.id,u.login FROM auth_sessions s JOIN auth_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?",
+      "SELECT u.id,u.login FROM auth_sessions s JOIN auth_users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>? AND NOT EXISTS (SELECT 1 FROM auth_mfa m WHERE m.user_id=u.id AND m.enabled=1 AND (s.mfa_generation IS NULL OR s.mfa_generation<>m.generation))",
     )
     .bind(digest(token), Date.now())
     .first();
@@ -59,15 +59,29 @@ export async function authenticatedUser(request, db) {
 function cookie(request, token, maxAge) {
   return `yaviya_session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}${new URL(request.url).protocol === "https:" ? "; Secure" : ""}`;
 }
-export async function startSession(request, db, user) {
+export async function startSession(request, db, user, mfaGeneration = null) {
   const token = randomBytes(32).toString("hex"),
     maxAge = 7 * 24 * 3600;
-  await db
+  const inserted = await db
     .prepare(
-      "INSERT INTO auth_sessions (token_hash,user_id,expires_at) VALUES (?,?,?)",
+      "INSERT INTO auth_sessions (token_hash,user_id,expires_at,issued_at,mfa_generation) SELECT ?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM auth_mfa WHERE user_id=? AND enabled=1 AND (generation<>? OR ? IS NULL)) RETURNING token_hash",
     )
-    .bind(digest(token), user.id, Date.now() + maxAge * 1000)
-    .run();
+    .bind(
+      digest(token),
+      user.id,
+      Date.now() + maxAge * 1000,
+      Date.now(),
+      mfaGeneration,
+      user.id,
+      mfaGeneration,
+      mfaGeneration,
+    )
+    .first();
+  if (!inserted)
+    return json(
+      { error: "La sécurité du compte a changé. Reconnectez-vous." },
+      401,
+    );
   return json({ user: { id: user.id, login: user.login } }, 200, {
     "Set-Cookie": cookie(request, token, maxAge),
   });
@@ -75,6 +89,10 @@ export async function startSession(request, db, user) {
 
 export async function handleAuth(request, db) {
   const action = new URL(request.url).pathname.split("/").at(-1);
+  if (action.startsWith("mfa-")) {
+    const { handleTwoFactor } = await import("./two-factor.js");
+    return handleTwoFactor(request, db, action);
+  }
   if (action === "google" || action === "google-callback") {
     const { googleAuth } = await import("./google-auth.js");
     return googleAuth(request, db);
@@ -90,13 +108,32 @@ export async function handleAuth(request, db) {
       .prepare("DELETE FROM auth_sessions WHERE token_hash=?")
       .bind(digest(sessionToken(request)))
       .run();
-    return json({ ok: true }, 200, { "Set-Cookie": cookie(request, "", 0) });
+    const challenge =
+      request.headers
+        .get("cookie")
+        ?.split(";")
+        .map((x) => x.trim())
+        .find((x) => x.startsWith("yaviya_mfa="))
+        ?.slice(11) || "";
+    await db
+      .prepare("DELETE FROM auth_mfa_challenges WHERE token_hash=?")
+      .bind(digest(challenge))
+      .run();
+    const response = json({ ok: true }, 200, {
+      "Set-Cookie": cookie(request, "", 0),
+    });
+    response.headers.append(
+      "Set-Cookie",
+      `yaviya_mfa=; HttpOnly; SameSite=Lax; Path=/api/auth; Max-Age=0${new URL(request.url).protocol === "https:" ? "; Secure" : ""}`,
+    );
+    return response;
   }
   if (!["login", "signup"].includes(action))
     return json({ error: "Introuvable" }, 404);
   let body;
   try {
     body = await request.json();
+    if (!body || typeof body !== "object") throw new Error("Invalid form");
   } catch {
     return json({ error: "Formulaire invalide" }, 400);
   }
@@ -177,5 +214,6 @@ export async function handleAuth(request, db) {
     if (!(await passwordMatches(password, encoded)) || !user)
       return json({ error: "Identifiant ou mot de passe incorrect" }, 401);
   }
-  return startSession(request, db, user);
+  const { primaryAuthenticated } = await import("./two-factor.js");
+  return primaryAuthenticated(request, db, user);
 }

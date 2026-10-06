@@ -19,3 +19,7 @@
 | `/api/delivery`                                                        | `delivery.js`             | Compatibilité avec l'ancien scénario isolé          |
 
 Les requêtes JSON et multipart exigent les droits du compte, la bonne origine et, pour les transitions, la révision courante. Les prix et stocks sont relus côté serveur. Les détails exacts et des appels exécutables figurent dans `tests/independent.test.mjs`. Les comptes ne doivent pas pouvoir choisir leur identité serveur ni devenir admin par inscription.
+
+## Double authentification
+
+Les routes `mfa-status`, `mfa-setup`, `mfa-enable`, `mfa-challenge`, `mfa-verify`, `mfa-recovery` et `mfa-disable` sous `/api/auth/` sont détaillées dans [TWO_FACTOR.md](TWO_FACTOR.md). Le frontend doit gérer `requiresTwoFactor` avant de considérer la connexion terminée. Les connexions Google utilisent le même challenge.

@@ -11,3 +11,7 @@ Intégrations : base Turso persistante et migrations ; identifiants OAuth Google
 Validation : tests automatisés, compilation et présence de toutes les photos du catalogue. Connexion Google réelle et déploiement Vercel non vérifiés faute de configuration et d’accès autorisé au projet. Aucun paiement électronique activé.
 
 Navigation produit : flèche Retour visible sur ordinateur et mobile. Pendant la comparaison, retour à la fiche produit ou à la boutique précédente sans fermer la fenêtre ; galerie et boutons conservés. Retour en haut de chaque vue. Fichiers : frontend/page-navigation.js et frontend/style.css.
+
+## Version 1.2.0 — double authentification
+
+Activation facultative par application TOTP avec QR code et clé manuelle, premier code obligatoire, 8 codes de secours à usage unique, connexion en deux étapes par mot de passe ou Google. Chiffrement des secrets, challenges courts, limitation des essais, protection contre le rejeu et invalidation des anciennes sessions. Configuration `MFA_ENCRYPTION_KEY` et migration 0014 nécessaires sur le serveur cible. Documentation : docs/TWO_FACTOR.md.

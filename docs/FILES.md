@@ -146,7 +146,7 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `legacy-vitrine/tests/catalog.test.mjs`                  | Ancienne vitrine de huit produits : catalog.test.mjs. Conservée hors du build principal.                   |
 | `legacy-vitrine/vercel.json`                             | Ancienne vitrine de huit produits : vercel.json. Conservée hors du build principal.                        |
 | `package-lock.json`                                      | Versions exactes utilisées par npm ci.                                                                     |
-| `package.json`                                           | Commandes npm, dépendances et version 1.1.0.                                                               |
+| `package.json`                                           | Commandes npm, dépendances et version 1.2.0.                                                               |
 | `scripts/build.mjs`                                      | Assemble les sources frontend classées en fichiers publics plats dans dist.                                |
 | `scripts/check.mjs`                                      | Syntaxe des sources et présence des assets référencés.                                                     |
 | `scripts/create-owner.mjs`                               | Crée le propriétaire admin dans un terminal de confiance.                                                  |
@@ -155,3 +155,14 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `tests/independent.test.mjs`                             | Tests sessions, permissions, quatre comptes et parcours partagé.                                           |
 | `tests/purchase.test.mjs`                                | Tests photos, achat immédiat et Google non configuré.                                                      |
 | `vercel.json`                                            | Build, routage API et fonction Vercel.                                                                     |
+
+Fichiers ajoutés en version 1.2.0 :
+
+| Fichier | Rôle |
+| --- | --- |
+| `backend/two-factor.js` | Enrôlement TOTP, chiffrement, challenges, codes de secours et mutations protégées. |
+| `database/migrations/0014_two_factor_auth.sql` | Tables 2FA, générations des facteurs et date des sessions. |
+| `frontend/src/two-factor-settings.js` | Activation par QR, gestion et téléchargement des codes. |
+| `tests/two-factor.test.mjs` | Vérification des garanties de sécurité et parcours API. |
+| `tests/two-factor-ui.test.mjs` | Parcours des formulaires frontend reliés au backend local. |
+| `docs/TWO_FACTOR.md` | Configuration serveur et parcours utilisateur 2FA. |
