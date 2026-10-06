@@ -1,0 +1,240 @@
+const productPhotos = [
+  "dinner-set",
+  "plates",
+  "standing-fan",
+  "desk-fan",
+  "soap",
+  "lotion",
+  "toys",
+  "puzzle",
+  "rice",
+  "coffee",
+  "ringlight",
+  "frame",
+  "guitar",
+  "keyboard",
+  "power-strip",
+  "watch",
+  "tie",
+  "usb-c",
+];
+products
+  .filter((p) => !p.img)
+  .forEach((p, i) => {
+    p.img = "product-" + productPhotos[i] + ".jpg";
+  });
+const heroSlides = [
+  {
+    img: "hero.png",
+    eyebrow: [
+      "VOTRE MARCHÉ, À PORTÉE DE MAIN",
+      "YOUR MARKETPLACE, AT YOUR FINGERTIPS",
+    ],
+    title: ["Découvrez vos nouvelles envies.", "Discover your next favourite."],
+    copy: [
+      "Mode, maison, beauté et high-tech : une sélection à comparer en quelques clics.",
+      "Fashion, home, beauty and electronics: compare a varied selection in a few clicks.",
+    ],
+    link: "#catalog",
+    cta: ["Explorer le catalogue", "Browse the catalogue"],
+    tag: "YAVIYA",
+  },
+  {
+    img: "headphones.png",
+    eyebrow: ["SÉLECTION HIGH-TECH", "ELECTRONICS SELECTION"],
+    title: ["Le son en liberté.", "Wireless sound."],
+    copy: [
+      "Découvrez les offres sur les casques et comparez les prix des boutiques.",
+      "Discover headphone deals and compare prices across shops.",
+    ],
+    link: "#catalog",
+    cta: ["Explorer le catalogue", "Browse the catalogue"],
+    tag: "KIN TECH",
+  },
+  {
+    img: "sneakers.png",
+    eyebrow: ["MODE & ACCESSOIRES", "FASHION & ACCESSORIES"],
+    title: ["Votre style prend de l’avance.", "Your style takes the lead."],
+    copy: [
+      "Les baskets de la sélection du moment vous attendent sur YAVIYA.",
+      "Discover sneakers in the latest YAVIYA selection.",
+    ],
+    link: "#catalog",
+    cta: ["Découvrir les offres", "Explore the deals"],
+    tag: "PAS URBAIN",
+  },
+  {
+    img: "handbag.png",
+    eyebrow: ["PROMO DU JOUR · DÉMONSTRATION", "DAILY DEALS · DEMO"],
+    title: ["L’élégance vous accompagne.", "Carry elegance with you."],
+    copy: [
+      "Le sac Daily, parmi les promotions illustratives du jour.",
+      "The Daily handbag, among today’s illustrative deals.",
+    ],
+    link: "#daily-promos",
+    cta: ["Voir la promo du jour", "View daily deals"],
+    tag: "ÉLÉGANCE CONGO",
+  },
+];
+$(".hero").outerHTML =
+  `<section class="home-ad-carousel" aria-label="Publicités YAVIYA" tabindex="0"><div id="home-ad-slide"></div><div class="home-ad-controls"><label hidden>${T("Filtrer les publicités", "Filter advertisements")}<select id="home-ad-filter"><option value="all">${T("Toutes les publicités", "All advertisements")}</option><option value="catalog">${T("Catalogue", "Catalogue")}</option><option value="daily">${T("Promo du jour", "Daily deals")}</option></select></label><div class="home-ad-navigation"><button id="home-ad-prev" aria-label="${T("Précédente", "Previous")}">‹</button><span id="home-ad-count" hidden></span><button id="home-ad-next" aria-label="${T("Suivante", "Next")}">›</button><button id="home-ad-pause">Pause</button></div><a href="publicite.html">${T("Toutes les campagnes", "All campaigns")}</a></div></section>`;
+let homeAdIndex = 0,
+  homeAdFilter = "all",
+  homeAdPaused =
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || false,
+  homeAdInterval;
+function filteredHomeAds() {
+  return heroSlides.filter(
+    (s, i) =>
+      homeAdFilter === "all" ||
+      (homeAdFilter === "catalog" && i === 0) ||
+      (homeAdFilter === "daily" && i === 3),
+  );
+}
+function drawHomeAd() {
+  const slides = filteredHomeAds();
+  homeAdIndex = (homeAdIndex + slides.length) % slides.length;
+  const s = slides[homeAdIndex];
+  $("#home-ad-slide").innerHTML =
+    `<article class="home-ad"><div class="home-ad-copy"><span class="eyebrow">${T(...s.eyebrow)}</span><h1>${T(...s.title)}</h1><p>${T(...s.copy)}</p><a class="primary" href="${s.link}">${T(...s.cta)}</a><small>${s.tag} · ${T("Publicité illustrative", "Illustrative advertisement")}</small></div><img src="${s.img}" alt="${s.tag} · ${T("Sélection de produits", "Product selection")}"></article>`;
+  $("#home-ad-count").textContent = `${homeAdIndex + 1} / ${slides.length}`;
+  $("#home-ad-pause").textContent = homeAdPaused
+    ? T("Reprendre", "Play")
+    : T("Pause", "Pause");
+}
+function startHomeAd() {
+  clearInterval(homeAdInterval);
+  if (!homeAdPaused)
+    homeAdInterval = setInterval(() => {
+      if (!document.hidden) {
+        homeAdIndex++;
+        drawHomeAd();
+      }
+    }, 6500);
+}
+$("#home-ad-filter").onchange = (e) => {
+  homeAdFilter = e.target.value;
+  homeAdIndex = 0;
+  drawHomeAd();
+  startHomeAd();
+};
+$("#home-ad-prev").onclick = () => {
+  homeAdIndex--;
+  drawHomeAd();
+  startHomeAd();
+};
+$("#home-ad-next").onclick = () => {
+  homeAdIndex++;
+  drawHomeAd();
+  startHomeAd();
+};
+$("#home-ad-pause").onclick = () => {
+  homeAdPaused = !homeAdPaused;
+  drawHomeAd();
+  startHomeAd();
+};
+$(".home-ad-carousel").onkeydown = (e) => {
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    e.preventDefault();
+    homeAdIndex += e.key === "ArrowRight" ? 1 : -1;
+    drawHomeAd();
+    startHomeAd();
+  }
+};
+$(".home-ad-carousel").addEventListener("focusin", () =>
+  clearInterval(homeAdInterval),
+);
+$(".home-ad-carousel").addEventListener("focusout", startHomeAd);
+const currentApplyLanguage = applyLanguage;
+applyLanguage = function () {
+  currentApplyLanguage();
+  drawHomeAd();
+};
+drawHomeAd();
+startHomeAd();
+const receiptHandler = (e) => {
+  const b = e.target.closest("[data-receipt]");
+  if (!b) return;
+  e.stopImmediatePropagation();
+  if (activeRole !== "buyer") return;
+  const o = orders.find((o) => o.id === b.dataset.receipt);
+  if (!o || o.step !== 3 || o.buyerConfirmed) return;
+  o.buyerConfirmed = true;
+  o.paymentState =
+    o.paymentId === "cod" || o.payment === "Paiement à la livraison"
+      ? "Paiement reçu · fonds libérés (démo)"
+      : "Escrow · fonds libérés (démo)";
+  o.events.push(
+    T(
+      "Réception confirmée par le client. Fonds libérés en démonstration.",
+      "Receipt confirmed by the buyer. Demo funds released.",
+    ) +
+      " — " +
+      new Date().toLocaleTimeString(),
+  );
+  [...new Set(o.items.map((i) => i.seller))].forEach((s) =>
+    transactions.push({
+      seller: s,
+      label: "Réception confirmée " + o.id,
+      amount:
+        o.items
+          .filter((i) => i.seller === s)
+          .reduce((n, i) => n + i.price * i.q, 0) - orderSellerCommission(o, s),
+    }),
+  );
+  showTracking();
+  toast(
+    T(
+      "Réception confirmée · fonds libérés en démo",
+      "Receipt confirmed · demo funds released",
+    ),
+  );
+};
+document.addEventListener("click", receiptHandler, true);
+function escrowTable(seller = null) {
+  const list = orders.filter(
+    (o) => seller === null || o.items.some((i) => i.seller === seller),
+  );
+  return `<section class="escrow-summary"><h3>${T("Paiements & escrow", "Payments & escrow")}</h3><p class="demo-note">${T("Simulation uniquement. Aucun fonds réel n’est détenu. Les ventes deviennent retirables après confirmation de réception par l’acheteur.", "Simulation only. No real funds are held. Sales become withdrawable after the buyer confirms receipt.")}</p>${
+    list.length
+      ? `<div class="table-wrap"><table><thead><tr><th>${T("Commande", "Order")}</th><th>${T("Montant produits", "Product amount")}</th><th>${T("État du paiement", "Payment status")}</th><th>${T("Réception client", "Buyer receipt")}</th></tr></thead><tbody>${list
+          .map((o) => {
+            const value = o.items
+              .filter((i) => seller === null || i.seller === seller)
+              .reduce((n, i) => n + i.q * i.price, 0);
+            return `<tr><td>${o.id}</td><td>${money(value)}</td><td>${esc(o.paymentState || "Démo")}</td><td>${o.buyerConfirmed ? T("Confirmée", "Confirmed") : T("En attente", "Pending")}</td></tr>`;
+          })
+          .join("")}</tbody></table></div>`
+      : `<p>${T("Aucune commande pendant cette visite.", "No orders during this visit.")}</p>`
+  }</section>`;
+}
+const escrowSeller = showSeller;
+showSeller = function () {
+  escrowSeller();
+  if (activeRole === "seller")
+    $('#role-content [data-dashboard-panel="wallet"]').insertAdjacentHTML(
+      "afterbegin",
+      escrowTable(selectedSeller),
+    );
+};
+const escrowAdmin = showAdmin;
+showAdmin = function () {
+  escrowAdmin();
+  if (activeRole === "admin")
+    $('#role-content [data-dashboard-panel="finance"]').insertAdjacentHTML(
+      "afterbegin",
+      escrowTable(),
+    );
+};
+render();
+if (activeRole === "seller") showSeller();
+if (activeRole === "admin") showAdmin();
+content.delivery = `<span class="eyebrow">YAVIYA · LIVRAISON</span><h2>${T("Livraison en 24 à 48 heures", "Delivery in 24–48 hours")}</h2><p>${T("Délai estimé après validation de la commande, selon la disponibilité du produit et votre localité. La livraison réelle n’est pas encore activée dans cette démonstration.", "Estimated time after order confirmation, depending on product availability and your location. Real delivery is not yet activated in this demonstration.")}</p><ul><li>${T("Main propre : retrait chez chaque vendeur sur rendez-vous.", "In-person handover: collection from each seller by appointment.")}</li><li>${T("À domicile : choix de YAVIYA Courier ou de trois partenaires de démonstration.", "Home delivery: choose YAVIYA Courier or one of three demo partners.")}</li><li>${T("Point relais : sélection d’un emplacement illustratif dans votre ville.", "Collection point: select an illustrative location in your city.")}</li></ul><p>${T("Abonnements provisoires : 25 000 FC/mois ou 250 000 FC/an. Avantages, limites et zones à confirmer avant activation.", "Provisional subscriptions: FC 25,000/month or FC 250,000/year. Benefits, limits and coverage to be confirmed before activation.")}</p>`;
+faqItems.push([
+  "Comment fonctionne l’escrow ?",
+  "How does escrow work?",
+  "Le paiement anticipé reste retenu jusqu’à ce que le client confirme la réception dans Mes commandes. Marquer un colis livré ne suffit pas à débloquer le solde vendeur. Ce parcours est simulé : aucun fonds réel n’est détenu. Le paiement à la livraison est collecté à réception.",
+  "Prepaid funds remain held until the buyer confirms receipt in My orders. Marking a parcel delivered does not release the seller balance. This flow is simulated: no real funds are held. Cash on delivery is collected on receipt.",
+]);
+$("#home-faq").dataset.language = "";
+applyLanguage();

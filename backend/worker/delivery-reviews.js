@@ -1,0 +1,132 @@
+import { marketContext, getMarketOrder } from "./commerce.js";
+const json = (v, status = 200) =>
+  Response.json(v, { status, headers: { "Cache-Control": "no-store" } });
+const score = (n) => Number.isInteger(n) && n >= 1 && n <= 5;
+export async function handleDeliveryReviews(request, env) {
+  const url = new URL(request.url),
+    user = request.headers.get("yaviya-user-id");
+  if (!user) return json({ error: "Connexion requise" }, 401);
+  if (request.method !== "GET" && request.headers.get("origin") !== url.origin)
+    return json({ error: "Origine refusée" }, 403);
+  try {
+    const ctx = await marketContext(env, user);
+    if (request.method === "POST") {
+      const d = await request.json();
+      if (
+        typeof d.orderId !== "string" ||
+        !d.sellerScores ||
+        Array.isArray(d.sellerScores) ||
+        typeof d.sellerScores !== "object" ||
+        typeof d.comment !== "string" ||
+        d.comment.length > 1500
+      )
+        return json({ error: "Évaluation invalide" }, 400);
+      const o = await getMarketOrder(env, d.orderId, ctx.country);
+      if (!o || o.buyerUserId !== user)
+        return json(
+          { error: "Seul l’acheteur de cette commande peut évaluer" },
+          403,
+        );
+      if (
+        o.step !== 3 ||
+        o.cancelled ||
+        !o.buyerConfirmed ||
+        (o.requestedCourier && !o.deliveryProof)
+      )
+        return json({ error: "Confirmez la réception avant de noter" }, 409);
+      const sellers = [...new Set(o.items.map((i) => String(i.seller)))];
+      if (
+        Object.keys(d.sellerScores).length !== sellers.length ||
+        sellers.some((id) => !score(d.sellerScores[id]))
+      )
+        return json({ error: "Notez chaque vendeur de 1 à 5" }, 400);
+      if (o.courierUserId ? !score(d.courierScore) : d.courierScore !== null)
+        return json({ error: "Notez le livreur affecté de 1 à 5" }, 400);
+      const names = {};
+      for (const seller of sellers) {
+        const row = await env.DB.prepare(
+          "SELECT name FROM owned_stores WHERE id=? AND country=?",
+        )
+          .bind(Number(seller) - 10000, ctx.country)
+          .first();
+        names[seller] = row?.name || "Boutique " + seller;
+      }
+      const result = await env.DB.prepare(
+        "INSERT INTO delivery_reviews (id,buyer_user_id,courier_user_id,country,order_id,seller_scores,seller_names,courier_score,comment,created_at) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO NOTHING",
+      )
+        .bind(
+          "shared:" + o.id,
+          user,
+          o.courierUserId || null,
+          ctx.country,
+          o.id,
+          JSON.stringify(d.sellerScores),
+          JSON.stringify(names),
+          o.courierUserId ? d.courierScore : null,
+          d.comment.trim(),
+          Date.now(),
+        )
+        .run();
+      return result.meta.changes
+        ? json({ ok: true })
+        : json({ error: "Cette commande a déjà été évaluée" }, 409);
+    }
+    if (request.method !== "GET")
+      return json({ error: "Méthode non autorisée" }, 405);
+    const view = url.searchParams.get("view") || "buyer";
+    if (!["buyer", "seller", "courier", "admin"].includes(view))
+      return json({ error: "Vue inconnue" }, 400);
+    if (
+      (view === "admin" && !ctx.isAdmin) ||
+      (view === "seller" && !ctx.sellerIds.length) ||
+      (view === "courier" && !ctx.courier)
+    )
+      return json({ error: "Accès à cet espace refusé" }, 403);
+    let query =
+        "SELECT r.courier_user_id AS courierUserId,r.order_id AS orderId,r.seller_scores AS sellerScores,r.seller_names AS sellerNames,r.courier_score AS courierScore,r.comment,r.created_at AS createdAt,c.name AS courierName FROM delivery_reviews r LEFT JOIN customers c ON c.user_id=r.courier_user_id WHERE r.country=? AND r.id LIKE 'shared:%'",
+      args = [ctx.country];
+    if (view === "buyer") {
+      query += " AND r.buyer_user_id=?";
+      args.push(user);
+    }
+    if (view === "courier") {
+      query += " AND r.courier_user_id=?";
+      args.push(user);
+    }
+    query += " ORDER BY r.created_at DESC LIMIT 1000";
+    let rows = (
+      await env.DB.prepare(query)
+        .bind(...args)
+        .all()
+    ).results.map((r) => ({
+      ...r,
+      sellerScores: JSON.parse(r.sellerScores),
+      sellerNames: JSON.parse(r.sellerNames),
+    }));
+    if (view === "seller")
+      rows = rows
+        .filter((r) =>
+          Object.keys(r.sellerScores).some((id) => ctx.sellerIds.includes(+id)),
+        )
+        .map((r) => ({
+          ...r,
+          sellerScores: Object.fromEntries(
+            Object.entries(r.sellerScores).filter(([id]) =>
+              ctx.sellerIds.includes(+id),
+            ),
+          ),
+          sellerNames: Object.fromEntries(
+            Object.entries(r.sellerNames).filter(([id]) =>
+              ctx.sellerIds.includes(+id),
+            ),
+          ),
+          courierScore: null,
+          courierName: null,
+        }));
+    for (const r of rows) delete r.courierUserId;
+    return json(rows);
+  } catch (e) {
+    console.error("Shared reviews unavailable", e);
+    return json({ error: "Évaluations indisponibles. Réessayez." }, 503);
+  }
+}

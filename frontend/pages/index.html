@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>YAVIYA — Votre marché, à portée de main</title>
+    <meta
+      name="description"
+      content="Découvrez YAVIYA, votre future marketplace à Kinshasa. Mode, high-tech et maison, réunis au même endroit."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236136dd'/%3E%3Cpath d='M8 8l8 10 8-10M16 18v8' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="country-bootstrap.js"></script>
+  </head>
+  <body>
+    <div class="topbar">
+      <span>Votre marché à Kinshasa et Lubumbashi.</span
+      ><button data-action="about">Découvrir YAVIYA</button>
+    </div>
+    <header>
+      <a class="logo" href="#">YAVIYA<span>●</span></a>
+      <form id="search" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10" cy="10" r="6" />
+          <path d="m15 15 5 5" /></svg
+        ><input
+          id="query"
+          aria-label="Rechercher un produit"
+          placeholder="Qu’est-ce qui vous ferait plaisir ?"
+        /><button
+          type="submit"
+          class="text-search-submit"
+          aria-label="Rechercher"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10" cy="10" r="6" />
+            <path d="m15 15 5 5" />
+          </svg>
+        </button>
+      </form>
+      <div class="header-actions">
+        <button data-action="account" class="icon-btn" hidden>
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="7" r="4" />
+            <path d="M4 22v-3a8 8 0 0 1 16 0v3" /></svg
+          ><span>Mon compte</span></button
+        ><button data-action="cart" class="icon-btn" hidden>
+          <svg viewBox="0 0 24 24">
+            <path d="M3 3h2l3 13h11l2-9H6" />
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="18" cy="21" r="1" /></svg
+          ><span>Panier <b id="count">0</b></span>
+        </button>
+      </div>
+    </header>
+    <nav class="market-navigation">
+      <button
+        id="all"
+        class="nav-primary"
+        aria-expanded="false"
+        aria-controls="customer-menu"
+      >
+        ▦ <span>Catégories</span>
+      </button>
+    </nav>
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">LE QUOTIDIEN, EN MIEUX</span>
+          <h1>Vos envies.<br />Votre ville.<br /><em>Votre YAVIYA.</em></h1>
+          <p>
+            Du coup de cœur à l’essentiel, découvrez votre prochain achat au
+            même endroit.
+          </p>
+          <button class="primary" id="discover">Explorer le catalogue</button>
+          <div class="hero-note">
+            <span>Kinshasa, RDC</span><span>Prix en francs congolais</span>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img
+            src="hero.png"
+            alt="Sélection d’accessoires : casque, baskets, téléphone et sac"
+          /><span class="floating-label"
+            >Des trouvailles pour tous les jours.</span
+          >
+        </div>
+      </section>
+      <section class="catalog" id="catalog">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">LE BON ENDROIT POUR TROUVER</span>
+            <h2>À découvrir sur YAVIYA</h2>
+          </div>
+          <label class="sort-label"
+            >Trier
+            <select id="sort">
+              <option value="default">Notre sélection</option>
+              <option value="asc">Prix croissant</option>
+              <option value="desc">Prix décroissant</option>
+            </select></label
+          >
+        </div>
+        <div class="chips" id="chips">
+          <button data-cat="Tout" class="active">Tout découvrir</button
+          ><button data-cat="High-tech">High-tech</button
+          ><button data-cat="Mode">Mode & accessoires</button
+          ><button data-cat="Maison">Maison & quotidien</button>
+        </div>
+        <p class="demo-note">
+          Catalogue de démonstration · produits et prix illustratifs · aucune
+          commande réelle
+        </p>
+        <div class="products" id="products"></div>
+        <p id="empty" hidden>
+          Aucun produit trouvé. Essayez un autre mot ou une autre catégorie.
+        </p>
+      </section>
+      <section class="payment-overview" aria-label="Modes de paiement">
+        <div>
+          <span class="eyebrow">À L’ÉTAPE DE COMMANDE</span>
+          <h2>Choisissez votre mode de paiement</h2>
+          <p>
+            M-Pesa · Airtel Money · Orange Money · Afrimoney · Carte bancaire ·
+            Paiement à la livraison
+          </p>
+          <p class="demo-note">
+            Modes proposés dans la démonstration. Les paiements réels seront
+            disponibles après activation des prestataires.
+          </p>
+        </div>
+      </section>
+      <section class="seller-banner">
+        <div>
+          <span class="eyebrow">POUR LES COMMERÇANTS</span>
+          <h2>Votre boutique mérite<br />une nouvelle vitrine.</h2>
+          <p>
+            Faites découvrir vos produits et préparez votre présence sur YAVIYA.
+          </p>
+          <button class="primary" data-action="seller">
+            Découvrir les offres vendeurs
+          </button>
+        </div>
+        <div class="seller-letter">
+          Y<span>Le commerce avance<br />avec vous.</span>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div>
+        <a class="logo" href="#">YAVIYA<span>●</span></a>
+        <p>
+          Votre marché, à portée de main.<br />Kinshasa, République démocratique
+          du Congo.
+        </p>
+      </div>
+      <div>
+        <b>Explorer</b><button data-cat="High-tech">High-tech</button
+        ><button data-cat="Mode">Mode & accessoires</button
+        ><button data-cat="Maison">Maison & quotidien</button>
+      </div>
+      <div>
+        <b>YAVIYA</b><button data-action="about">À propos</button
+        ><button data-action="seller">Devenir vendeur</button
+        ><button data-action="delivery">Livraison</button>
+      </div>
+      <div>
+        <b>Informations</b><a href="aide.html">Centre d’aide</a
+        ><button data-action="privacy">Confidentialité</button
+        ><span>Version de démonstration</span>
+      </div>
+      <div class="footer-bottom">
+        © 2026 YAVIYA <span>Le début d’une nouvelle expérience.</span>
+      </div>
+    </footer>
+    <dialog id="modal">
+      <button class="close" aria-label="Fermer">×</button>
+      <div id="modal-content"></div>
+    </dialog>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+    <script src="country-data.js"></script>
+    <script src="marketplace.js"></script>
+    <script src="support.js"></script>
+    <script src="customer.js"></script>
+    <script src="delivery-roles.js"></script>
+    <script src="promotions-dashboards.js"></script>
+    <script src="enhancements.js"></script>
+    <script src="yavicoins.js"></script>
+    <script src="partner-campaigns.js"></script>
+    <script src="popular-faq.js"></script>
+    <script src="seller-plans.js"></script>
+    <script src="seller-markets.js"></script>
+    <script src="country-final.js"></script>
+    <script src="mobile-nav.js"></script>
+    <script src="search-photo-ratings.js"></script>
+    <script src="language-top.js"></script>
+    <script src="account-verification-flows.js"></script>
+    <script src="commerce-guard.js"></script>
+    <script src="shared-delivery.js"></script>
+    <script src="profile-commerce.js"></script>
+    <script src="pricing-benefits.js"></script>
+    <script src="registration-categories.js"></script>
+    <script src="courier-reviews.js"></script>
+    <script src="mvp-final.js"></script>
+    <script src="product-gallery.js"></script>
+    <script src="shared-commerce.js"></script>
+    <script src="page-navigation.js"></script>
+    <script src="auth-independent.js"></script>
+  </body>
+</html>

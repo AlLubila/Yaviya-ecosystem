@@ -1,13 +1,22 @@
 {
   "name": "yaviya-market",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/dev.mjs",
-    "start": "node scripts/dev.mjs --dist",
+    "dev": "npm run build && node --env-file-if-exists=.env scripts/dev.mjs --dist",
+    "start": "node --env-file-if-exists=.env scripts/dev.mjs --dist",
     "build": "node scripts/build.mjs",
     "check": "node scripts/check.mjs",
-    "test": "npm run check && node --test tests/*.test.mjs"
+    "test": "npm run check && node --test tests/*.test.mjs",
+    "db:migrate": "node --env-file-if-exists=.env scripts/migrate.mjs",
+    "db:owner": "node --env-file-if-exists=.env scripts/create-owner.mjs"
   },
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.18.0",
+    "jose": "^6.2.12"
+  }
 }

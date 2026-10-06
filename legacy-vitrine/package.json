@@ -1,0 +1,13 @@
+{
+  "name": "yaviya-market",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "start": "node scripts/dev.mjs --dist",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "npm run check && node --test tests/*.test.mjs"
+  },
+  "type": "module"
+}

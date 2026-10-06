@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Publicités & offres — YAVIYA</title>
+    <meta
+      name="description"
+      content="Découvrez les campagnes et promotions de démonstration YAVIYA."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236136dd'/%3E%3Cpath d='M8 8l8 10 8-10M16 18v8' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="country-bootstrap.js"></script>
+  </head>
+  <body class="advert-page">
+    <div class="topbar" id="ad-topbar">
+      YAVIYA · Publicités de démonstration
+    </div>
+    <header>
+      <a class="logo" href="index.html">YAVIYA<span>●</span></a
+      ><a class="add" id="back-market" href="index.html">Retour au marché</a
+      ><label class="advert-language"
+        >Langue<select id="ad-language">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+        </select></label
+      >
+    </header>
+    <main>
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow" id="ad-eyebrow">LES ENVIES DU MOMENT</span>
+          <h1 id="ad-heading">À l’affiche sur YAVIYA</h1>
+        </div>
+        <a class="primary" href="index.html#catalog" id="ad-deals-link"
+          >Explorer le catalogue</a
+        >
+      </div>
+      <p class="demo-note" id="ad-note">
+        Campagnes illustratives : produits, prix et boutiques de démonstration.
+        Aucun partenariat publicitaire réel.
+      </p>
+      <label class="advert-filter" hidden
+        >Filtrer les campagnes<select id="ad-category">
+          <option value="all">Toutes les campagnes</option>
+          <option value="payments">Paiement & Mobile Money</option>
+          <option value="logistics">Logistique</option>
+          <option value="products">Produits</option>
+          <option value="benefits">YAVIYA Benefits</option>
+        </select></label
+      >
+      <section
+        class="advert-carousel"
+        aria-label="Campagnes publicitaires"
+        tabindex="0"
+      >
+        <div id="ad-slide"></div>
+        <div class="advert-controls">
+          <button id="ad-prev" aria-label="Publicité précédente">‹</button>
+          <div id="ad-dots" hidden></div>
+          <button id="ad-next" aria-label="Publicité suivante">›</button
+          ><button id="ad-pause">Pause</button
+          ><span id="ad-position" hidden aria-live="polite"></span>
+        </div>
+      </section>
+      <section class="advert-collection">
+        <h2 id="ad-collection-title">Les campagnes à découvrir</h2>
+        <div id="ad-collection"></div>
+      </section>
+    </main>
+    <footer>
+      <div>
+        <a class="logo" href="index.html">YAVIYA<span>●</span></a>
+        <p id="ad-footer">Votre marché, à portée de main.</p>
+      </div>
+      <div><a href="index.html#catalog">Catalogue</a></div>
+      <div>
+        <a href="index.html#daily-promos" id="daily-link">Promo du jour</a>
+      </div>
+      <div><a href="aide.html" id="help-link">Centre d’aide</a></div>
+    </footer>
+    <script src="advertising.js"></script>
+    <script src="country-final.js"></script>
+    <script src="mobile-nav.js"></script>
+    <script src="language-top.js"></script>
+  </body>
+</html>

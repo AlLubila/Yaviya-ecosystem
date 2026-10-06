@@ -1,0 +1,1 @@
+ALTER TABLE `identity_checks` ADD `courier_plan` text DEFAULT 'standard' NOT NULL;

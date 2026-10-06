@@ -1,3 +1,10 @@
-dist/
 node_modules/
-.DS_Store
+dist/
+.local/
+.env
+.env.*
+!.env.example
+*.sqlite*
+*.db
+*.log
+.vercel/

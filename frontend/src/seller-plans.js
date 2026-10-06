@@ -1,0 +1,257 @@
+const sellerPlans = [
+  {
+    id: "free",
+    name: "Free",
+    en: "Free",
+    monthly: 0,
+    annual: 0,
+    limit: 5,
+    commission: 10,
+    target: [
+      "Particuliers et nouveaux vendeurs",
+      "Individuals and new sellers",
+    ],
+    features: [
+      ["Jusqu’à 5 produits", "Up to 5 products"],
+      ["Tableau de bord vendeur", "Seller dashboard"],
+      ["Gestion des commandes", "Order management"],
+      [
+        "Badge de vendeur vérifié après validation",
+        "Verified seller badge after approval",
+      ],
+      ["Support communautaire", "Community support"],
+    ],
+  },
+  {
+    id: "plus",
+    name: "Plus",
+    en: "Plus",
+    monthly: 35000,
+    annual: 350000,
+    limit: 30,
+    commission: 8,
+    target: ["Commerçants en pleine croissance", "Growing merchants"],
+    features: [
+      ["Jusqu’à 30 produits", "Up to 30 products"],
+      ["Promotions et coupons", "Promotions and coupons"],
+      ["Statistiques de base", "Basic statistics"],
+      ["Support prioritaire", "Priority support"],
+      ["Outils de visibilité des produits", "Product visibility tools"],
+    ],
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    en: "Premium",
+    monthly: 75000,
+    annual: 750000,
+    limit: null,
+    commission: 7,
+    target: ["Magasins professionnels", "Professional shops"],
+    features: [
+      ["Produits illimités", "Unlimited products"],
+      ["Visibilité prioritaire des produits", "Priority product visibility"],
+      ["Promotions avancées", "Advanced promotions"],
+      ["Statistiques avancées", "Advanced statistics"],
+      ["Support prioritaire", "Priority support"],
+      [
+        "Participation à des campagnes YAVIYA sélectionnées",
+        "Participation in selected YAVIYA campaigns",
+      ],
+    ],
+  },
+  {
+    id: "business",
+    name: "Business",
+    en: "Business",
+    monthly: 275000,
+    annual: 2750000,
+    limit: null,
+    commission: 5,
+    target: [
+      "Commerçants professionnels et PME",
+      "Professional merchants and SMEs",
+    ],
+    features: [
+      ["Gestion multi-boutiques", "Multi-shop management"],
+      ["Comptes d’équipe", "Team accounts"],
+      ["Intégration API", "API integration"],
+      ["Analyses avancées", "Advanced analytics"],
+      [
+        "Promotions et accès aux services intégrés",
+        "Promotions and access to integrated services",
+      ],
+      ["Commission réduite à 5 %", "Reduced 5% commission"],
+      ["Gestionnaire de compte dédié", "Dedicated account manager"],
+    ],
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    en: "Enterprise",
+    monthly: null,
+    annual: null,
+    limit: null,
+    commission: null,
+    target: [
+      "Grandes entreprises, marques, importateurs, grossistes et distributeurs",
+      "Large companies, brands, importers, wholesalers and distributors",
+    ],
+    features: [
+      [
+        "Solution personnalisée selon vos besoins",
+        "Solution tailored to your needs",
+      ],
+      [
+        "Tarification et commission négociées",
+        "Negotiated pricing and commission",
+      ],
+      ["Fabricants et distributeurs", "Manufacturers and distributors"],
+      ["Grands détaillants et marques", "Large retailers and brands"],
+      [
+        "Chaînes de supermarchés et grandes organisations",
+        "Supermarket chains and large organisations",
+      ],
+      [
+        "Fonctionnalités, services intégrés et accompagnement adaptés",
+        "Tailored features, integrated services and support",
+      ],
+    ],
+  },
+];
+let sellerBilling = "monthly";
+let adAdminCategory = "all";
+function sellerPlanPrice(p, billing = sellerBilling) {
+  return p.monthly === null
+    ? T("Sur mesure", "Custom")
+    : money(billing === "annual" ? p.annual : p.monthly);
+}
+function sellerPlanCommission(p) {
+  return p.commission === null
+    ? T("Négociée", "Negotiated")
+    : p.commission + " %";
+}
+function sellerPlansTable() {
+  return `<div class="table-wrap"><table class="plan-comparison"><thead><tr><th>${T("Offre vendeur", "Seller plan")}</th><th>${T("Mensuel", "Monthly")}</th><th>${T("Annuel", "Annual")}</th><th>${T("Commission", "Commission")}</th><th>${T("Pour qui ?", "Target")}</th><th>${T("Fonctionnalités principales", "Main features")}</th></tr></thead><tbody>${sellerPlans.map((p) => `<tr><td><b>${T(p.name, p.en)}</b></td><td>${sellerPlanPrice(p, "monthly")}</td><td>${sellerPlanPrice(p, "annual")}</td><td>${sellerPlanCommission(p)}</td><td>${T(...p.target)}</td><td>${p.id === "enterprise" ? T("Solution personnalisée", "Tailored solution") : p.limit === null ? T("Produits illimités", "Unlimited products") : T("Jusqu’à ", "Up to ") + p.limit + " " + T("produits", "products")} · ${T(...p.features[p.id === "free" ? 1 : p.id === "plus" ? 1 : 0])}</td></tr>`).join("")}</tbody></table></div>`;
+}
+function sellerSubscriptionsMarkup() {
+  const shop = shops.find((s) => s.id === selectedSeller),
+    plan = shop.demoPlan || "free",
+    current = sellerPlans.find((p) => p.id === plan) || sellerPlans[0];
+  return `<section class="seller-subscriptions"><div class="section-heading"><div><span class="eyebrow">${T("DÉVELOPPEZ VOTRE BOUTIQUE", "GROW YOUR SHOP")}</span><h2>${T("Abonnements vendeurs", "Seller subscriptions")}</h2></div><label>${T("Facturation", "Billing")}<select id="seller-billing"><option value="monthly" ${sellerBilling === "monthly" ? "selected" : ""}>${T("Mensuelle", "Monthly")}</option><option value="annual" ${sellerBilling === "annual" ? "selected" : ""}>${T("Annuelle · 2 mois offerts", "Annual · 2 months free")}</option></select></label></div><p>${T("Boutique : ", "Shop: ")}<b>${esc(shop.name)}</b> · ${T("Forfait choisi : ", "Selected plan: ")}<b>${T(current.name, current.en)}</b></p><p class="plan-saving">${T("Bénéficiez de 2 mois offerts pour tout abonnement annuel à tarif fixe : 10 mois facturés pour 12 mois. Enterprise : conditions sur mesure.", "Get 2 months free with every fixed-price annual plan: pay for 10 months and receive 12. Enterprise: custom terms.")}</p><p class="demo-note">${T("Offres et fonctionnalités présentées pour le lancement. La sélection simule le parcours sans facturation ni activation réelle des services avancés. Le choix d’un vendeur enregistré est conservé dans son dossier.", "Plans and features are presented for launch. Selection simulates the journey without billing or real activation of advanced services. A registered seller’s choice is saved with their verification request.")}</p>${sellerPlansTable()}<div class="seller-plan-grid">${sellerPlans.map((p) => `<article class="seller-plan ${plan === p.id ? "selected" : ""}"><h3>${T(p.name, p.en)}</h3><p>${T(...p.target)}</p><strong>${sellerPlanPrice(p)}${p.monthly === null ? "" : `<small> / ${sellerBilling === "annual" ? T("an", "year") : T("mois", "month")}</small>`}</strong><p class="plan-commission">${T("Commission : ", "Commission: ")}<b>${sellerPlanCommission(p)}</b></p><ul>${p.features.map((f) => `<li>${T(...f)}</li>`).join("")}</ul>${sellerBilling === "annual" && p.monthly ? `<p class="plan-saving">${T("Économie annuelle : ", "Annual saving: ")}${money(p.monthly * 2)}</p>` : ""}<button class="${plan === p.id ? "add" : "primary"}" data-select-plan="${p.id}" ${plan === p.id ? "disabled" : ""}>${T(plan === p.id ? "Forfait sélectionné · démo" : p.id === "enterprise" ? "Choisir Enterprise · sur mesure" : "Choisir en démonstration", plan === p.id ? "Selected plan · demo" : p.id === "enterprise" ? "Choose Enterprise · custom" : "Select demo plan")}</button></article>`).join("")}</div>${["business", "enterprise"].includes(plan) ? businessWorkspaceMarkup(shop) : ""}<div class="plan-conditions"><h3>${T("Conditions communes", "Common conditions")}</h3><p>${T("La commission dépend du forfait et porte sur les produits. Les frais de livraison sont calculés séparément. Enterprise nécessite un taux négocié configuré par l’administration avant une commande de démonstration.", "Commission depends on the plan and applies to products. Delivery fees are calculated separately. Enterprise requires a negotiated rate configured by the administrator before a demo order.")}</p><p>${T("Le badge vérifié est attribué après contrôle manuel du vendeur ; l’abonnement ne remplace pas la vérification. Les comptes d’équipe, l’API, le support prioritaire et les mises en avant sont des services prévus, soumis aux conditions du lancement.", "The verified badge requires manual seller review; a plan does not replace verification. Team accounts, API, priority support and promotional visibility are planned services subject to launch terms.")}</p></div></section>`;
+}
+const advertisingCategoryLabels = {
+  all: ["Toutes les publicités", "All advertisements"],
+  products: ["Produits", "Products"],
+  payments: ["Paiement & Mobile Money", "Payment & Mobile Money"],
+  logistics: ["Logistique", "Logistics"],
+  benefits: ["YAVIYA Benefits", "YAVIYA Benefits"],
+};
+function adminAdvertisingMarkup() {
+  const list = heroSlides.map((s, i) => ({
+      ...s,
+      id: i + 1,
+      category:
+        i === 4
+          ? "payments"
+          : i === 5
+            ? "logistics"
+            : i === 0 || i === 6
+              ? "benefits"
+              : "products",
+    })),
+    filtered = list.filter(
+      (s) => adAdminCategory === "all" || s.category === adAdminCategory,
+    );
+  return `<section><h2>${T("Administration des publicités", "Advertisement administration")}</h2><p>${T("Les filtres de campagne et le nombre de publicités sont réservés à cette vue administrateur de démonstration.", "Campaign filters and advertisement counts are reserved for this demo administrator view.")}</p><div class="dashboard-kpis"><div><span>${T("Total des publicités", "Total advertisements")}</span><b>${list.length}</b></div><div><span>${T("Résultats filtrés", "Filtered results")}</span><b>${filtered.length}</b></div></div><label>${T("Filtrer par catégorie", "Filter by category")}<select id="admin-ad-category">${Object.entries(
+    advertisingCategoryLabels,
+  )
+    .map(
+      ([id, label]) =>
+        `<option value="${id}" ${adAdminCategory === id ? "selected" : ""}>${T(...label)}</option>`,
+    )
+    .join(
+      "",
+    )}</select></label><div class="table-wrap"><table><thead><tr><th>${T("Campagne", "Campaign")}</th><th>${T("Annonceur", "Advertiser")}</th><th>${T("Catégorie", "Category")}</th><th>${T("État", "Status")}</th></tr></thead><tbody>${filtered.map((s) => `<tr><td><img class="admin-ad-thumb" src="${s.img}" alt=""><b>${T(...s.title)}</b></td><td>${esc(s.tag)}</td><td>${T(...advertisingCategoryLabels[s.category])}</td><td>${T("Concept de démonstration", "Demo concept")}</td></tr>`).join("")}</tbody></table></div><p class="demo-note">${T("Aucun partenariat commercial ni paiement publicitaire réel. Les impressions et clics ne sont pas mesurés dans cette version.", "No real commercial partnership or advertising payment. Impressions and clicks are not measured in this version.")}</p></section>`;
+}
+const subscriptionSeller = showSeller;
+showSeller = function () {
+  subscriptionSeller();
+  if (activeRole !== "seller") return;
+  const panel = $('#role-content [data-dashboard-panel="subscriptions"]');
+  panel.innerHTML = sellerSubscriptionsMarkup();
+  panel.querySelector("#seller-billing").onchange = (e) => {
+    sellerBilling = e.target.value;
+    showSeller();
+  };
+};
+const advertisingAdmin = showAdmin;
+showAdmin = function () {
+  advertisingAdmin();
+  if (activeRole !== "admin") return;
+  const panel = $('#role-content [data-dashboard-panel="advertising"]');
+  panel.innerHTML = adminAdvertisingMarkup();
+  panel.querySelector("#admin-ad-category").onchange = (e) => {
+    adAdminCategory = e.target.value;
+    showAdmin();
+  };
+};
+document.addEventListener(
+  "click",
+  (e) => {
+    const b = e.target.closest("[data-select-plan]");
+    if (!b || activeRole !== "seller") return;
+    e.stopImmediatePropagation();
+    const shop = shops.find((s) => s.id === selectedSeller);
+    shop.demoPlan = b.dataset.selectPlan;
+    showSeller();
+    toast(
+      T(
+        "Forfait sélectionné en démonstration, sans facturation",
+        "Plan selected in the demo, without billing",
+      ),
+    );
+  },
+  true,
+);
+content.delivery += `<h3>${T("Livraison express", "Express delivery")}</h3><p>${T("Option à domicile : 15 000 FC par colis vendeur, tarif provisoire. Délai estimé de 6 à 12 heures après validation, selon la zone et la disponibilité du coursier. À confirmer avant lancement.", "Home delivery option: FC 15,000 per seller parcel, provisional rate. Estimated 6–12 hours after confirmation, depending on area and courier availability. To be confirmed before launch.")}</p>`;
+if (activeRole === "seller") showSeller();
+if (activeRole === "admin") showAdmin();
+
+function businessWorkspaceMarkup(shop) {
+  const ids = shop.demoEnterpriseStores || [shop.id],
+    stores = shops.filter((s) => ids.includes(s.id));
+  return `<section class="business-workspace"><span class="eyebrow">BUSINESS · ${T("ESPACE ENTREPRISE", "ENTERPRISE WORKSPACE")}</span><h3>${T("Votre réseau de boutiques", "Your shop network")}</h3><p class="demo-note">${T("Regroupement illustratif pendant cette visite. Les boutiques proposées sont fictives. Les droits collaborateurs et la propriété des boutiques seront vérifiés au lancement.", "Illustrative grouping during this visit. Listed shops are fictional. Team permissions and shop ownership will be verified at launch.")}</p><form id="business-stores"><fieldset><legend>${T("Boutiques du réseau de démonstration", "Demo network shops")}</legend>${shops
+    .filter((s) => ownedSellerIds().includes(s.id))
+    .map(
+      (s) =>
+        `<label><input type="checkbox" name="enterprise-store" value="${s.id}" ${ids.includes(s.id) ? "checked" : ""} ${s.id === shop.id ? "disabled" : ""}>${esc(s.name)} · ${esc(s.city)}</label>`,
+    )
+    .join(
+      "",
+    )}</fieldset><button class="primary">${T("Actualiser mon réseau", "Update my network")}</button></form><div class="dashboard-kpis"><div><span>${T("Boutiques du réseau", "Network shops")}</span><b>${stores.length}</b></div><div><span>${T("Produits du réseau", "Network products")}</span><b>${products.filter((p) => ids.includes(p.seller)).length}</b></div><div><span>${T("Commandes du réseau", "Network orders")}</span><b>${orders.filter((o) => o.items.some((p) => ids.includes(p.seller))).length}</b></div></div><div class="table-wrap"><table><thead><tr><th>${T("Boutique", "Shop")}</th><th>${T("Produits", "Products")}</th><th>${T("Commandes", "Orders")}</th><th>${T("Valeur produits commandés", "Ordered product value")}</th></tr></thead><tbody>${stores
+    .map((s) => {
+      const items = orders.flatMap((o) =>
+        o.items.filter((p) => p.seller === s.id),
+      );
+      return `<tr><td>${esc(s.name)}<br><small>${esc(s.city)}</small></td><td>${products.filter((p) => p.seller === s.id).length}</td><td>${orders.filter((o) => o.items.some((p) => p.seller === s.id)).length}</td><td>${money(items.reduce((n, p) => n + p.price * p.q, 0))}</td></tr>`;
+    })
+    .join(
+      "",
+    )}</tbody></table></div><p>${T("Pour gérer une boutique, utilisez le sélecteur de boutique du tableau de bord. Les stocks, commandes et portefeuilles restent propres à chaque boutique.", "Use the dashboard shop selector to manage a shop. Each shop keeps its own stock, orders and wallet.")}</p></section>`;
+}
+document.addEventListener("submit", (e) => {
+  if (e.target.id !== "business-stores") return;
+  e.preventDefault();
+  const shop = shops.find((s) => s.id === selectedSeller);
+  shop.demoEnterpriseStores = [
+    ...new Set([
+      shop.id,
+      ...[...e.target.querySelectorAll("[name=enterprise-store]:checked")].map(
+        (x) => +x.value,
+      ),
+    ]),
+  ];
+  showSeller();
+  toast(T("Réseau actualisé en démonstration", "Demo network updated"));
+});

@@ -1,73 +1,69 @@
-# YAVIYA Market
+# YAVIYA — nouvelle version complète (1.1.0)
 
-Nouvelle vitrine e-commerce responsive pour **YAVIYA**, pensée comme une marketplace locale premium pour la RDC. L'interface met en avant les créateurs, les produits locaux et les garanties de confiance, avec recherche, filtres, favoris et panier interactifs.
+Version complète indépendante issue de la version 31 de YAVIYA « Votre marché, à portée de main », avec les corrections d'achat immédiat, de connexion indépendante et de retour produit. Frontend, backend, API, migrations, tests et photos sont accessibles comme fichiers séparés dans le dépôt public. L'ancienne vitrine de huit produits est conservée dans `legacy-vitrine/` ; le build principal utilise désormais la version complète.
 
-## Lancer le site
+[Rôle de chaque fichier](docs/FILES.md) · [Lancer et tester les parcours](docs/DEMO.md)
 
-Prérequis : Node.js 22 ou supérieur.
+## Ce qui est conservé
+
+Catalogue multi-vendeurs, catégories, favoris, comparateur, galerie de photos, recherche, panier, deux marchés, français/anglais, communes de Kinshasa et Lubumbashi, FAQ, assistant local, inscriptions vendeur/livreur, vérification manuelle, commandes partagées, disponibilité et rémunération indicative du livreur, messages, preuve de livraison privée et évaluations. Les règles métier du backend original sont conservées.
+
+## Installation locale
+
+Node.js **24** est requis.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Ouvrir ensuite [http://127.0.0.1:3000](http://127.0.0.1:3000).
-
-## Commandes
+Ouvrir http://127.0.0.1:3000. Les migrations sont appliquées automatiquement au démarrage local. La base SQLite se trouve dans `.local/`, exclue de Git. La connexion utilise un e-mail ou un téléphone et un mot de passe de 12 à 128 caractères. Le profil conserve son formulaire d'origine et ses identifiants YVC/YVYS/YVYC.
 
 ```bash
-npm run check  # vérifications statiques
-npm test       # contrôles statiques et tests catalogue/parcours
-npm run build  # copie la version publiable dans dist/
-npm start      # sert la version construite
+npm test
+npm run build
+npm start
 ```
 
-## Fonctionnalités
+## Activer l'installation Vercel
 
-- Accueil éditorial responsive et navigation mobile.
-- Catalogue filtrable par sélection et catégorie.
-- Recherche instantanée, favoris et panier latéral.
-- Bloc d'impact dédié aux vendeurs et artisans locaux.
-- Inscription newsletter avec confirmation visuelle.
-- Accessibilité de base : libellés, focus, textes alternatifs et régions dynamiques.
+Le projet GitHub doit être relié au projet Vercel `yaviyaecosystem`, avec la racine du dépôt comme Root Directory. `vercel.json` configure `npm run build`, le dossier `dist` et la fonction API indépendante. Utiliser Node.js 24.
 
-Les images de démonstration sont chargées depuis Unsplash. Pour une mise en production, remplacez-les par les visuels officiels des vendeurs YAVIYA et connectez le catalogue ainsi que le panier aux API métier.
+1. Créer ou connecter une base **Turso/libSQL** dédiée à cette installation. Elle conserve le SQL SQLite du backend original et évite une réécriture des règles métier.
+2. Ajouter `TURSO_DATABASE_URL` et `TURSO_AUTH_TOKEN` aux environnements Production et Preview du projet Vercel. Idéalement utiliser une base distincte pour les previews ; ne pas exposer ces valeurs au frontend.
+3. Copier `.env.example` vers `.env` dans un terminal local de confiance et renseigner les mêmes valeurs, puis exécuter `npm run db:migrate`. La migration est idempotente et refuse les erreurs plutôt que de continuer avec un schéma partiel.
+4. Pour créer le propriétaire administrateur, renseigner un identifiant distinct `OWNER_LOGIN` et un mot de passe choisi par le propriétaire dans `.env`, puis exécuter `npm run db:owner`. Cette opération ne peut pas être effectuée depuis le navigateur. Supprimer ensuite ces deux valeurs de `.env` ; elles ne sont pas nécessaires au serveur.
+5. Déployer la branche validée, puis vérifier la connexion, le profil, les documents, commandes et messages sur la preview avant la fusion dans `main`.
 
-## Architecture du catalogue
+**Sans la base et ses variables, la vitrine peut se charger mais les API répondent 503. Cela ne constitue pas une installation complète.** Aucun stockage temporaire en mémoire ou sur `/tmp` n'est utilisé comme base de production. Le build n'a pas besoin de secrets et ne modifie pas la base.
 
-| Fichier | Rôle |
-| --- | --- |
-| `catalog/products.js` | Les huit produits de démonstration, conservés dans leur ordre original. |
-| `catalog/catalog.js` | Contrat asynchrone `listProducts()`, création d'un catalogue avec un fournisseur et choix du fournisseur local. |
-| `app.js` | Charge le catalogue une fois, puis gère l'affichage, la recherche, les filtres, les favoris et le panier. |
-| `scripts/build.mjs` | Copie aussi le dossier `catalog/` dans `dist/`. |
-| `scripts/check.mjs` | Vérifie les fichiers JavaScript et le raccordement de l'adaptateur. |
-| `tests/catalog.test.mjs` | Vérifie les données, le remplacement du fournisseur et les parcours recherche/panier. |
+## Architecture
 
-`index.html` charge déjà `app.js` comme module. `package.json` déclare également les modules ES pour permettre aux tests Node d'importer les mêmes sources. Aucun outil de compilation ni dépendance supplémentaire n'est nécessaire.
+| Emplacement                  | Rôle                                                                                      |
+| ---------------------------- | ----------------------------------------------------------------------------------------- |
+| `frontend/pages/`            | Cinq pages HTML, dont les portails RDC et Congo                                           |
+| `frontend/src/`              | Scripts classiques du catalogue, comptes et parcours métier                               |
+| `frontend/styles/`           | Styles responsive                                                                         |
+| `frontend/assets/images/`    | 34 images illustratives locales                                                           |
+| `api/handler.js`             | Fonction Vercel : conversion HTTP vers les gestionnaires existants                        |
+| `backend/application.js`     | Session indépendante et identité injectée côté serveur                                    |
+| `backend/auth.js`            | Comptes, mots de passe scrypt, sessions serveur, déconnexion et limitation des tentatives |
+| `backend/database.js`        | Adaptation D1 vers libSQL : requêtes, transactions et stockage privé des fichiers         |
+| `backend/worker/`            | Gestionnaires métier de la version 31, avec identités YAVIYA indépendantes                |
+| `database/migrations/`       | Migrations originales et tables des accès indépendants                                    |
+| `scripts/`                   | Serveur local, build, migrations, création propriétaire et contrôles                      |
+| `tests/independent.test.mjs` | Tests des accès privés et du parcours partagé à quatre comptes distincts                  |
 
-## Futurs points d'intégration
+Les documents privés sont enregistrés en BLOB dans la base, avec leurs types MIME. Ils ne sont pas copiés dans `dist`, ni exposés sous une URL publique ; les routes conservent les contrôles du backend original. Pour un volume important, un stockage de fichiers privé séparé devra remplacer cet adaptateur. Les limites de téléversement de la plateforme et de la base devront être vérifiées sur le projet actif avant l'ouverture publique ; les contrôles existants de 8 Mo et de signature des fichiers sont conservés.
 
-Le point de remplacement se trouve dans `catalog/catalog.js` : substituer un fournisseur API à `localSource` dans `createCatalog(localSource)`. Le fournisseur peut être synchrone ou asynchrone ; `app.js` attend toujours `catalog.listProducts()` et reçoit des copies des produits.
+## Limites de la version originale et de cette restauration
 
-Exemple de fournisseur à ajouter lorsque l'API sera disponible (l'URL et le format ci-dessous sont illustratifs) :
+Cette installation est indépendante de ChatGPT : elle n'utilise ni sa connexion, ni sa base, ni ses fichiers privés, et n'appelle pas le site original. Elle démarre avec une **nouvelle base**. Les profils, commandes, messages et documents déjà enregistrés dans ChatGPT Sites ne sont pas exportés ni migrés par ce projet.
 
-```js
-const apiSource = {
-  async listProducts() {
-    const response = await fetch('/api/products');
-    if (!response.ok) throw new Error(`Catalogue : HTTP ${response.status}`);
-    const payload = await response.json();
-    return payload.products.map(mapApiProduct);
-  }
-};
-export const catalog = createCatalog(apiSource);
-```
+Les produits et boutiques initiaux sont illustratifs. Les paiements Mobile Money/carte, l'escrow financier, les reversements automatiques, les abonnements payants et l'envoi d'e-mails ne sont pas activés. Google est intégré au code, mais exige la configuration du client OAuth avant de fonctionner. La connexion indépendante n'ajoute pas de vérification e-mail/SMS ni de récupération automatique du mot de passe. Les paiements à réception et règlements manuels conservent leurs déclarations de suivi, sans transfert automatique de fonds. L'assistant reste celui du site original.
 
-- **Transport et mapping** : implémenter `mapApiProduct` dans le fournisseur pour retourner `{ id, name, shop, price, tag, category, image }`. Les ID doivent rester des nombres uniques et stables ; `price` est un nombre en FC. Les filtres actuels utilisent les libellés exacts `Nouveau`, `Populaire`, `Mode`, `Beauté`, `Maison`, `Tech`. Conserver l'ordre fourni pour conserver l'ordre d'affichage.
-- **Chargement et erreurs** : les erreurs du fournisseur sont propagées. Avant d'activer une API réelle, ajouter les états chargement/erreur et la relance autour du chargement dans `app.js`. Le fournisseur local actuel ne dépend d'aucun réseau.
-- **Données externes** : valider les réponses et adapter le rendu par `innerHTML` à du contenu non fiable avant de brancher des champs vendeur sur une API. Les données de démonstration actuelles restent identiques.
-- **Recherche et pagination serveur** : la recherche reste locale, sur le nom et la boutique, avec les règles existantes. Une pagination ou un filtrage distant nécessitera un contrat de requête supplémentaire ; `listProducts()` doit actuellement fournir la sélection complète.
-- **Panier et commande** : le panier conserve ses objets produits en mémoire, y compris les ajouts multiples du même article. La persistance et la commande constituent une intégration distincte ; le backend devra vérifier prix et disponibilité au moment de commander.
+Validation locale : syntaxe des sources, fichiers référencés, migrations, transactions atomiques, session/CSRF, isolation des profils, refus d'identité falsifiée, pièces privées, validation manuelle vendeur/livreur, création de produit, commande idempotente, acceptation, préparation, affectation livreur, preuve privée, réception et notes vendeur/livreur. La configuration et les ressources réelles Vercel/Turso doivent encore être activées et testées à distance. Aucun test visuel navigateur n'a encore été exécuté dans cet environnement.
 
-Ce refactoring n'active aucune API ni paiement. Les favoris restent liés au rendu actuel et le bouton « Voir plus » conserve sa notification existante.
+## Connexion Google / Gmail
+
+Créer un client OAuth Google de type Web. Ajouter exactement GOOGLE_REDIRECT_URI aux URI autorisés, puis définir GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET et GOOGLE_REDIRECT_URI sur Vercel. Le secret reste côté serveur. Aucun accès Gmail ni lecture des messages : seuls openid, email et profile sont demandés. Les comptes Google sont séparés des comptes par mot de passe pour éviter un rattachement par e-mail non vérifié.

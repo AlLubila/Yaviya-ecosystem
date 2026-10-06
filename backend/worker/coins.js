@@ -1,0 +1,121 @@
+const reply = (data, status = 200) =>
+  Response.json(data, { status, headers: { "Cache-Control": "no-store" } });
+export const rewardProducts = {
+  30: { name: "Câble USB-C", cost: 1200 },
+  29: { name: "Cravate élégante", cost: 2000 },
+  28: { name: "Montre classique", cost: 5500 },
+  17: { name: "Savon doux 3 pièces", cost: 1800 },
+  23: { name: "Ring light 26 cm", cost: 6500 },
+};
+async function wallet(env, userId) {
+  const total = await env.DB.prepare(
+    "SELECT COALESCE(SUM(delta),0) AS balance FROM coin_events WHERE user_id=?",
+  )
+    .bind(userId)
+    .first();
+  const rows = await env.DB.prepare(
+    "SELECT kind,delta,reference,created_at FROM coin_events WHERE user_id=? ORDER BY created_at DESC LIMIT 50",
+  )
+    .bind(userId)
+    .all();
+  return {
+    balance: Number(total.balance),
+    events: rows.results,
+    rewards: rewardProducts,
+    demo: true,
+    coinValueFC: 10,
+    earnPerFC: 2000,
+  };
+}
+export async function handleCoins(request, env) {
+  const url = new URL(request.url),
+    userId = request.headers.get("yaviya-user-id");
+  if (!userId) return reply({ error: "Sign in required" }, 401);
+  try {
+    if (request.method === "GET") return reply(await wallet(env, userId));
+    if (request.method !== "POST")
+      return reply({ error: "Method not allowed" }, 405);
+    if (request.headers.get("origin") !== url.origin)
+      return reply({ error: "Origin rejected" }, 403);
+    const exists = await env.DB.prepare(
+      "SELECT user_id FROM customers WHERE user_id=?",
+    )
+      .bind(userId)
+      .first();
+    if (!exists) return reply({ error: "Create your profile first" }, 409);
+    const d = await request.json();
+    let delta, reference, id;
+    if (d.kind === "demo_credit") {
+      delta = 5000;
+      reference = "Crédit de démonstration";
+      id = userId + ":demo_credit";
+    } else if (d.kind === "earn") {
+      if (
+        typeof d.reference !== "string" ||
+        !/^YV-[A-Z0-9-]{4,50}$/.test(d.reference) ||
+        !Number.isInteger(d.amount) ||
+        d.amount < 0 ||
+        d.amount > 100000000
+      )
+        return reply({ error: "Invalid demo order" }, 400);
+      delta = Math.floor(d.amount / 2000);
+      reference = d.reference;
+      id = userId + ":earn:" + d.reference;
+    } else if (d.kind === "redeem") {
+      const p = rewardProducts[d.productId];
+      if (
+        !p ||
+        typeof d.reference !== "string" ||
+        !/^[a-f0-9-]{36}$/.test(d.reference)
+      )
+        return reply({ error: "Invalid reward" }, 400);
+      delta = -p.cost;
+      reference = String(d.productId);
+      id = userId + ":redeem:" + d.reference;
+    } else return reply({ error: "Unknown operation" }, 400);
+    const prior = await env.DB.prepare(
+      "SELECT delta,reference FROM coin_events WHERE id=? AND user_id=?",
+    )
+      .bind(id, userId)
+      .first();
+    if (prior) {
+      if (
+        (d.kind !== "earn" && prior.delta !== delta) ||
+        prior.reference !== reference
+      )
+        return reply({ error: "Reference mismatch" }, 409);
+      return reply({
+        ...(await wallet(env, userId)),
+        replayed: true,
+        eventId: id,
+      });
+    }
+    const inserted = await env.DB.prepare(
+      "INSERT OR IGNORE INTO coin_events (id,user_id,kind,delta,reference,created_at) SELECT ?,?,?,?,?,? WHERE ? >= 0 OR COALESCE((SELECT SUM(delta) FROM coin_events WHERE user_id=?),0) + ? >= 0",
+    )
+      .bind(
+        id,
+        userId,
+        d.kind,
+        delta,
+        reference,
+        Date.now(),
+        delta,
+        userId,
+        delta,
+      )
+      .run();
+    if (!inserted.meta?.changes) {
+      const repeated = await env.DB.prepare(
+        "SELECT id FROM coin_events WHERE id=? AND user_id=?",
+      )
+        .bind(id, userId)
+        .first();
+      if (!repeated) return reply({ error: "Insufficient coins" }, 409);
+    }
+    return reply({ ...(await wallet(env, userId)), eventId: id });
+  } catch (e) {
+    console.error("Yavicoins unavailable", e);
+    return reply({ error: "Wallet temporarily unavailable" }, 503);
+  }
+}

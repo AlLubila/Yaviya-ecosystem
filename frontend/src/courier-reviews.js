@@ -1,0 +1,508 @@
+// Private courier conversations and ratings linked to confirmed deliveries.
+let courierWorkspaceTab = "missions",
+  courierHistoryPeriod = "30",
+  selectedMessageCourier = null,
+  courierChatToken = 0;
+const reviewCache = { buyer: [], courier: [], seller: [], admin: [] };
+let pendingReceiptRating = null;
+async function reviewsAPI(view = "buyer", body) {
+  const r = await fetch("/api/delivery-reviews?view=" + view, {
+      method: body ? "POST" : "GET",
+      headers: body ? { "Content-Type": "application/json" } : {},
+      body: body ? JSON.stringify(body) : undefined,
+    }),
+    d = await r.json();
+  if (!r.ok)
+    throw Error(
+      T(
+        "Évaluations indisponibles. Vérifiez la réception et réessayez.",
+        "Ratings unavailable. Check receipt confirmation and retry.",
+      ),
+    );
+  return d;
+}
+async function refreshReviews(view = "buyer") {
+  try {
+    reviewCache[view] = await reviewsAPI(view);
+    if (view === "buyer") renderBuyerReviewButtons();
+    return true;
+  } catch {
+    return false;
+  }
+}
+function reviewFor(id) {
+  return reviewCache.buyer.find((r) => r.orderId === id);
+}
+function renderBuyerReviewButtons() {
+  if (activeRole !== "buyer") return;
+  $("#modal-content")
+    .querySelectorAll("[data-shared-order]")
+    .forEach((article) => {
+      article.querySelector(".order-review-action")?.remove();
+      const o = orders.find((x) => x.id === article.dataset.sharedOrder);
+      if (!o || o.step !== 3 || !o.buyerConfirmed || o.cancelled) return;
+      const rated = reviewFor(o.id);
+      article.insertAdjacentHTML(
+        "beforeend",
+        `<div class="order-review-action">${
+          rated
+            ? `<p>${T("Évaluation enregistrée", "Rating saved")} · ${Object.entries(
+                rated.sellerScores,
+              )
+                .map(
+                  ([id, n]) =>
+                    `${esc(shops.find((s) => s.id === +id)?.name || T("Vendeur", "Seller"))} : ${n}/5`,
+                )
+                .join(
+                  " · ",
+                )}${rated.courierScore ? " · " + T("Livreur", "Courier") + " : " + rated.courierScore + "/5" : ""}</p>`
+            : `<button class="primary" data-rate-delivery="${esc(o.id)}">${o.assignedCourier ? T("Noter le vendeur et le livreur", "Rate seller and courier") : T("Noter le vendeur", "Rate the seller")}</button>`
+        }</div>`,
+      );
+    });
+}
+function starsField(name, label) {
+  return `<fieldset class="rating-field"><legend>${esc(label)} *</legend><div class="rating-stars">${[1, 2, 3, 4, 5].map((n) => `<label><input type="radio" name="${name}" value="${n}" required><span aria-hidden="true">★</span><small>${n}</small><span class="sr-only">${n} ${T("étoile(s) sur 5", "stars out of 5")}</span></label>`).join("")}</div></fieldset>`;
+}
+function showDeliveryRating(id) {
+  const o = orders.find((x) => x.id === id);
+  if (!o || o.step !== 3 || !o.buyerConfirmed || o.cancelled) return;
+  const sellers = [...new Set(o.items.map((i) => i.seller))];
+  openCustomerPage(() =>
+    open(
+      `<section class="delivery-rating-page"><button class="add" data-action="tracking">${T("Mes commandes", "My orders")}</button><h2>${T("Évaluer ma livraison", "Rate my delivery")}</h2><p>${esc(o.id)}</p>${reviewFor(id) ? `<p>${T("Vous avez déjà évalué cette livraison. Merci !", "You have already rated this delivery. Thank you!")}</p>` : `<form id="delivery-rating-form" class="editor">${sellers.map((s) => starsField("seller-" + s, T("Vendeur : ", "Seller: ") + (shops.find((x) => x.id === s)?.name || s))).join("")}${o.assignedCourier ? starsField("courier", T("Livreur : ", "Courier: ") + (couriers.find((c) => c.id === o.assignedCourier)?.name || "YAVIYA Courier")) : `<p>${T("Aucun livreur affecté à cette remise : évaluez le vendeur.", "No courier was assigned to this handover: rate the seller.")}</p>`}<label>${T("Votre commentaire (facultatif)", "Your comment (optional)")}<textarea name="comment" maxlength="1500" rows="4"></textarea></label><p id="delivery-rating-error" role="alert"></p><button class="primary">${T("Enregistrer mon évaluation", "Save my rating")}</button></form>`}</section>`,
+    ),
+  );
+  const form = $("#delivery-rating-form");
+  if (form)
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const button = form.querySelector("button.primary");
+      button.disabled = true;
+      const d = new FormData(form),
+        scores = Object.fromEntries(
+          sellers.map((s) => [s, +d.get("seller-" + s)]),
+        );
+      try {
+        await reviewsAPI("buyer", {
+          orderId: id,
+          sellerScores: scores,
+          sellerNames: Object.fromEntries(
+            sellers.map((s) => [
+              s,
+              shops.find((x) => x.id === s)?.name || "Boutique " + s,
+            ]),
+          ),
+          courierScore: o.assignedCourier ? +d.get("courier") : null,
+          comment: d.get("comment") || "",
+        });
+        await refreshReviews("buyer");
+        showTracking();
+        toast(
+          T(
+            "Merci, vos évaluations sont enregistrées.",
+            "Thank you, your ratings have been saved.",
+          ),
+        );
+      } catch (err) {
+        $("#delivery-rating-error").textContent = err.message;
+        if (button.isConnected) button.disabled = false;
+      }
+    };
+}
+const reviewsTracking = showTracking;
+showTracking = function () {
+  reviewsTracking();
+  renderBuyerReviewButtons();
+  refreshReviews("buyer");
+};
+const reviewsSave = saveDelivery;
+saveDelivery = async function () {
+  const result = await reviewsSave();
+  if (result && pendingReceiptRating) {
+    const id = pendingReceiptRating;
+    pendingReceiptRating = null;
+    const o = orders.find((o) => o.id === id);
+    if (o?.buyerConfirmed && activeRole === "buyer") {
+      await refreshReviews("buyer");
+      if (activeRole === "buyer" && !reviewFor(id)) showDeliveryRating(id);
+    }
+  }
+  return result;
+};
+function ratingSummary(rows, role, seller) {
+  const scores = rows.flatMap((r) =>
+    role === "courier"
+      ? r.courierScore
+        ? [r.courierScore]
+        : []
+      : role === "seller"
+        ? r.sellerScores[seller]
+          ? [r.sellerScores[seller]]
+          : []
+        : Object.values(r.sellerScores).concat(
+            r.courierScore ? [r.courierScore] : [],
+          ),
+  );
+  return {
+    count: scores.length,
+    average: scores.length
+      ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)
+      : "—",
+  };
+}
+function reviewsMarkup(rows, role) {
+  const relevant =
+    role === "seller"
+      ? rows.filter((r) => r.sellerScores[selectedSeller])
+      : rows;
+  const summary = ratingSummary(relevant, role, selectedSeller);
+  const sellerScores = relevant.flatMap((r) => Object.values(r.sellerScores)),
+    courierSummary = ratingSummary(relevant, "courier"),
+    sellerAverage = sellerScores.length
+      ? (sellerScores.reduce((a, b) => a + b, 0) / sellerScores.length).toFixed(
+          1,
+        )
+      : "—";
+  return `<div class="dashboard-kpis"><div><span>${role === "admin" ? T("Note vendeurs", "Seller rating") : T("Note moyenne", "Average rating")}</span><b>${role === "admin" ? sellerAverage : summary.average}${summary.count ? " / 5" : ""}</b></div><div><span>${T("Évaluations reçues", "Ratings received")}</span><b>${summary.count}</b></div>${role === "admin" ? `<div><span>${T("Note livreurs", "Courier rating")}</span><b>${courierSummary.average}${courierSummary.count ? " / 5" : ""}</b></div>` : ""}</div><div class="table-wrap"><table class="reviews-table"><thead><tr><th>${T("Commande", "Order")}</th><th>${T("Date", "Date")}</th>${role === "courier" ? "" : `<th>${T("Vendeur", "Seller")}</th>`}${role === "seller" ? "" : `<th>${T("Livreur", "Courier")}</th>`}<th>${T("Commentaire", "Comment")}</th></tr></thead><tbody>${
+    relevant
+      .map(
+        (r) =>
+          `<tr><td>${esc(r.orderId)}</td><td>${new Date(r.createdAt).toLocaleDateString(language === "en" ? "en-GB" : "fr-FR")}</td>${
+            role === "courier"
+              ? ""
+              : `<td>${Object.entries(r.sellerScores)
+                  .filter(([id]) => role !== "seller" || +id === selectedSeller)
+                  .map(
+                    ([id, n]) =>
+                      esc(r.sellerNames[id] || "Boutique " + id) +
+                      " · " +
+                      n +
+                      "/5",
+                  )
+                  .join("<br>")}</td>`
+          }${role === "seller" ? "" : `<td>${r.courierScore ? (role === "admin" && r.courierName ? esc(r.courierName) + " · " : "") + r.courierScore + "/5" : "—"}</td>`}<td>${esc(r.comment) || "—"}</td></tr>`,
+      )
+      .join("") ||
+    `<tr><td colspan="5">${T("Aucune évaluation reçue pour le moment.", "No ratings received yet.")}</td></tr>`
+  }</tbody></table></div>`;
+}
+async function loadReviewPanel(role) {
+  const host = $('[data-review-panel="' + role + '"]');
+  if (!host) return;
+  host.textContent = T("Chargement…", "Loading…");
+  const ok = await refreshReviews(role);
+  if (!host.isConnected) return;
+  host.innerHTML = ok
+    ? reviewsMarkup(reviewCache[role], role)
+    : `<p role="alert">${T("Évaluations indisponibles.", "Ratings unavailable.")}</p><button class="add" data-refresh-reviews="${role}">${T("Réessayer", "Retry")}</button>`;
+}
+function courierNavigation() {
+  return `<nav class="courier-tabs" aria-label="${T("Espace livreur", "Courier workspace")}">${[
+    ["missions", "Mes livraisons", "My deliveries"],
+    ["reviews", "Mes évaluations", "My ratings"],
+    ["discussion", "Discussion avec YAVIYA", "Talk to YAVIYA"],
+  ]
+    .map(
+      ([id, fr, en]) =>
+        `<button class="add" data-courier-tab="${id}" aria-pressed="${courierWorkspaceTab === id}">${T(fr, en)}</button>`,
+    )
+    .join("")}</nav>`;
+}
+function courierHistoryMarkup() {
+  const days = {
+      7: 7,
+      30: 30,
+      quarter: 90,
+      semester: 180,
+      year: 365,
+      all: Infinity,
+    }[courierHistoryPeriod],
+    list = orders.filter(
+      (o) =>
+        o.assignedCourier === "yaviya" &&
+        o.step === 3 &&
+        (days === Infinity ||
+          Date.now() - (o.createdAt || Date.now()) <= days * 86400000),
+    );
+  return `<section class="courier-history"><h3>${T("Historique des livraisons", "Delivery history")}</h3><label>${T("Période", "Period")}<select id="courier-history-period">${[
+    ["7", "7 jours", "7 days"],
+    ["30", "30 jours", "30 days"],
+    ["quarter", "Trimestre", "Quarter"],
+    ["semester", "Semestre", "Six months"],
+    ["year", "Année", "Year"],
+    ["all", "Tout", "All"],
+  ]
+    .map(
+      ([v, fr, en]) =>
+        `<option value="${v}" ${courierHistoryPeriod === v ? "selected" : ""}>${T(fr, en)}</option>`,
+    )
+    .join(
+      "",
+    )}</select></label><div class="table-wrap"><table><thead><tr><th>${T("Commande", "Order")}</th><th>${T("Localité", "Location")}</th><th>${T("Statut", "Status")}</th><th>${T("Preuve", "Proof")}</th><th>${T("Note client", "Customer rating")}</th></tr></thead><tbody>${list.map((o) => `<tr><td>${esc(o.id)}</td><td>${esc(o.city)} · ${esc(o.commune || "")}</td><td>${sharedDeliveryLabel(o)}</td><td>${o.deliveryProof ? `<a href="/api/demo-delivery/proof?orderId=${encodeURIComponent(o.id)}&country=${window.YAVIYA_COUNTRY}" target="_blank" rel="noopener">${T("Voir la photo", "View photo")}</a>` : "—"}</td><td>${reviewCache.courier.find((r) => r.orderId === o.id)?.courierScore ? reviewCache.courier.find((r) => r.orderId === o.id).courierScore + "/5" : T("En attente", "Pending")}</td></tr>`).join("") || `<tr><td colspan="5">${T("Aucune livraison terminée sur cette période.", "No completed deliveries in this period.")}</td></tr>`}</tbody></table></div></section>`;
+}
+const developedCourier = showCourier;
+showCourier = function () {
+  if (activeRole !== "courier") return developedCourier();
+  if (
+    courierWorkspaceTab === "discussion" &&
+    $("#role-content .courier-tabs") &&
+    $("#courier-chat-form")
+  )
+    return;
+  if (
+    courierWorkspaceTab === "reviews" &&
+    $("#role-content .courier-tabs") &&
+    $("[data-review-panel=courier]")
+  )
+    return;
+  if (courierWorkspaceTab !== "missions") {
+    open(
+      `${courierNavigation()}<h2>${courierWorkspaceTab === "reviews" ? T("Mes évaluations", "My ratings") : T("Discussion avec l’administration", "Talk to administration")}</h2>${courierWorkspaceTab === "reviews" ? '<div data-review-panel="courier"></div>' : courierDiscussionMarkup("courier")}`,
+    );
+    orderFocus(false);
+    if (courierWorkspaceTab === "reviews") loadReviewPanel("courier");
+    else loadCourierDiscussion("courier");
+    return;
+  }
+  developedCourier();
+  const host = $("#role-content");
+  host.insertAdjacentHTML("afterbegin", courierNavigation());
+  if (!courierCanWork()) return;
+  const mine = orders.filter(
+    (o) => o.assignedCourier === "yaviya" && !o.cancelled,
+  );
+  const avg = ratingSummary(reviewCache.courier, "courier");
+  host
+    .querySelector("h2")
+    .insertAdjacentHTML(
+      "afterend",
+      `<div class="dashboard-kpis courier-kpis"><div><span>${T("Missions en cours", "Active assignments")}</span><b>${mine.filter((o) => o.step < 3).length}</b></div><div><span>${T("Livraisons terminées", "Completed deliveries")}</span><b>${mine.filter((o) => o.step === 3).length}</b></div><div><span>${T("Note client", "Customer rating")}</span><b>${avg.average}${avg.count ? " / 5" : ""}</b></div></div>`,
+    );
+  host
+    .querySelectorAll(".courier-missions [data-shared-order]")
+    .forEach((a) => {
+      const o = orders.find((o) => o.id === a.dataset.sharedOrder);
+      if (o?.step === 3) a.hidden = true;
+    });
+  host.insertAdjacentHTML("beforeend", courierHistoryMarkup());
+  $("#courier-history-period").onchange = (e) => {
+    courierHistoryPeriod = e.target.value;
+    showCourier();
+  };
+  $("#role-description").textContent = T(
+    "Disponibilité, missions, preuves de livraison, évaluations et assistance.",
+    "Availability, assignments, delivery proofs, ratings and support.",
+  );
+};
+async function courierMessagesAPI(body, target, view) {
+  const q = new URLSearchParams();
+  if (target) q.set("courierUserId", target);
+  if (view === "courier") q.set("view", "courier");
+  const r = await fetch("/api/courier-messages?" + q, {
+      method: body ? "POST" : "GET",
+      headers: body ? { "Content-Type": "application/json" } : {},
+      body: body ? JSON.stringify(body) : undefined,
+    }),
+    d = await r.json();
+  if (!r.ok)
+    throw Error(
+      T(
+        "Créez un compte livreur pour discuter avec YAVIYA, ou réessayez si votre compte est déjà créé.",
+        "Create a courier account to talk to YAVIYA, or retry if your account already exists.",
+      ),
+    );
+  return d;
+}
+function courierDiscussionMarkup(role) {
+  return `<div class="seller-chat courier-chat"><aside id="courier-chat-threads"></aside><section><div id="courier-chat-messages" role="log" aria-live="polite">${T("Chargement…", "Loading…")}</div><form id="courier-chat-form" class="editor" hidden><label>${T("Votre message *", "Your message *")}<textarea name="message" rows="3" maxlength="2000" required></textarea></label><button class="primary">${T("Envoyer", "Send")}</button><p id="courier-chat-error" role="alert"></p></form></section></div>`;
+}
+async function loadCourierDiscussion(role) {
+  const token = ++courierChatToken,
+    host = $("#courier-chat-messages"),
+    threads = $("#courier-chat-threads"),
+    form = $("#courier-chat-form");
+  if (!host || !form) return;
+  try {
+    let d = await courierMessagesAPI(
+      null,
+      role === "admin" ? selectedMessageCourier : null,
+      role,
+    );
+    if (token !== courierChatToken || !host.isConnected) return;
+    if (role === "admin" && !d.isAdmin)
+      throw Error(
+        T("Accès administrateur requis.", "Administrator access required."),
+      );
+    if (role === "admin" && !d.courierUserId && d.threads.length) {
+      selectedMessageCourier = d.threads[0].userId;
+      d = await courierMessagesAPI(null, selectedMessageCourier, role);
+      if (token !== courierChatToken || !host.isConnected) return;
+    }
+    threads.innerHTML =
+      role === "admin"
+        ? d.threads
+            .map(
+              (t) =>
+                `<button class="add" type="button" data-message-courier="${esc(t.userId)}" aria-pressed="${t.userId === d.courierUserId}"><b>${esc(t.name)}</b>${t.publicId ? `<span>${esc(t.publicId)}</span>` : ""}<small>${t.status === "approved" ? T("Identité vérifiée", "Verified identity") : T("Vérification en cours", "Verification in progress")}</small></button>`,
+            )
+            .join("") ||
+          `<p>${T("Aucun compte livreur enregistré dans ce pays.", "No courier account registered in this country.")}</p>`
+        : "<b>YAVIYA</b><p>" +
+          T(
+            "Administration et assistance livreurs",
+            "Administration and courier support",
+          ) +
+          "</p>";
+    host.innerHTML =
+      d.messages
+        .map(
+          (m) =>
+            `<article class="seller-chat-message ${m.sender === role ? "outgoing" : ""}"><b>${m.sender === "admin" ? "YAVIYA" : T("Livreur", "Courier")}</b><p>${esc(m.message)}</p><small>${new Date(m.createdAt).toLocaleString(language === "en" ? "en-GB" : "fr-FR")}</small></article>`,
+        )
+        .join("") ||
+      "<p>" + T("Aucun message pour le moment.", "No messages yet.") + "</p>";
+    form.hidden = !d.courierUserId;
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const button = form.querySelector("button");
+      button.disabled = true;
+      try {
+        await courierMessagesAPI(
+          {
+            message: form.elements.message.value,
+            courierUserId: d.courierUserId,
+          },
+          null,
+          role,
+        );
+        form.elements.message.value = "";
+        await loadCourierDiscussion(role);
+      } catch (e) {
+        $("#courier-chat-error").textContent = e.message;
+      } finally {
+        if (button.isConnected) button.disabled = false;
+      }
+    };
+    host.scrollTop = host.scrollHeight;
+  } catch (e) {
+    if (host.isConnected) {
+      host.innerHTML = `<p role="alert">${esc(e.message)}</p><button class="add" data-refresh-courier-chat="${role}">${T("Réessayer", "Retry")}</button>${role === "courier" ? `<button class="add" data-client="register">${T("Créer / modifier mon compte", "Create / edit my account")}</button>` : ""}`;
+      form.hidden = true;
+    }
+  }
+}
+dashboardTabs.admin.push(
+  ["courier-discussions", "Discussions livreurs", "Courier conversations"],
+  ["reviews", "Évaluations clients", "Customer ratings"],
+);
+dashboardTabs.seller.push(["reviews", "Mes évaluations", "My ratings"]);
+const ratingsAdmin = showAdmin;
+showAdmin = function () {
+  ratingsAdmin();
+  if (activeRole !== "admin") return;
+  const c = $('[data-dashboard-panel="courier-discussions"]'),
+    r = $('[data-dashboard-panel="reviews"]');
+  if (c)
+    c.innerHTML = `<h2>${T("Discussions avec les livreurs", "Courier conversations")}</h2>${courierDiscussionMarkup("admin")}`;
+  if (r)
+    r.innerHTML = `<h2>${T("Évaluations des vendeurs et livreurs", "Seller and courier ratings")}</h2><div data-review-panel="admin"></div>`;
+  if (selectedDashTab.admin === "courier-discussions")
+    loadCourierDiscussion("admin");
+  if (selectedDashTab.admin === "reviews") loadReviewPanel("admin");
+};
+const ratingsSeller = showSeller;
+showSeller = function () {
+  ratingsSeller();
+  if (activeRole !== "seller") return;
+  const p = $('[data-dashboard-panel="reviews"]');
+  if (p)
+    p.innerHTML = `<h2>${T("Évaluations de ma boutique", "My shop ratings")}</h2><div data-review-panel="seller"></div>`;
+  if (selectedDashTab.seller === "reviews") loadReviewPanel("seller");
+};
+const ratingsDashTab = switchDashTab;
+switchDashTab = function (role, tab) {
+  ratingsDashTab(role, tab);
+  if (tab === "courier-discussions") loadCourierDiscussion("admin");
+  if (tab === "reviews") loadReviewPanel(role);
+};
+window.addEventListener(
+  "click",
+  (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.receipt) pendingReceiptRating = b.dataset.receipt;
+    if (b.dataset.rateDelivery) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      showDeliveryRating(b.dataset.rateDelivery);
+    }
+    if (b.dataset.courierTab) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      courierWorkspaceTab = b.dataset.courierTab;
+      if (typeof courierSettingsDirty !== "undefined")
+        courierSettingsDirty = false;
+      $("#role-content").innerHTML = "";
+      showCourier();
+      if (courierWorkspaceTab === "missions")
+        refreshReviews("courier").then(() => {
+          if (activeRole === "courier" && courierWorkspaceTab === "missions")
+            showCourier();
+        });
+    }
+    if (b.dataset.messageCourier) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      selectedMessageCourier = b.dataset.messageCourier;
+      loadCourierDiscussion("admin");
+    }
+    if (b.dataset.refreshCourierChat)
+      loadCourierDiscussion(b.dataset.refreshCourierChat);
+    if (b.dataset.refreshReviews) loadReviewPanel(b.dataset.refreshReviews);
+  },
+  true,
+);
+setInterval(() => {
+  if (document.hidden) return;
+  const role = activeRole;
+  if (
+    ((role === "courier" && courierWorkspaceTab === "discussion") ||
+      (role === "admin" && selectedDashTab.admin === "courier-discussions")) &&
+    $("#courier-chat-form") &&
+    !$("#courier-chat-form textarea")?.value.trim()
+  )
+    loadCourierDiscussion(role);
+  if (role === "courier") {
+    refreshReviews("courier").then(() => {
+      if (
+        activeRole === "courier" &&
+        courierWorkspaceTab === "reviews" &&
+        $("[data-review-panel=courier]")
+      )
+        $("[data-review-panel=courier]").innerHTML = reviewsMarkup(
+          reviewCache.courier,
+          "courier",
+        );
+    });
+  }
+  if (
+    ["seller", "admin"].includes(role) &&
+    selectedDashTab[role] === "reviews" &&
+    $('[data-review-panel="' + role + '"]')
+  )
+    refreshReviews(role).then(() => {
+      const panel = $('[data-review-panel="' + role + '"]');
+      if (panel) panel.innerHTML = reviewsMarkup(reviewCache[role], role);
+    });
+}, 5000);
+refreshReviews("buyer");
+if (activeRole === "courier") {
+  refreshReviews("courier").then(() => {
+    if (activeRole === "courier") showCourier();
+  });
+}
+if (activeRole === "admin") showAdmin();
+if (activeRole === "seller") showSeller();

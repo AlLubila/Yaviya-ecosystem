@@ -1,0 +1,267 @@
+// Illustrative offers: all displayed prices and shopping paths remain a demo.
+const offers = [
+  { id: 3, discount: 10, kind: "daily" },
+  { id: 4, discount: 15, kind: "daily" },
+];
+offers.forEach((o) => {
+  const p = products.find((p) => p.id === o.id);
+  p.regularPrice = p.price;
+  p.price = Math.round(p.price * (1 - o.discount / 100));
+  p.offer = o;
+});
+const promoCard = card;
+card = function (p) {
+  let html = promoCard(p);
+  if (p.offer)
+    html = html
+      .replace(
+        '<span class="price">',
+        `<span class="sale-pricing"><del>${money(p.regularPrice)}</del><span class="price">`,
+      )
+      .replace(`${money(p.price)}</span>`, `${money(p.price)}</span></span>`)
+      .replace(
+        '<div class="product-info">',
+        `<div class="product-info"><span class="offer-badge">−${p.offer.discount}% · ${T("Promo du jour", "Daily deal")}</span>`,
+      );
+  return html;
+};
+const catalog = $("#catalog");
+catalog.insertAdjacentHTML(
+  "beforebegin",
+  `<section class="deal-section" id="daily-promos"><div class="section-heading"><div><span class="eyebrow">${T("LA SÉLECTION DU JOUR", "TODAY’S SELECTION")}</span><h2>${T("Promo du jour", "Daily deals")}</h2></div><a class="add" href="publicite.html">${T("Voir les publicités", "View advertisements")}</a></div><div class="deal-grid" id="daily-products"></div></section>`,
+);
+function renderOffers() {
+  $("#daily-products").innerHTML = offers
+    .map((o) => products.find((p) => p.id === o.id))
+    .filter((p) => p.visible && p.approved && sellerInCurrentMarket(shopOf(p)))
+    .map(card)
+    .join("");
+}
+const promotionRender = render;
+render = function () {
+  promotionRender();
+  renderOffers();
+};
+render();
+let analyticsSource = "visit";
+const dashboardTabs = {
+  seller: [
+    ["overview", "Vue d’ensemble", "Overview"],
+    ["catalog", "Catalogue", "Catalogue"],
+    ["orders", "Commandes", "Orders"],
+    ["wallet", "Portefeuille", "Wallet"],
+    ["subscriptions", "Abonnements", "Subscriptions"],
+  ],
+  admin: [
+    ["overview", "Vue d’ensemble", "Overview"],
+    ["sellers", "Vendeurs", "Sellers"],
+    ["moderation", "Modération", "Moderation"],
+    ["finance", "Finance", "Finance"],
+    ["advertising", "Publicités", "Advertisements"],
+  ],
+};
+let selectedDashTab = { seller: "overview", admin: "overview" };
+let analyticsPeriod = "7";
+const periodLabels = {
+  7: ["7 jours", "7 days"],
+  30: ["30 jours", "30 days"],
+  quarter: ["Trimestre · 3 mois", "Quarter · 3 months"],
+  semester: ["Semestre · 6 mois", "Half year · 6 months"],
+  year: ["Annuel · 12 mois", "Year · 12 months"],
+};
+function periodBounds() {
+  const end = Date.now(),
+    start = new Date(end);
+  if (["7", "30"].includes(analyticsPeriod))
+    start.setUTCDate(start.getUTCDate() - Number(analyticsPeriod));
+  else {
+    const months = { quarter: 3, semester: 6, year: 12 }[analyticsPeriod],
+      day = start.getUTCDate();
+    start.setUTCDate(1);
+    start.setUTCMonth(start.getUTCMonth() - months);
+    const last = new Date(
+      Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 0),
+    ).getUTCDate();
+    start.setUTCDate(Math.min(day, last));
+  }
+  return { start: start.getTime(), end };
+}
+function analyticsFor(role) {
+  const { start, end } = periodBounds(),
+    seller = selectedSeller;
+  const relevant = orders.filter(
+    (o) =>
+      (o.createdAt || end) >= start &&
+      (o.createdAt || end) <= end &&
+      (role !== "seller" || o.items.some((i) => i.seller === seller)),
+  );
+  const bins = { 7: 7, 30: 10, quarter: 3, semester: 6, year: 12 }[
+    analyticsPeriod
+  ];
+  let series = Array(bins).fill(0);
+  relevant.forEach((o) => {
+    const idx = Math.min(
+      bins - 1,
+      Math.max(
+        0,
+        Math.floor((((o.createdAt || end) - start) / (end - start)) * bins),
+      ),
+    );
+    series[idx]++;
+  });
+  const example = analyticsSource === "example";
+  if (example)
+    series = Array.from(
+      { length: bins },
+      (_, i) => (role === "seller" ? 2 : 15) + ((i * 7 + bins) % 12),
+    );
+  const count = series.reduce((s, n) => s + n, 0),
+    amount = example
+      ? count * (role === "seller" ? 76500 : 88000)
+      : relevant.reduce(
+          (sum, o) =>
+            sum +
+            o.items
+              .filter((i) => role !== "seller" || i.seller === seller)
+              .reduce((s, i) => s + i.price * i.q, 0),
+          0,
+        );
+  const labels = series.map((_, i) =>
+    new Date(start + ((end - start) * (i + 1)) / bins).toLocaleDateString(
+      language === "en" ? "en-GB" : "fr-FR",
+      { day: "2-digit", month: "2-digit" },
+    ),
+  );
+  return {
+    count,
+    amount,
+    series,
+    labels,
+    pending: example
+      ? Math.ceil(count * 0.15)
+      : relevant.filter((o) =>
+          role === "seller" ? o.sellerSteps[seller] < 3 : o.step < 3,
+        ).length,
+  };
+}
+function chartBars(values, labels) {
+  const max = Math.max(1, ...values);
+  return `<div class="dashboard-bars" role="img" aria-label="${T("Commandes par période", "Orders by period")}">${values.map((v, i) => `<div><b>${v}</b><span class="bar-track"><span style="height:${(v / max) * 100}%"></span></span><small>${labels[i]}</small></div>`).join("")}</div>`;
+}
+function overviewMarkup(role) {
+  const a = analyticsFor(role),
+    catalogue =
+      role === "seller"
+        ? products.filter((p) => p.seller === selectedSeller)
+        : products,
+    visible = catalogue.filter(
+      (p) => p.visible && p.approved && sellerInCurrentMarket(shopOf(p)),
+    ).length;
+  const source = analyticsSource === "example";
+  return `<div class="dashboard-overview"><div class="overview-toolbar"><h2>${T("Vue d’ensemble", "Overview")}</h2><label>${T("Période", "Period")}<select id="analytics-period">${Object.entries(
+    periodLabels,
+  )
+    .map(
+      ([id, labels]) =>
+        `<option value="${id}" ${analyticsPeriod === id ? "selected" : ""}>${T(...labels)}</option>`,
+    )
+    .join(
+      "",
+    )}</select></label><label>${T("Données affichées", "Displayed data")}<select id="analytics-source"><option value="visit" ${!source ? "selected" : ""}>${T("Cette visite", "This visit")}</option><option value="example" ${source ? "selected" : ""}>${T("Exemple chiffré · démo", "Sample figures · demo")}</option></select></label></div><p class="demo-note">${source ? T("Exemple fictif pour visualiser le tableau de bord. Ces chiffres ne sont pas des ventes réelles et ne modifient pas les commandes ni les soldes.", "Fictional example to preview the dashboard. These figures are not real sales and do not change orders or balances.") : T("Indicateurs calculés à partir des commandes de démonstration créées pendant cette visite.", "Metrics calculated from demo orders created during this visit.")}</p><div class="dashboard-kpis"><div><span>${T("Commandes", "Orders")}</span><b>${a.count}</b></div><div><span>${T("Valeur des produits commandés", "Ordered product value")}</span><b>${money(a.amount)}</b></div><div><span>${T("Commandes en cours", "Orders in progress")}</span><b>${a.pending}</b></div><div><span>${T("Produits visibles", "Visible products")}</span><b>${visible}</b></div></div><div class="dashboard-panels"><section class="dashboard-panel"><h3>${T("Commandes", "Orders")} · ${T(...periodLabels[analyticsPeriod])}</h3>${chartBars(a.series, a.labels)}${!source ? `<p class="demo-note">${T("Les commandes de cette visite sont filtrées sur la période choisie. Les périodes sans historique apparaissent à zéro.", "Orders from this visit are filtered by the selected period. Periods with no recorded history show zero.")}</p>` : ""}</section><section class="dashboard-panel"><h3>${T("État du catalogue", "Catalogue status")}</h3>${[
+    ["Produits visibles", "Visible products", visible],
+    [
+      "En attente de validation",
+      "Awaiting approval",
+      catalogue.filter((p) => !p.approved).length,
+    ],
+    [
+      "Stock faible (≤ 3)",
+      "Low stock (≤ 3)",
+      catalogue.filter((p) => p.stock <= 3).length,
+    ],
+  ]
+    .map(
+      ([fr, en, n]) =>
+        `<div class="delivery-row"><span>${T(fr, en)}</span><b>${n}</b></div>`,
+    )
+    .join(
+      "",
+    )}<button class="add" data-dashboard-tab="${role === "seller" ? "catalog" : "moderation"}">${T("Gérer le catalogue", "Manage catalogue")}</button></section></div>${role === "admin" ? `<div class="dashboard-panel"><h3>${T("Suivi de la plateforme", "Platform monitoring")}</h3><div class="delivery-row"><span>${T("Boutiques de démonstration", "Demo shops")}</span><b>${shops.length}</b></div><div class="delivery-row"><span>${T("Vendeurs à contrôler", "Sellers awaiting review")}</span><b>${shops.filter((s) => !s.reviewed).length}</b></div><div class="delivery-row"><span>${T("Demandes de retrait en attente", "Pending withdrawal requests")}</span><b>${withdrawals.filter((w) => w.status === "En attente").length}</b></div></div>` : ""}</div>`;
+}
+function frameDashboard(role) {
+  if (activeRole === "buyer") return;
+  const host = $("#role-content");
+  const nodes = [...host.childNodes];
+  host.innerHTML = `<div class="dashboard-layout"><aside class="dashboard-sidebar"><strong>${T("Tableau de bord", "Dashboard")}</strong>${dashboardTabs[role].map(([id, fr, en]) => `<button data-dashboard-tab="${id}" aria-pressed="false">${T(fr, en)}</button>`).join("")}<a href="publicite.html">${T("Publicités YAVIYA", "YAVIYA advertisements")}</a></aside><section class="dashboard-main"><div id="dashboard-common"></div>${dashboardTabs[role].map(([id]) => `<section data-dashboard-panel="${id}" hidden></section>`).join("")}</section></div>`;
+  const common = host.querySelector("#dashboard-common");
+  let target = common;
+  for (const node of nodes) {
+    if (node.nodeType === 1 && node.tagName === "H3") {
+      const h = node.textContent.toLowerCase();
+      let key =
+        role === "seller"
+          ? h.includes("catalog")
+            ? "catalog"
+            : h.includes("commande") || h.includes("order")
+              ? "orders"
+              : "wallet"
+          : h.includes("vendeur") || h.includes("seller")
+            ? h.includes("reversement")
+              ? "finance"
+              : "sellers"
+            : h.includes("modération") || h.includes("moderation")
+              ? "moderation"
+              : h.includes("commission") || h.includes("reversement")
+                ? "finance"
+                : "overview";
+      target = host.querySelector(`[data-dashboard-panel="${key}"]`);
+    }
+    if (node.nodeType === 1 && node.classList.contains("metrics")) continue;
+    target.appendChild(node);
+  }
+  const over = host.querySelector('[data-dashboard-panel="overview"]');
+  over.insertAdjacentHTML("afterbegin", overviewMarkup(role));
+  host.querySelector("#analytics-source").onchange = (e) => {
+    analyticsSource = e.target.value;
+    role === "seller" ? showSeller() : showAdmin();
+  };
+  host.querySelector("#analytics-period").onchange = (e) => {
+    analyticsPeriod = e.target.value;
+    role === "seller" ? showSeller() : showAdmin();
+  };
+  switchDashTab(role, selectedDashTab[role]);
+}
+function switchDashTab(role, tab) {
+  if (!dashboardTabs[role].some((t) => t[0] === tab)) tab = "overview";
+  selectedDashTab[role] = tab;
+  $("#role-content")
+    .querySelectorAll("[data-dashboard-panel]")
+    .forEach((p) => (p.hidden = p.dataset.dashboardPanel !== tab));
+  $("#role-content")
+    .querySelectorAll("[data-dashboard-tab]")
+    .forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.dataset.dashboardTab === tab)),
+    );
+}
+const dashboardSeller = showSeller;
+showSeller = function () {
+  dashboardSeller();
+  frameDashboard("seller");
+};
+const dashboardAdmin = showAdmin;
+showAdmin = function () {
+  dashboardAdmin();
+  frameDashboard("admin");
+};
+document.addEventListener(
+  "click",
+  (e) => {
+    const b = e.target.closest("[data-dashboard-tab]");
+    if (!b) return;
+    e.stopImmediatePropagation();
+    switchDashTab(activeRole, b.dataset.dashboardTab);
+  },
+  true,
+);
+if (activeRole === "seller") showSeller();
+if (activeRole === "admin") showAdmin();
