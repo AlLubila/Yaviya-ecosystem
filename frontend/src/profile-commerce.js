@@ -572,7 +572,7 @@ window.addEventListener(
 );
 
 async function buyNow(id) {
-  const product = products.find((p) => p.id === id);
+  let product = products.find((p) => p.id === id);
   if (
     !product ||
     !product.visible ||
@@ -590,13 +590,35 @@ async function buyNow(id) {
     if (window.ensureYaviyaSignedIn) await window.ensureYaviyaSignedIn();
     if (activeRole !== "buyer") setRole("buyer");
     if (typeof loadMarket === "function" && !(await loadMarket(false))) {
-      toast(
-        marketError || T("Réessayez dans un instant.", "Please retry shortly."),
+      throw Error(
+        marketError ||
+          T(
+            "Service de commande indisponible. Réessayez.",
+            "Order service unavailable. Retry.",
+          ),
       );
-      return;
+    }
+    if (typeof customerAPI === "function")
+      customerProfile = await customerAPI();
+    product = products.find((p) => p.id === id);
+    if (
+      !product ||
+      !product.visible ||
+      !product.approved ||
+      product.stock < 1 ||
+      !sellerInCurrentMarket(shopOf(product))
+    ) {
+      throw Error(
+        T(
+          "Ce produit n’est plus disponible.",
+          "This product is no longer available.",
+        ),
+      );
     }
   } catch (error) {
-    toast(error.message);
+    open(
+      `<h2>${T("Finaliser mon achat", "Complete my purchase")}</h2><p>${esc(product?.title || "")}</p><p role="alert">${esc(error.message)}</p><p>${T("Votre achat n’a pas été enregistré. Réessayez lorsque le service est disponible.", "Your purchase was not saved. Retry when the service is available.")}</p><button class="primary" data-buy-now="${id}">${T("Réessayer cet achat", "Retry this purchase")}</button>`,
+    );
     return;
   }
   const selection = new Map([[id, 1]]);
@@ -627,7 +649,13 @@ window.addEventListener(
     if (!button) return;
     e.preventDefault();
     e.stopImmediatePropagation();
-    buyNow(+button.dataset.buyNow);
+    if (button.disabled) return;
+    button.disabled = true;
+    button.setAttribute("aria-busy", "true");
+    buyNow(+button.dataset.buyNow).finally(() => {
+      button.disabled = false;
+      button.removeAttribute("aria-busy");
+    });
   },
   true,
 );

@@ -13,6 +13,7 @@ const comparableProduct = (p) =>
         "seller",
         "title",
         "category",
+        "subcategory",
         "price",
         "stock",
         "visible",
@@ -124,28 +125,42 @@ function marketReadView() {
     ? "buyer"
     : activeRole;
 }
+let marketLoadPromise = null,
+  marketLoadingRole = null;
 async function loadMarket(redraw = true) {
-  if (marketLoading) return false;
+  if (marketLoadPromise) {
+    const pendingRole = marketLoadingRole;
+    const loaded = await marketLoadPromise;
+    return pendingRole === activeRole ? loaded : loadMarket(redraw);
+  }
   marketLoading = true;
   const role = activeRole;
-  try {
-    let data;
+  marketLoadingRole = role;
+  marketLoadPromise = (async () => {
     try {
-      data = await marketAPI("?view=" + marketReadView());
+      let data;
+      try {
+        data = await marketAPI("?view=" + marketReadView());
+      } catch (e) {
+        if (e.status !== 403 || role !== "courier") throw e;
+        data = await marketAPI("?view=buyer");
+      }
+      if (role !== activeRole) return false;
+      applyMarket(data, redraw);
+      return true;
     } catch (e) {
-      if (e.status !== 403 || role !== "courier") throw e;
-      data = await marketAPI("?view=buyer");
+      marketError = e.message;
+      setSyncStatus(e.message, true);
+      return false;
+    } finally {
+      marketLoading = false;
     }
-    if (role !== activeRole) return false;
-    applyMarket(data, redraw);
-    return true;
-  } catch (e) {
-    marketError = e.message;
-    setSyncStatus(e.message, true);
-    return false;
+  })();
+  try {
+    return await marketLoadPromise;
   } finally {
-    marketLoading = false;
-    if (role !== activeRole) queueMicrotask(() => loadMarket());
+    marketLoadPromise = null;
+    marketLoadingRole = null;
   }
 }
 const sharedRole = setRole;
@@ -311,6 +326,13 @@ showCheckout = function (selection = cart) {
   form.onsubmit = async (event) => {
     event.preventDefault();
     if (deliverySaving || !form.reportValidity()) return;
+    if (!isDeliveryCityEnabled(form.querySelector("#city").value)) {
+      $("#market-checkout-error").textContent = T(
+        "Cette ville n’est pas encore ouverte aux commandes.",
+        "Orders are not yet open in this city.",
+      );
+      return;
+    }
     const button = form.querySelector("button.primary");
     button.disabled = true;
     const mode = form.querySelector("[name=deliveryMode]:checked").value,

@@ -204,106 +204,7 @@ showRegister = function () {
   };
   display();
 };
-const categorySections = [
-  [
-    "High-tech",
-    "High-tech",
-    "Electronics",
-    [
-      ["Téléphones", "Phones", "téléphone"],
-      ["Casques & écouteurs", "Headphones & earphones", "casque"],
-      ["Câbles & accessoires", "Cables & accessories", "câble"],
-      ["Informatique", "Computing", "ordinateur"],
-    ],
-  ],
-  [
-    "Mode",
-    "Habits homme",
-    "Men’s clothing",
-    [
-      ["Chemises", "Shirts", "chemise"],
-      ["Cravates", "Ties", "cravate"],
-      ["Complets & vestes", "Suits & jackets", "veste"],
-      ["Baskets & chaussures", "Trainers & shoes", "baskets"],
-      ["Montres", "Watches", "montre"],
-    ],
-  ],
-  [
-    "Mode",
-    "Habits femme",
-    "Women’s clothing",
-    [
-      ["Robes", "Dresses", "robe"],
-      ["Sacs à main", "Handbags", "sac à main"],
-      ["Chaussures", "Shoes", "baskets"],
-      ["Accessoires", "Accessories", "accessoire"],
-    ],
-  ],
-  [
-    "Maison",
-    "Maison & quotidien",
-    "Home & household",
-    [
-      ["Vaisselle", "Tableware", "assiettes"],
-      ["Ventilateurs", "Fans", "ventilateur"],
-      [
-        "Électricité & rallonges",
-        "Electrical items & extension leads",
-        "rallonge",
-      ],
-      ["Décoration", "Decor", "photo personnalisée"],
-    ],
-  ],
-  [
-    "Beauté",
-    "Beauté & soins",
-    "Beauty & care",
-    [
-      ["Savons", "Soap", "savon"],
-      ["Laits & soins du corps", "Body lotions & care", "lait"],
-      ["Cosmétiques", "Cosmetics", "cosmétique"],
-    ],
-  ],
-  [
-    "Enfants",
-    "Enfants & bébé",
-    "Kids & baby",
-    [
-      ["Jouets", "Toys", "jouets"],
-      ["Jeux éducatifs", "Educational games", "jeu éducatif"],
-      ["Habits enfants", "Kids’ clothing", "habit"],
-    ],
-  ],
-  [
-    "Épicerie",
-    "Épicerie",
-    "Groceries",
-    [
-      ["Riz & céréales", "Rice & cereals", "riz"],
-      ["Café & boissons", "Coffee & drinks", "café"],
-      ["Produits alimentaires", "Food products", ""],
-    ],
-  ],
-  [
-    "Création",
-    "Photo & création",
-    "Photo & creativity",
-    [
-      ["Éclairage & ring lights", "Lighting & ring lights", "ring light"],
-      ["Photos personnalisées", "Custom photos", "photo personnalisée"],
-    ],
-  ],
-  [
-    "Musique",
-    "Musique",
-    "Music",
-    [
-      ["Guitares", "Guitars", "guitare"],
-      ["Claviers", "Keyboards", "clavier"],
-      ["Instruments", "Instruments", ""],
-    ],
-  ],
-];
+const categorySections = window.YAVIYA_MARKET_CONFIG.categorySections;
 showCategories = function () {
   openCustomerPage(() =>
     open(
@@ -348,6 +249,8 @@ function categoryProducts(section, item) {
     const title = normalize(p.title);
     if (section === 1 && /femme|enfant|bebe/.test(title)) return false;
     if (section === 2 && /homme|enfant|bebe/.test(title)) return false;
+    if (p.subcategory) return p.subcategory === children[item][0];
+    if (!term && section >= 9) return false;
     return terms.some((t) => title.includes(t));
   });
 }
@@ -371,13 +274,16 @@ function showCategoryProducts(section, item) {
     : T(group[1], group[2]);
   let list = child
     ? categoryProducts(section, item)
-    : [
-        ...new Map(
-          group[3]
-            .flatMap((_, i) => categoryProducts(section, i))
-            .map((p) => [p.id, p]),
-        ).values(),
-      ];
+    : products.filter(
+        (p) =>
+          p.category === group[0] &&
+          p.visible &&
+          p.approved &&
+          sellerInCurrentMarket(shopOf(p)) &&
+          (section !== 1 || !/femme|enfant|bebe/.test(p.title.toLowerCase())) &&
+          (section !== 2 || !/homme|enfant|bebe/.test(p.title.toLowerCase())),
+      );
+
   if (categoryPageSort === "rating")
     list.sort((a, b) => reviewStats(b).rating - reviewStats(a).rating);
   else if (categoryPageSort !== "default")

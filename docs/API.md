@@ -23,3 +23,7 @@ Les requêtes JSON et multipart exigent les droits du compte, la bonne origine e
 ## Double authentification
 
 Les routes `mfa-status`, `mfa-setup`, `mfa-enable`, `mfa-challenge`, `mfa-verify`, `mfa-recovery` et `mfa-disable` sous `/api/auth/` sont détaillées dans [TWO_FACTOR.md](TWO_FACTOR.md). Le frontend doit gérer `requiresTwoFactor` avant de considérer la connexion terminée. Les connexions Google utilisent le même challenge.
+
+## Classement et destinations
+
+`/api/marketplace/catalogue` accepte une `subcategory` facultative parmi les sous-catégories de la famille choisie et la conserve. `/api/marketplace/orders` refuse toute destination RDC hors Kinshasa/Lubumbashi, même pour `hand` et `relay`. La source unique est `backend/data/market-config.json` ; voir [CATALOGUE_COVERAGE.md](CATALOGUE_COVERAGE.md).

@@ -59,3 +59,16 @@ window.regionalContentCopy = (s) =>
         .replace(/Lubumbashi/g, "Pointe-Noire")
         .replace(/République démocratique du Congo/g, "République du Congo")
     : s;
+
+window.isDeliveryCityEnabled = (city) =>
+  window.YAVIYA_COUNTRY === "CG"
+    ? Object.hasOwn(communes, city)
+    : window.YAVIYA_MARKET_CONFIG.deliverableCities.includes(city);
+window.checkoutCityOptions = () => {
+  if (window.YAVIYA_COUNTRY === "CG") return countryCityOptions();
+  const active = window.YAVIYA_MARKET_CONFIG.deliverableCities;
+  const future = window.YAVIYA_MARKET_CONFIG.cities.filter(
+    (c) => !active.includes(c),
+  );
+  return `<optgroup label="${T("Commandes ouvertes", "Orders open")}">${active.map((c) => `<option value="${c}">${c}</option>`).join("")}</optgroup><optgroup label="${T("Extension à venir — commandes fermées", "Upcoming expansion — orders closed")}">${future.map((c) => `<option value="${c}" disabled>${c} · ${T("bientôt disponible", "coming soon")}</option>`).join("")}</optgroup>`;
+};

@@ -146,7 +146,7 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `legacy-vitrine/tests/catalog.test.mjs`                  | Ancienne vitrine de huit produits : catalog.test.mjs. Conservée hors du build principal.                   |
 | `legacy-vitrine/vercel.json`                             | Ancienne vitrine de huit produits : vercel.json. Conservée hors du build principal.                        |
 | `package-lock.json`                                      | Versions exactes utilisées par npm ci.                                                                     |
-| `package.json`                                           | Commandes npm, dépendances et version 1.2.0.                                                               |
+| `package.json`                                           | Commandes npm, dépendances et version 1.3.0.                                                               |
 | `scripts/build.mjs`                                      | Assemble les sources frontend classées en fichiers publics plats dans dist.                                |
 | `scripts/check.mjs`                                      | Syntaxe des sources et présence des assets référencés.                                                     |
 | `scripts/create-owner.mjs`                               | Crée le propriétaire admin dans un terminal de confiance.                                                  |
@@ -156,7 +156,7 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `tests/purchase.test.mjs`                                | Tests photos, achat immédiat et Google non configuré.                                                      |
 | `vercel.json`                                            | Build, routage API et fonction Vercel.                                                                     |
 
-Fichiers ajoutés en version 1.2.0 :
+Fichiers ajoutés en version 1.3.0 :
 
 | Fichier | Rôle |
 | --- | --- |
@@ -166,3 +166,13 @@ Fichiers ajoutés en version 1.2.0 :
 | `tests/two-factor.test.mjs` | Vérification des garanties de sécurité et parcours API. |
 | `tests/two-factor-ui.test.mjs` | Parcours des formulaires frontend reliés au backend local. |
 | `docs/TWO_FACTOR.md` | Configuration serveur et parcours utilisateur 2FA. |
+
+Fichiers ajoutés en version 1.3.0 :
+
+| Fichier | Rôle |
+| --- | --- |
+| `backend/data/market-config.json` | Source unique des catégories, villes de RDC et villes ouvertes aux commandes. |
+| `tests/checkout-flow.test.mjs` | Parcours des pages complètes et API réelle : clic, profil, commande, catégories et zones fermées. |
+| `docs/CATALOGUE_COVERAGE.md` | Comportement, données géographiques, sources et diagnostic du déploiement. |
+
+Le build génère `dist/market-config.js` depuis le JSON ; ce fichier généré n’est pas une source à modifier.

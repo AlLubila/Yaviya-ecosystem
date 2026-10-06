@@ -207,13 +207,33 @@ editProduct = function (id) {
   let busy = false;
   const previewUrls = new Set();
   open(
-    `<h2>${T(product ? "Modifier le produit" : "Ajouter un produit", product ? "Edit product" : "Add a product")}</h2><form id="product-form" class="editor"><label>${T("Nom du produit *", "Product name *")}<input name="title" maxlength="100" required value="${esc(product?.title || "")}"></label><label>${T("Catégorie", "Category")}<select name="category">${[...new Set(products.map((p) => p.category))].map((category) => `<option ${category === product?.category ? "selected" : ""}>${esc(category)}</option>`).join("")}</select></label><div class="product-editor-values"><label>${T("Prix", "Price")} (${window.YAVIYA_COUNTRY === "CG" ? "FCFA" : "FC"})<input name="price" type="number" min="1" max="1000000000" required value="${product?.price || ""}"></label><label>${T("Stock", "Stock")}<input name="stock" type="number" min="0" max="100000" step="1" required value="${product?.stock ?? 0}"></label></div><section class="product-photo-editor"><h3>${T("Photos du produit", "Product photos")}</h3><p>${T("Ajoutez jusqu’à 8 photos. La première est la photo principale du catalogue.", "Add up to 8 photos. The first is the main catalogue photo.")}</p><label class="photo-upload-choice">${T("Ajouter plusieurs photos", "Add multiple photos")}<input id="product-photo-files" name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><p class="photo-upload-limits">${T("JPG, PNG ou WebP · 8 Mo maximum par photo.", "JPG, PNG or WebP · maximum 8 MB per photo.")}</p><div id="product-photo-previews" class="product-photo-previews"></div></section><label class="product-visible-choice"><input name="visible" type="checkbox" ${!product || product.visible ? "checked" : ""}>${T("Afficher après validation du produit par l’admin", "Show after administrator approval")}</label><p id="product-photo-error" role="alert"></p><p id="product-photo-progress" role="status" aria-live="polite"></p><div class="product-editor-actions"><button class="primary" type="submit">${T("Enregistrer le produit", "Save product")}</button><button class="add" type="button" id="cancel-product-edit">${T("Annuler", "Cancel")}</button></div></form>`,
+    `<h2>${T(product ? "Modifier le produit" : "Ajouter un produit", product ? "Edit product" : "Add a product")}</h2><form id="product-form" class="editor"><label>${T("Nom du produit *", "Product name *")}<input name="title" maxlength="100" required value="${esc(product?.title || "")}"></label><label>${T("Catégorie", "Category")}<select name="category">${[...new Set([...window.YAVIYA_MARKET_CONFIG.categorySections.map((s) => s[0]), ...products.map((p) => p.category)])].map((category) => `<option ${category === product?.category ? "selected" : ""}>${esc(category)}</option>`).join("")}</select></label><div class="product-editor-values"><label>${T("Prix", "Price")} (${window.YAVIYA_COUNTRY === "CG" ? "FCFA" : "FC"})<input name="price" type="number" min="1" max="1000000000" required value="${product?.price || ""}"></label><label>${T("Stock", "Stock")}<input name="stock" type="number" min="0" max="100000" step="1" required value="${product?.stock ?? 0}"></label></div><section class="product-photo-editor"><h3>${T("Photos du produit", "Product photos")}</h3><p>${T("Ajoutez jusqu’à 8 photos. La première est la photo principale du catalogue.", "Add up to 8 photos. The first is the main catalogue photo.")}</p><label class="photo-upload-choice">${T("Ajouter plusieurs photos", "Add multiple photos")}<input id="product-photo-files" name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><p class="photo-upload-limits">${T("JPG, PNG ou WebP · 8 Mo maximum par photo.", "JPG, PNG or WebP · maximum 8 MB per photo.")}</p><div id="product-photo-previews" class="product-photo-previews"></div></section><label class="product-visible-choice"><input name="visible" type="checkbox" ${!product || product.visible ? "checked" : ""}>${T("Afficher après validation du produit par l’admin", "Show after administrator approval")}</label><p id="product-photo-error" role="alert"></p><p id="product-photo-progress" role="status" aria-live="polite"></p><div class="product-editor-actions"><button class="primary" type="submit">${T("Enregistrer le produit", "Save product")}</button><button class="add" type="button" id="cancel-product-edit">${T("Annuler", "Cancel")}</button></div></form>`,
   );
   const form = $("#product-form"),
     input = $("#product-photo-files"),
     previews = $("#product-photo-previews"),
     error = $("#product-photo-error"),
     progress = $("#product-photo-progress");
+  form.elements.category
+    .closest("label")
+    .insertAdjacentHTML(
+      "afterend",
+      `<label>${T("Sous-catégorie", "Subcategory")}<select name="subcategory"><option value="">${T("Non précisée", "Not specified")}</option></select></label>`,
+    );
+  function categoryChildren() {
+    const children = window.YAVIYA_MARKET_CONFIG.categorySections
+      .filter((s) => s[0] === form.elements.category.value)
+      .flatMap((s) => s[3]);
+    form.elements.subcategory.innerHTML =
+      `<option value="">${T("Non précisée", "Not specified")}</option>` +
+      [...new Map(children.map((c) => [c[0], c])).values()]
+        .map(([fr, en]) => `<option value="${esc(fr)}">${T(fr, en)}</option>`)
+        .join("");
+    if (product?.category === form.elements.category.value)
+      form.elements.subcategory.value = product.subcategory || "";
+  }
+  form.elements.category.onchange = categoryChildren;
+  categoryChildren();
   function cleanPreviews() {
     previewUrls.forEach((url) => URL.revokeObjectURL(url));
     previewUrls.clear();
@@ -344,6 +364,7 @@ editProduct = function (id) {
         data = {
           title,
           category,
+          subcategory: form.elements.subcategory.value,
           price,
           stock,
           visible,

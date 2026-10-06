@@ -1,8 +1,8 @@
-# YAVIYA — nouvelle version complète (1.2.0)
+# YAVIYA — nouvelle version complète (1.3.0)
 
 Version complète indépendante issue de la version 31 de YAVIYA « Votre marché, à portée de main », avec les corrections d'achat immédiat, de connexion indépendante et de retour produit. Frontend, backend, API, migrations, tests et photos sont accessibles comme fichiers séparés dans le dépôt public. L'ancienne vitrine de huit produits est conservée dans `legacy-vitrine/` ; le build principal utilise désormais la version complète.
 
-[Double authentification](docs/TWO_FACTOR.md) · [Rôle de chaque fichier](docs/FILES.md) · [Lancer et tester les parcours](docs/DEMO.md)
+[Catalogue et couverture](docs/CATALOGUE_COVERAGE.md) · [Double authentification](docs/TWO_FACTOR.md) · [Rôle de chaque fichier](docs/FILES.md) · [Lancer et tester les parcours](docs/DEMO.md)
 
 ## Ce qui est conservé
 
@@ -71,3 +71,7 @@ Créer un client OAuth Google de type Web. Ajouter exactement GOOGLE_REDIRECT_UR
 ## Double authentification
 
 Le bouton **Sécurité · 2FA** permet de configurer une application Authenticator, confirmer un premier code et télécharger 8 codes de secours. Les connexions par mot de passe et Google passent par le second facteur pour les comptes protégés. Configurer `MFA_ENCRYPTION_KEY` et appliquer la migration 0014 avant le déploiement. Les étapes, garanties et limites figurent dans [le guide 2FA](docs/TWO_FACTOR.md).
+
+## Catalogue et couverture 1.3.0
+
+19 familles et 72 sous-catégories, avec sélection vendeur et classement persistant. Le formulaire affiche 96 villes/agglomérations de RDC ; seules Kinshasa et Lubumbashi acceptent les commandes. Les autres restent désactivées jusqu’à l’extension, avec contrôle serveur dans les quatre modes. Le clic Acheter maintenant est testé à travers les vrais scripts, formulaires et API : synchronisation concurrente, profil et commande du produit choisi. Voir [le guide](docs/CATALOGUE_COVERAGE.md). Le site en ligne consulté répondait encore HTTP 503 sur son API de compte ; la configuration du projet cible reste à vérifier.

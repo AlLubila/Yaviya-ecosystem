@@ -1,3 +1,4 @@
+import marketConfig from "../data/market-config.json" with { type: "json" };
 import { accountIdentifiers } from "./account-identifiers.js";
 import {
   seedCatalogue,
@@ -353,6 +354,15 @@ function validateProduct(p) {
     p.desc.length > 5000
   )
     fail("Produit invalide");
+  if (
+    p.subcategory &&
+    (typeof p.subcategory !== "string" ||
+      !marketConfig.categorySections
+        .filter((s) => s[0] === p.category)
+        .flatMap((s) => s[3])
+        .some((c) => c[0] === p.subcategory))
+  )
+    fail("Sous-catégorie invalide");
   const images = p.images || [];
   if (
     !Array.isArray(images) ||
@@ -402,6 +412,7 @@ async function saveProduct(env, ctx, p) {
         "desc",
       ].map((key) => [key, p[key]]),
     ),
+    subcategory: p.subcategory || "",
     title: p.title.trim(),
     approved: ctx.isAdmin ? p.approved : false,
     family: typeof p.family === "string" ? p.family.slice(0, 100) : p.category,
@@ -436,6 +447,10 @@ async function saveProduct(env, ctx, p) {
   return { ok: true };
 }
 function deliveryFee(country, mode, city, commune, count) {
+  if (country === "CD" && !marketConfig.deliverableCities.includes(city))
+    fail(
+      "Les commandes sont ouvertes uniquement à Kinshasa et Lubumbashi. Cette ville sera disponible lors de l’extension.",
+    );
   const cities = country === "CG" ? deliveryCommunesCG : deliveryCommunes;
   if (!cities[city] || !["home", "express", "hand", "relay"].includes(mode))
     fail("Livraison invalide");

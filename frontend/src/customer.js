@@ -66,6 +66,9 @@ const categoryNames = {
   Création: "Photo & lighting",
   Musique: "Musical instruments",
 };
+for (const [cat, fr, en] of window.YAVIYA_MARKET_CONFIG.categorySections) {
+  if (!categoryNames[cat]) categoryNames[cat] = en;
+}
 function faqMarkup() {
   return faqItems
     .map(

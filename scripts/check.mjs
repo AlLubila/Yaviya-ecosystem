@@ -7,7 +7,9 @@ const folders = [
   "frontend/styles",
   "frontend/assets/images",
 ];
-const assets = new Map();
+const assets = new Map([
+  ["market-config.js", "backend/data/market-config.json"],
+]);
 for (const folder of folders)
   for (const name of await readdir(folder)) {
     assert(!assets.has(name), "Duplicate asset: " + name);

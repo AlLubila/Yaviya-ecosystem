@@ -15,3 +15,7 @@ Navigation produit : flèche Retour visible sur ordinateur et mobile. Pendant la
 ## Version 1.2.0 — double authentification
 
 Activation facultative par application TOTP avec QR code et clé manuelle, premier code obligatoire, 8 codes de secours à usage unique, connexion en deux étapes par mot de passe ou Google. Chiffrement des secrets, challenges courts, limitation des essais, protection contre le rejeu et invalidation des anciennes sessions. Configuration `MFA_ENCRYPTION_KEY` et migration 0014 nécessaires sur le serveur cible. Documentation : docs/TWO_FACTOR.md.
+
+## Version 1.3.0 — achat immédiat, catégories et couverture
+
+Le clic attend la synchronisation en cours et recharge explicitement le profil, puis vérifie le produit serveur. La reprise après inscription, une commande du seul article choisi et les erreurs persistantes sont testées avec les pages complètes et le backend SQLite. 19 familles, 72 sous-catégories, sélection dans l’éditeur vendeur et conservation côté serveur. Répertoire de 96 villes/agglomérations RDC ; seules Kinshasa et Lubumbashi sont ouvertes, avec refus des autres villes dans chaque mode, côté UI et serveur. Le répertoire est commercial et ne certifie pas les statuts administratifs actuels. Le backend du déploiement consulté répondait 503 et le projet n’était pas accessible par la connexion Vercel disponible.

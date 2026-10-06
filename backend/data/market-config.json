@@ -1,0 +1,319 @@
+{
+  "cities": [
+    "Aba",
+    "Aketi",
+    "Ariwara",
+    "Aru",
+    "Bandundu",
+    "Bangu",
+    "Baraka",
+    "Basankusu",
+    "Basoko",
+    "Bena-Dibele",
+    "Beni",
+    "Boende",
+    "Bolobo",
+    "Boma",
+    "Bondo",
+    "Bukavu",
+    "Bulungu",
+    "Bumba",
+    "Bunia",
+    "Buta",
+    "Butembo",
+    "Dibaya-Lubue",
+    "Dingila",
+    "Dungu",
+    "Gbadolite",
+    "Gemena",
+    "Goma",
+    "Gungu",
+    "Idiofa",
+    "Ilebo",
+    "Ingbokolo",
+    "Inkisi",
+    "Inongo",
+    "Isangi",
+    "Isiro",
+    "Kabinda",
+    "Kahemba",
+    "Kalemie",
+    "Kalima",
+    "Kamina",
+    "Kamituga",
+    "Kananga",
+    "Kaoze",
+    "Kasaji",
+    "Kasangulu",
+    "Kasongo",
+    "Kasongo-Lunda",
+    "Kenge",
+    "Kikwit",
+    "Kindu",
+    "Kinshasa",
+    "Kipushi",
+    "Kisangani",
+    "Kolwezi",
+    "Kongolo",
+    "Likasi",
+    "Lisala",
+    "Lodja",
+    "Lubao",
+    "Lubumbashi",
+    "Lubutu",
+    "Luebo",
+    "Luholu",
+    "Lukalaba",
+    "Lukula",
+    "Lusambo",
+    "Mahagi",
+    "Mangai",
+    "Manono",
+    "Masi-Manimba",
+    "Matadi",
+    "Mbandaka",
+    "Mbanza-Ngungu",
+    "Mbuji-Mayi",
+    "Mbuy-a-Tshow",
+    "Miabi",
+    "Mobayi-Mbongo",
+    "Mongbwalu",
+    "Muanda",
+    "Mwene-Ditu",
+    "Namoya",
+    "Ngandajika",
+    "Nioki",
+    "Oïcha",
+    "Punia",
+    "Rutshuru",
+    "Shabunda",
+    "Tshela",
+    "Tshikapa",
+    "Tshilenge",
+    "Tshimbulu",
+    "Uvira",
+    "Wamba",
+    "Watsa",
+    "Yangambi",
+    "Zongo"
+  ],
+  "deliverableCities": ["Kinshasa", "Lubumbashi"],
+  "categorySections": [
+    [
+      "High-tech",
+      "High-tech",
+      "Electronics",
+      [
+        ["Téléphones", "Phones", "téléphone"],
+        ["Casques & écouteurs", "Headphones & earphones", "casque"],
+        ["Câbles & accessoires", "Cables & accessories", "câble"],
+        ["Informatique", "Computing", "ordinateur"]
+      ]
+    ],
+    [
+      "Mode",
+      "Habits homme",
+      "Men’s clothing",
+      [
+        ["Chemises", "Shirts", "chemise"],
+        ["Cravates", "Ties", "cravate"],
+        ["Complets & vestes", "Suits & jackets", "veste"],
+        ["Baskets & chaussures", "Trainers & shoes", "baskets"],
+        ["Montres", "Watches", "montre"]
+      ]
+    ],
+    [
+      "Mode",
+      "Habits femme",
+      "Women’s clothing",
+      [
+        ["Robes", "Dresses", "robe"],
+        ["Sacs à main", "Handbags", "sac à main"],
+        ["Chaussures", "Shoes", "baskets"],
+        ["Accessoires", "Accessories", "accessoire"]
+      ]
+    ],
+    [
+      "Maison",
+      "Maison & quotidien",
+      "Home & household",
+      [
+        ["Vaisselle", "Tableware", "assiettes"],
+        ["Ventilateurs", "Fans", "ventilateur"],
+        [
+          "Électricité & rallonges",
+          "Electrical items & extension leads",
+          "rallonge"
+        ],
+        ["Décoration", "Decor", "photo personnalisée"]
+      ]
+    ],
+    [
+      "Beauté",
+      "Beauté & soins",
+      "Beauty & care",
+      [
+        ["Savons", "Soap", "savon"],
+        ["Laits & soins du corps", "Body lotions & care", "lait"],
+        ["Cosmétiques", "Cosmetics", "cosmétique"]
+      ]
+    ],
+    [
+      "Enfants",
+      "Enfants & bébé",
+      "Kids & baby",
+      [
+        ["Jouets", "Toys", "jouets"],
+        ["Jeux éducatifs", "Educational games", "jeu éducatif"],
+        ["Habits enfants", "Kids’ clothing", "habit"]
+      ]
+    ],
+    [
+      "Épicerie",
+      "Épicerie",
+      "Groceries",
+      [
+        ["Riz & céréales", "Rice & cereals", "riz"],
+        ["Café & boissons", "Coffee & drinks", "café"],
+        ["Produits alimentaires", "Food products", ""]
+      ]
+    ],
+    [
+      "Création",
+      "Photo & création",
+      "Photo & creativity",
+      [
+        ["Éclairage & ring lights", "Lighting & ring lights", "ring light"],
+        ["Photos personnalisées", "Custom photos", "photo personnalisée"]
+      ]
+    ],
+    [
+      "Musique",
+      "Musique",
+      "Music",
+      [
+        ["Guitares", "Guitars", "guitare"],
+        ["Claviers", "Keyboards", "clavier"],
+        ["Instruments", "Instruments", ""]
+      ]
+    ],
+    [
+      "Électroménager",
+      "Électroménager",
+      "Home appliances",
+      [
+        ["Réfrigérateurs", "Refrigerators", "réfrigérateur"],
+        ["Lave-linge", "Washing machines", "lave-linge"],
+        ["Climatiseurs", "Air conditioners", "climatiseur"],
+        ["Petits appareils", "Small appliances", ""]
+      ]
+    ],
+    [
+      "Bricolage",
+      "Bricolage",
+      "DIY & tools",
+      [
+        ["Outils manuels", "Hand tools", "outil"],
+        ["Outillage électrique", "Power tools", "perceuse"],
+        ["Matériaux de construction", "Building supplies", ""],
+        ["Plomberie", "Plumbing", ""]
+      ]
+    ],
+    [
+      "Jardin",
+      "Jardin",
+      "Garden & outdoor",
+      [
+        ["Mobilier extérieur", "Outdoor furniture", ""],
+        ["Outils de jardin", "Garden tools", ""],
+        ["Plantes & semences", "Plants & seeds", ""]
+      ]
+    ],
+    [
+      "Sport",
+      "Sport",
+      "Sports & leisure",
+      [
+        ["Fitness & musculation", "Fitness & strength", ""],
+        ["Football & sports collectifs", "Football & team sports", ""],
+        ["Vélos & accessoires", "Bikes & accessories", "vélo"],
+        ["Camping & randonnée", "Camping & hiking", ""]
+      ]
+    ],
+    [
+      "Automobile",
+      "Automobile",
+      "Automotive",
+      [
+        ["Pièces automobiles", "Car parts", ""],
+        ["Accessoires voiture", "Car accessories", ""],
+        ["Motos & accessoires", "Motorcycles & accessories", ""],
+        ["Pneus & entretien", "Tyres & maintenance", ""]
+      ]
+    ],
+    [
+      "Bureau",
+      "Bureau",
+      "Office & school",
+      [
+        ["Fournitures scolaires", "School supplies", ""],
+        ["Papeterie", "Stationery", ""],
+        ["Mobilier de bureau", "Office furniture", ""],
+        ["Imprimantes & consommables", "Printers & supplies", ""]
+      ]
+    ],
+    [
+      "Livres",
+      "Livres",
+      "Books & entertainment",
+      [
+        ["Livres & romans", "Books & novels", ""],
+        ["Manuels scolaires", "Textbooks", ""],
+        ["Jeux vidéo", "Video games", ""],
+        ["Arts & loisirs créatifs", "Arts & crafts", ""]
+      ]
+    ],
+    [
+      "Animaux",
+      "Animaux",
+      "Pet supplies",
+      [
+        ["Alimentation animale", "Pet food", ""],
+        ["Accessoires animaux", "Pet accessories", ""],
+        ["Hygiène & soins", "Pet hygiene & care", ""]
+      ]
+    ],
+    [
+      "Agriculture",
+      "Agriculture",
+      "Agriculture",
+      [
+        ["Semences & plants", "Seeds & seedlings", ""],
+        ["Équipements agricoles", "Agricultural equipment", ""],
+        ["Irrigation", "Irrigation", ""],
+        ["Élevage", "Livestock supplies", ""]
+      ]
+    ],
+    [
+      "Professionnel",
+      "Professionnel",
+      "Business & industry",
+      [
+        ["Équipements de commerce", "Retail equipment", ""],
+        ["Machines & équipements", "Machinery & equipment", ""],
+        ["Emballages", "Packaging", ""],
+        ["Équipements de protection", "Protective equipment", ""]
+      ]
+    ],
+    [
+      "Santé",
+      "Santé",
+      "Health & wellbeing",
+      [
+        ["Hygiène & bien-être", "Hygiene & wellbeing", ""],
+        ["Accessoires de mobilité", "Mobility accessories", ""],
+        ["Premiers secours", "First aid", ""]
+      ]
+    ]
+  ]
+}
