@@ -11,8 +11,9 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `README.md`                                              | Installation, activation distante et limites de la version complète.                                       |
 | `docs/POSTGRESQL_SUPABASE.md`                            | Déploiement et sécurité de la cible PostgreSQL/Supabase.                                                    |
 | `supabase/config.toml`                                   | Configuration locale de Supabase.                                                                          |
-| `supabase/migrations/20261008000100_yaviya_core.sql`     | Schéma PostgreSQL, fonctions, RLS et données de référence.                                                  |
-| `supabase/migrations/20261008000200_storage.sql`         | Buckets et politiques des fichiers publics et privés.                                                       |
+| `supabase/migrations/20261007231856_yaviya_core.sql`     | Schéma PostgreSQL, fonctions, RLS et données de référence.                                                  |
+| `supabase/migrations/20261007231914_yaviya_storage.sql`  | Buckets et politiques des fichiers publics et privés.                                                       |
+| `supabase/migrations/20261007232019_advisor_hardening.sql` | Index et durcissement issus des audits Supabase.                                                          |
 | `tests/postgresql-schema.test.mjs`                       | Contrôle des domaines métier, de la RLS et du stockage privé PostgreSQL.                                    |
 | `YAVIYA-Backend-Documentation-v30.zip`                   | Archive préexistante conservée ; les fichiers de la nouvelle version sont désormais dépliés dans le dépôt. |
 | `YAVIYA-Frontend-v30.zip`                                | Archive préexistante conservée ; les fichiers de la nouvelle version sont désormais dépliés dans le dépôt. |

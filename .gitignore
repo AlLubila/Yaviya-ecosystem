@@ -8,3 +8,4 @@ dist/
 *.db
 *.log
 .vercel/
+supabase/.temp/

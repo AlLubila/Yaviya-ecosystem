@@ -3,7 +3,11 @@
 
 create extension if not exists pgcrypto;
 
-create or replace function public.set_updated_at()
+create schema if not exists private;
+revoke all on schema private from public;
+grant usage on schema private to anon, authenticated, service_role;
+
+create or replace function private.set_updated_at()
 returns trigger
 language plpgsql
 set search_path = public
@@ -31,7 +35,7 @@ create table public.profiles (
 );
 
 create trigger profiles_updated_at before update on public.profiles
-for each row execute function public.set_updated_at();
+for each row execute function private.set_updated_at();
 
 create table public.user_roles (
   user_id uuid not null references public.profiles(id) on delete cascade,
@@ -59,7 +63,7 @@ select user_id, role,
   end || lpad(sequence_id::text, 6, '0') as account_id
 from public.account_identifiers;
 
-create or replace function public.create_buyer_profile()
+create or replace function private.create_buyer_profile()
 returns trigger
 language plpgsql
 security definer
@@ -79,7 +83,7 @@ $$;
 
 create trigger auth_user_creates_buyer
 after insert on auth.users
-for each row execute function public.create_buyer_profile();
+for each row execute function private.create_buyer_profile();
 
 create table public.stores (
   id bigint generated always as identity primary key,
@@ -95,7 +99,7 @@ create table public.stores (
 );
 
 create trigger stores_updated_at before update on public.stores
-for each row execute function public.set_updated_at();
+for each row execute function private.set_updated_at();
 create index stores_owner_idx on public.stores(owner_id);
 create index stores_market_idx on public.stores(country, city, status);
 
@@ -169,7 +173,7 @@ create table public.products (
 );
 
 create trigger products_updated_at before update on public.products
-for each row execute function public.set_updated_at();
+for each row execute function private.set_updated_at();
 create index products_catalogue_idx on public.products(country, category_id, status, visible);
 create index products_store_idx on public.products(store_id, updated_at desc);
 
@@ -214,7 +218,7 @@ create table public.orders (
 );
 
 create trigger orders_updated_at before update on public.orders
-for each row execute function public.set_updated_at();
+for each row execute function private.set_updated_at();
 create index orders_buyer_idx on public.orders(buyer_id, created_at desc);
 create index orders_market_idx on public.orders(country, status, created_at desc);
 
@@ -257,7 +261,7 @@ create table public.deliveries (
   updated_at timestamptz not null default now()
 );
 create trigger deliveries_updated_at before update on public.deliveries
-for each row execute function public.set_updated_at();
+for each row execute function private.set_updated_at();
 create index deliveries_courier_idx on public.deliveries(courier_id, status, created_at desc);
 
 create table public.order_messages (
@@ -331,7 +335,7 @@ create table public.payment_transactions (
   unique (provider, provider_reference, operation)
 );
 create trigger payment_transactions_updated_at before update on public.payment_transactions
-for each row execute function public.set_updated_at();
+for each row execute function private.set_updated_at();
 create index payment_transactions_order_idx on public.payment_transactions(order_id, created_at desc);
 
 create table public.refunds (
@@ -347,7 +351,7 @@ create table public.refunds (
   updated_at timestamptz not null default now()
 );
 create trigger refunds_updated_at before update on public.refunds
-for each row execute function public.set_updated_at();
+for each row execute function private.set_updated_at();
 
 create table public.ledger_entries (
   id uuid primary key default gen_random_uuid(),
@@ -425,7 +429,7 @@ create table public.faq_feedback (
 );
 
 -- Authorization helpers are SECURITY DEFINER and have a fixed search_path.
-create or replace function public.is_admin()
+create or replace function private.is_admin()
 returns boolean
 language sql
 stable
@@ -438,7 +442,7 @@ as $$
   );
 $$;
 
-create or replace function public.is_store_member(target_store_id bigint)
+create or replace function private.is_store_member(target_store_id bigint)
 returns boolean
 language sql
 stable
@@ -454,19 +458,32 @@ as $$
   );
 $$;
 
-create or replace function public.can_access_order(target_order_id uuid)
+create or replace function private.is_store_owner(target_store_id bigint)
 returns boolean
 language sql
 stable
 security definer
 set search_path = public
 as $$
-  select public.is_admin()
+  select exists (
+    select 1 from public.stores s
+    where s.id = target_store_id and s.owner_id = auth.uid()
+  );
+$$;
+
+create or replace function private.can_access_order(target_order_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select private.is_admin()
     or exists (select 1 from public.orders o where o.id = target_order_id and o.buyer_id = auth.uid())
     or exists (select 1 from public.order_participants p where p.order_id = target_order_id and p.user_id = auth.uid());
 $$;
 
-create or replace function public.validate_courier_review()
+create or replace function private.validate_courier_review()
 returns trigger
 language plpgsql
 security definer
@@ -489,7 +506,7 @@ end;
 $$;
 
 create trigger courier_review_matches_delivery before insert or update on public.courier_reviews
-for each row execute function public.validate_courier_review();
+for each row execute function private.validate_courier_review();
 
 -- Row Level Security: backend webhooks use the service role; clients receive least privilege.
 alter table public.profiles enable row level security;
@@ -519,56 +536,96 @@ alter table public.coupon_events enable row level security;
 alter table public.product_view_events enable row level security;
 alter table public.faq_feedback enable row level security;
 
-create policy profiles_self_read on public.profiles for select using (id = auth.uid() or public.is_admin());
+create policy profiles_self_read on public.profiles for select using (id = auth.uid() or private.is_admin());
 create policy profiles_self_update on public.profiles for update using (id = auth.uid()) with check (id = auth.uid());
-create policy roles_self_read on public.user_roles for select using (user_id = auth.uid() or public.is_admin());
-create policy identifiers_self_read on public.account_identifiers for select using (user_id = auth.uid() or public.is_admin());
+create policy roles_self_read on public.user_roles for select using (user_id = auth.uid() or private.is_admin());
+create policy identifiers_self_read on public.account_identifiers for select using (user_id = auth.uid() or private.is_admin());
 
-create policy stores_public_read on public.stores for select using (status = 'approved' or public.is_store_member(id) or public.is_admin());
+create policy stores_public_read on public.stores for select using (status = 'approved' or private.is_store_member(id) or private.is_admin());
 create policy stores_owner_insert on public.stores for insert
 with check (owner_id = auth.uid() and status = 'pending' and not verified);
 create policy stores_member_update on public.stores for update
-using (public.is_store_member(id))
-with check (public.is_store_member(id) and status in ('pending', 'rejected') and not verified);
-create policy store_members_read on public.store_members for select using (public.is_store_member(store_id) or public.is_admin());
-create policy store_members_owner_write on public.store_members for all using (public.is_store_member(store_id)) with check (public.is_store_member(store_id));
+using (private.is_store_owner(id))
+with check (private.is_store_owner(id) and status in ('pending', 'rejected') and not verified);
+create policy store_members_read on public.store_members for select using (private.is_store_member(store_id) or private.is_admin());
+create policy store_members_owner_write on public.store_members for all using (private.is_store_owner(store_id)) with check (private.is_store_owner(store_id));
 
-create policy categories_read on public.categories for select using (active or public.is_admin());
-create policy subcategories_read on public.subcategories for select using (active or public.is_admin());
-create policy products_public_read on public.products for select using ((visible and status = 'approved') or public.is_store_member(store_id) or public.is_admin());
+create policy categories_read on public.categories for select using (active or private.is_admin());
+create policy subcategories_read on public.subcategories for select using (active or private.is_admin());
+create policy products_public_read on public.products for select using ((visible and status = 'approved') or private.is_store_member(store_id) or private.is_admin());
 create policy products_store_insert on public.products for insert
-with check (owner_id = auth.uid() and public.is_store_member(store_id) and status in ('draft', 'pending') and not visible);
+with check (owner_id = auth.uid() and private.is_store_member(store_id) and status in ('draft', 'pending') and not visible);
 create policy products_store_update on public.products for update
-using (public.is_store_member(store_id))
-with check (public.is_store_member(store_id) and status in ('draft', 'pending') and not visible);
-create policy product_images_read on public.product_images for select using (exists (select 1 from public.products p where p.id = product_id and ((p.visible and p.status = 'approved') or public.is_store_member(p.store_id) or public.is_admin())));
-create policy product_images_store_write on public.product_images for all using (exists (select 1 from public.products p where p.id = product_id and public.is_store_member(p.store_id))) with check (exists (select 1 from public.products p where p.id = product_id and public.is_store_member(p.store_id)));
+using (private.is_store_member(store_id))
+with check (private.is_store_member(store_id) and status in ('draft', 'pending') and not visible);
+create policy product_images_read on public.product_images for select using (exists (select 1 from public.products p where p.id = product_id and ((p.visible and p.status = 'approved') or private.is_store_member(p.store_id) or private.is_admin())));
+create policy product_images_store_write on public.product_images for all using (exists (select 1 from public.products p where p.id = product_id and private.is_store_member(p.store_id))) with check (exists (select 1 from public.products p where p.id = product_id and private.is_store_member(p.store_id)));
 
 create policy wishlist_self on public.wishlist_items for all using (user_id = auth.uid()) with check (user_id = auth.uid());
-create policy orders_participant_read on public.orders for select using (public.can_access_order(id));
-create policy order_items_participant_read on public.order_items for select using (public.can_access_order(order_id));
-create policy participants_self_read on public.order_participants for select using (user_id = auth.uid() or public.is_admin());
-create policy deliveries_participant_read on public.deliveries for select using (public.can_access_order(order_id));
-create policy deliveries_courier_update on public.deliveries for update using (courier_id = auth.uid() or public.is_admin()) with check (courier_id = auth.uid() or public.is_admin());
-create policy messages_participant_read on public.order_messages for select using (public.can_access_order(order_id));
-create policy messages_participant_insert on public.order_messages for insert with check (sender_id = auth.uid() and public.can_access_order(order_id));
+create policy orders_participant_read on public.orders for select using (private.can_access_order(id));
+create policy order_items_participant_read on public.order_items for select using (private.can_access_order(order_id));
+create policy participants_self_read on public.order_participants for select using (user_id = auth.uid() or private.is_admin());
+create policy deliveries_participant_read on public.deliveries for select using (private.can_access_order(order_id));
+create policy deliveries_courier_update on public.deliveries for update using (courier_id = auth.uid() or private.is_admin()) with check (courier_id = auth.uid() or private.is_admin());
+create policy messages_participant_read on public.order_messages for select using (private.can_access_order(order_id));
+create policy messages_participant_insert on public.order_messages for insert with check (sender_id = auth.uid() and private.can_access_order(order_id));
 
 create policy seller_reviews_public_read on public.seller_reviews for select using (true);
 create policy seller_reviews_buyer_insert on public.seller_reviews for insert with check (buyer_id = auth.uid() and exists (select 1 from public.orders o where o.id = order_id and o.buyer_id = auth.uid() and o.status in ('delivered', 'received')));
 create policy courier_reviews_public_read on public.courier_reviews for select using (true);
 create policy courier_reviews_buyer_insert on public.courier_reviews for insert with check (buyer_id = auth.uid());
 
-create policy identity_self_read on public.identity_checks for select using (user_id = auth.uid() or public.is_admin());
+create policy identity_self_read on public.identity_checks for select using (user_id = auth.uid() or private.is_admin());
 create policy identity_self_submit on public.identity_checks for insert with check (user_id = auth.uid());
 create policy identity_self_replace_pending on public.identity_checks for update using (user_id = auth.uid() and status in ('pending', 'rejected')) with check (user_id = auth.uid() and status = 'pending');
-create policy payments_buyer_read on public.payment_transactions for select using (public.is_admin() or exists (select 1 from public.orders o where o.id = order_id and o.buyer_id = auth.uid()));
-create policy refunds_requester_read on public.refunds for select using (requested_by = auth.uid() or public.can_access_order(order_id));
-create policy ledger_store_read on public.ledger_entries for select using (public.is_admin() or (store_id is not null and public.is_store_member(store_id)) or courier_id = auth.uid());
-create policy payout_accounts_self_read on public.payout_accounts for select using (user_id = auth.uid() or public.is_admin());
-create policy payouts_beneficiary_read on public.payouts for select using (beneficiary_id = auth.uid() or public.is_admin());
-create policy coupons_self_read on public.coupon_events for select using (user_id = auth.uid() or public.is_admin());
-create policy faq_feedback_own_read on public.faq_feedback for select using (user_id = auth.uid() or public.is_admin());
+create policy payments_buyer_read on public.payment_transactions for select using (private.is_admin() or exists (select 1 from public.orders o where o.id = order_id and o.buyer_id = auth.uid()));
+create policy refunds_requester_read on public.refunds for select using (requested_by = auth.uid() or private.can_access_order(order_id));
+create policy ledger_store_read on public.ledger_entries for select using (private.is_admin() or (store_id is not null and private.is_store_member(store_id)) or courier_id = auth.uid());
+create policy payout_accounts_self_read on public.payout_accounts for select using (user_id = auth.uid() or private.is_admin());
+create policy payouts_beneficiary_read on public.payouts for select using (beneficiary_id = auth.uid() or private.is_admin());
+create policy coupons_self_read on public.coupon_events for select using (user_id = auth.uid() or private.is_admin());
+create policy faq_feedback_own_read on public.faq_feedback for select using (user_id = auth.uid() or private.is_admin());
 create policy faq_feedback_submit on public.faq_feedback for insert with check (user_id is null or user_id = auth.uid());
 
 -- Financial tables intentionally have no client insert/update policies. Trusted webhook
 -- handlers use the Supabase service role after verifying provider signatures.
+
+-- Explicit Data API grants. RLS chooses rows; grants choose reachable objects.
+revoke all on all tables in schema public from anon, authenticated;
+revoke all on all sequences in schema public from anon, authenticated;
+revoke execute on all functions in schema public from public, anon, authenticated;
+revoke execute on all functions in schema private from public, anon, authenticated;
+
+grant select on public.stores, public.categories, public.subcategories,
+  public.products, public.product_images, public.seller_reviews,
+  public.courier_reviews to anon;
+
+grant select on all tables in schema public to authenticated;
+grant update (first_name, last_name, phone, email, address, residence_country,
+  currency, preferred_language, privacy_version, privacy_accepted_at)
+  on public.profiles to authenticated;
+grant insert, update on public.stores to authenticated;
+grant insert, update, delete on public.store_members to authenticated;
+grant insert, update on public.products to authenticated;
+grant insert, update, delete on public.product_images to authenticated;
+grant insert, update, delete on public.wishlist_items to authenticated;
+grant update on public.deliveries to authenticated;
+grant insert on public.order_messages, public.seller_reviews,
+  public.courier_reviews, public.faq_feedback to authenticated;
+grant usage on all sequences in schema public to authenticated;
+
+grant execute on function private.is_admin() to anon, authenticated;
+grant execute on function private.is_store_member(bigint) to anon, authenticated;
+grant execute on function private.is_store_owner(bigint) to authenticated;
+grant execute on function private.can_access_order(uuid) to authenticated;
+
+grant all on all tables in schema public to service_role;
+grant all on all sequences in schema public to service_role;
+grant execute on all functions in schema private to service_role;
+
+alter default privileges for role postgres in schema public
+  revoke select, insert, update, delete on tables from anon, authenticated;
+alter default privileges for role postgres in schema public
+  revoke usage, select on sequences from anon, authenticated;
+alter default privileges for role postgres in schema public
+  revoke execute on functions from public, anon, authenticated;

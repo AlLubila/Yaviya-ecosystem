@@ -19,10 +19,10 @@ Les montants sont enregistrés comme entiers dans la plus petite unité monétai
 
 ## Déploiement
 
-1. Créer un projet Supabase appartenant à l'organisation YAVIYA, idéalement dans la région Paris ou Francfort.
-2. Relier le dépôt avec `supabase link --project-ref <REFERENCE>` depuis un terminal de confiance.
-3. Vérifier la migration sur une branche Supabase ou un projet de test avec `supabase db push --dry-run`.
-4. Appliquer avec `supabase db push`, puis contrôler les tables, les politiques RLS et les trois buckets.
+1. Le projet `yaviya-production` est créé dans l'organisation YAVIYA, en région Paris (`eu-west-3`), avec la référence `ngaoyevncsocyqmlmbdw`.
+2. Relier le dépôt avec `supabase link --project-ref ngaoyevncsocyqmlmbdw` depuis un terminal de confiance.
+3. Les trois migrations ont été appliquées le 8 octobre 2026 et contrôlées avec les outils d'audit Supabase.
+4. Pour les changements futurs, vérifier d'abord une branche Supabase ou un projet de test, puis appliquer les nouvelles migrations.
 5. Configurer uniquement côté serveur : `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` et `DATABASE_URL`.
 6. Créer deux projets distincts pour Preview et Production. Ne jamais employer la clé `service_role` dans le navigateur.
 7. Adapter ensuite l'API YAVIYA de libSQL vers PostgreSQL/Supabase et lancer la recette à quatre comptes avant de modifier le domaine public.
@@ -31,6 +31,6 @@ Les montants sont enregistrés comme entiers dans la plus petite unité monétai
 
 Les écritures dans `payment_transactions`, `ledger_entries` et `payouts` sont interdites aux clients par RLS. Seuls les webhooks serveur, après vérification de leur signature, utilisent le rôle de service. Chaque appel financier possède une clé d'idempotence. Le schéma prépare l'encaissement, la commission, la dette envers le vendeur, le remboursement et le reversement, mais ne simule pas un agrément escrow : celui-ci doit être contractualisé avec la banque ou l'opérateur.
 
-## Limite actuelle
+## État au 8 octobre 2026
 
-La migration est prête dans GitHub, mais aucune base distante n'est créée sans connexion au compte Supabase du propriétaire. Après connexion de Supabase dans ChatGPT, la migration peut être appliquée et vérifiée directement. L'API hébergée existante reste sur Turso/libSQL jusqu'à la migration de l'adaptateur serveur.
+La base hébergée est active à Paris : 26 tables publiques avec RLS, 12 catégories, 3 buckets et 44 politiques. L'audit de sécurité Supabase ne signale aucune anomalie. Les avis d'index inutilisés sont attendus sur une base vide. L'API hébergée existante reste sur Turso/libSQL jusqu'à la migration de l'adaptateur serveur ; la création de cette base ne suffit donc pas encore à supprimer l'erreur 503 du site.
