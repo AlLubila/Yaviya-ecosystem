@@ -173,6 +173,7 @@ test("original shared buyer/seller/courier/admin delivery, private proof and rat
         companyName: "Boutique test",
         unregistered: "true",
         documentType: "identity",
+        issuingCountry: "CD",
         identityConfirmed: "true",
         sellerPlan: "free",
         courierPlan: "standard",
@@ -182,8 +183,41 @@ test("original shared buyer/seller/courier/admin delivery, private proof and rat
         form.set(key, value);
       form.set(
         "document",
-        new Blob(["%PDF-test fictif"], { type: "application/pdf" }),
-        "identite-fictive.pdf",
+        new Blob([new Uint8Array([255, 216, 255, 1])], { type: "image/jpeg" }),
+        "identite-fictive.jpg",
+      );
+      form.set("issuingCountry", "ZZ");
+      assert.equal(
+        (await call("/api/verification", user.cookie, form)).status,
+        400,
+      );
+      form.set("issuingCountry", "CD");
+      form.set("documentType", "licence-c");
+      if (user === seller) {
+        assert.equal(
+          (await call("/api/verification", user.cookie, form)).status,
+          400,
+        );
+        form.set("documentType", "identity");
+      }
+      form.set(
+        "document",
+        new Blob(["%PDF-fictive"], { type: "application/pdf" }),
+        "photo.pdf",
+      );
+      assert.equal(
+        (await call("/api/verification", user.cookie, form)).status,
+        400,
+      );
+      form.delete("document");
+      assert.equal(
+        (await call("/api/verification", user.cookie, form)).status,
+        400,
+      );
+      form.set(
+        "document",
+        new Blob([new Uint8Array([255, 216, 255, 1])], { type: "image/jpeg" }),
+        "identite-fictive.jpg",
       );
       const response = await call("/api/verification", user.cookie, form);
       assert.equal(response.status, 200, await response.clone().text());

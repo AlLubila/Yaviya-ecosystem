@@ -1515,3 +1515,6 @@ for (const product of [...seedCatalogue, ...seedCatalogueCG]) {
   const gallery = marketConfig.productGalleries[product.img];
   if (gallery) product.images = [...gallery];
 }
+
+for (const row of deliveryTariffs)
+  row[5] = marketConfig.deliveryRates.Kinshasa[row[2]];

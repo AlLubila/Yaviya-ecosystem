@@ -1,4 +1,4 @@
-# YAVIYA — nouvelle version complète (1.5.0)
+# YAVIYA — nouvelle version complète (1.6.0)
 
 Version complète indépendante issue de la version 31 de YAVIYA « Votre marché, à portée de main », avec les corrections d’achat immédiat, la connexion indépendante, des fenêtres sans Retour flottant et des galeries sous plusieurs angles. Le catalogue comprend 60 références par marché, des nombres d’acheteurs marqués « démo » et une confirmation avec accès au suivi après commande. Frontend, backend, API, migrations, tests et photos sont accessibles comme fichiers séparés dans le dépôt public. L'ancienne vitrine de huit produits est conservée dans `legacy-vitrine/` ; le build principal utilise désormais la version complète.
 

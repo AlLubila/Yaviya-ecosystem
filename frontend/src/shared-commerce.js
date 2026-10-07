@@ -77,7 +77,9 @@ function applyMarket(data, redraw = true) {
   orders.splice(0, orders.length, ...data.orders);
   courierAvailable = !!data.courierSettings?.available;
   document.querySelectorAll(".demo-role-bar [data-role]").forEach((b) => {
-    b.disabled = b.dataset.role === "admin" && !data.roles.admin;
+    b.disabled =
+      ["admin", "seller", "courier"].includes(b.dataset.role) &&
+      !data.roles[b.dataset.role];
     b.title = !data.roles[b.dataset.role]
       ? T(
           "Ouvrir le dossier et les étapes de validation",
@@ -303,7 +305,7 @@ showTracking = function () {
 const marketCheckout = showCheckout;
 showCheckout = function (selection = cart) {
   if (!customerProfile) {
-    showRegister();
+    showBuyerRegistration();
     toast(
       T("Créez votre compte pour commander.", "Create your account to order."),
     );

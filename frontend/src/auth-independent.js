@@ -145,6 +145,26 @@
             wishes.clear();
             profile.wishlist.forEach((id) => wishes.add(id));
             decorateHearts();
+            if (
+              ["seller", "courier"].includes(profile.accountType) &&
+              typeof refreshVerification === "function"
+            ) {
+              refreshVerification().then(() => {
+                const check = verificationState.check;
+                if (
+                  !check?.issuingCountry ||
+                  !["image/jpeg", "image/png"].includes(check.documentMime)
+                ) {
+                  showRegister();
+                  toast(
+                    translate(
+                      "Confirmez le pays d’émission et ajoutez la photo de votre pièce d’identité.",
+                      "Confirm the issuing country and upload your identity photo.",
+                    ),
+                  );
+                }
+              });
+            }
           }
         })
         .catch(() => {});
@@ -165,12 +185,20 @@
     document.querySelector(".header-actions") ||
     document.querySelector("header");
   if (anchor) anchor.append(logout);
+  let restoredSessionChecked = false;
   const refresh = () =>
     authRequest("session")
       .then((value) => {
         logout.hidden = !value.user;
+        if (value.user && !restoredSessionChecked) {
+          restoredSessionChecked = true;
+          window.dispatchEvent(new Event("yaviya-authenticated"));
+        }
       })
       .catch(() => {});
   refresh();
-  window.addEventListener("yaviya-authenticated", refresh);
+  window.addEventListener("yaviya-authenticated", () => {
+    restoredSessionChecked = true;
+    refresh();
+  });
 })();

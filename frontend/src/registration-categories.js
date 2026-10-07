@@ -1,9 +1,26 @@
+function showBuyerRegistration() {
+  window.YAVIYA_BUYER_REGISTRATION = true;
+  try {
+    showRegister();
+  } finally {
+    window.YAVIYA_BUYER_REGISTRATION = false;
+  }
+}
 // Keep one live form so going back never discards entered details or attachments.
 const stagedRegister = showRegister;
 showRegister = function () {
   stagedRegister();
   const form = $("#register-form");
   if (!form) return;
+  if (window.YAVIYA_BUYER_REGISTRATION) {
+    for (const radio of form.querySelectorAll("[name=accountType]")) {
+      radio.checked = radio.value === "buyer";
+      radio.disabled = radio.value !== "buyer";
+    }
+    form
+      .querySelector("[name=accountType][value=buyer]")
+      .dispatchEvent(new Event("change"));
+  }
   const originalSubmit = form.onsubmit,
     submit = form.querySelector("button.primary"),
     error = $("#registration-error"),

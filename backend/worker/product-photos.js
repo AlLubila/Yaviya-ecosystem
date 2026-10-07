@@ -1,3 +1,4 @@
+import { approvedIdentity } from "./identity-complete.js";
 const json = (data, status = 200) =>
   Response.json(data, { status, headers: { "Cache-Control": "no-store" } });
 const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
@@ -49,7 +50,7 @@ async function canEdit(env, user, seller) {
   )
     return true;
   const check = await env.DB.prepare(
-    "SELECT kind,status FROM identity_checks WHERE user_id=?",
+    "SELECT kind,status,document_type,document_mime,issuing_country FROM identity_checks WHERE user_id=?",
   )
     .bind(user)
     .first();
@@ -61,7 +62,7 @@ async function canEdit(env, user, seller) {
   if (
     profile?.account_type !== "seller" ||
     check?.kind !== "seller" ||
-    check.status !== "approved"
+    !approvedIdentity(check, "seller")
   )
     return false;
   return !!(await env.DB.prepare(

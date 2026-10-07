@@ -7,6 +7,7 @@ const documentLabels = {
   identity: ["Carte d’identité", "Identity card"],
   passport: ["Passeport", "Passport"],
   "licence-b": ["Permis B", "Driving licence B"],
+  "licence-c": ["Permis C · livreur", "Driving licence C · courier"],
   voter: ["Carte d’électeur", "Voter card"],
 };
 async function verificationAPI(path = "", body) {
@@ -106,14 +107,24 @@ function verificationStatus() {
     ? T("Chargement du dossier…", "Loading verification…")
     : !state
       ? T("Dossier à soumettre", "Submit your verification")
-      : state.status === "approved"
-        ? T("Vérifié et validé manuellement", "Manually verified and approved")
-        : state.status === "rejected"
-          ? T("Dossier refusé : ", "Request rejected: ") + state.note
-          : T(
-              "En attente de vérification manuelle par l’admin",
-              "Awaiting manual administrator verification",
-            );
+      : state.status === "approved" &&
+          (!state.issuingCountry ||
+            !["image/jpeg", "image/png"].includes(state.documentMime))
+        ? T(
+            "Dossier à compléter : pays d’émission et photo de la pièce.",
+            "Complete your issuing country and identity photo.",
+          )
+        : state.status === "approved"
+          ? T(
+              "Vérifié et validé manuellement",
+              "Manually verified and approved",
+            )
+          : state.status === "rejected"
+            ? T("Dossier refusé : ", "Request rejected: ") + state.note
+            : T(
+                "En attente de vérification manuelle par l’admin",
+                "Awaiting manual administrator verification",
+              );
 }
 async function refreshVerification() {
   try {
@@ -180,7 +191,7 @@ function identityFields() {
     )
     .join(
       "",
-    )}</select></label><label>${T("Joindre la pièce d’identité *", "Attach identity document *")}<input type="file" name="identityDocument" accept="image/jpeg,image/png,application/pdf"></label>${c?.fileName ? `<p>${T("Document déjà soumis : ", "Previously submitted document: ")}${esc(c.fileName)} · <a href="/api/verification/document?country=${window.YAVIYA_COUNTRY}" target="_blank" rel="noopener">${T("Consulter", "View")}</a></p>` : ""}<p class="demo-note">${T("JPG, PNG ou PDF, maximum 8 Mo. Le document est conservé dans un espace privé pour le contrôle manuel ; il n’est pas affiché aux clients ni aux autres vendeurs. Pour tester, utilisez un document fictif.", "JPG, PNG or PDF, maximum 8 MB. The document is privately stored for manual review; it is not shown to customers or other sellers. Use a fictional document for testing.")}</p><label class="privacy-consent"><input type="checkbox" name="identityConfirmed"><span>${T("Je confirme que cette pièce correspond à mon identité et que les informations fournies sont exactes. *", "I confirm this document represents my identity and the supplied information is accurate. *")}</span></label></section>`;
+    )}</select></label><label>${T("Pays d’émission de la pièce d’identité *", "Identity document issuing country *")}<select name="issuingCountry"><option value="">${T("Choisir le pays", "Select country")}</option>${window.YAVIYA_MARKET_CONFIG.identityCountries.map((country) => `<option value="${country.code}" ${c?.issuingCountry === country.code ? "selected" : ""}>${esc(T(country.fr, country.en))}</option>`).join("")}</select></label><label>${T("Photo de la pièce d’identité *", "Identity document photo *")}<input type="file" name="identityDocument" accept="image/jpeg,image/png"></label>${c?.fileName ? `<p>${T("Document déjà soumis : ", "Previously submitted document: ")}${esc(c.fileName)} · <a href="/api/verification/document?country=${window.YAVIYA_COUNTRY}" target="_blank" rel="noopener">${T("Consulter", "View")}</a></p>` : ""}<p class="demo-note">${T("Photo JPG ou PNG, maximum 8 Mo. Le document est conservé dans un espace privé pour le contrôle manuel ; il n’est pas affiché aux clients ni aux autres vendeurs. Pour tester, utilisez un document fictif.", "JPG or PNG photo, maximum 8 MB. The document is privately stored for manual review; it is not shown to customers or other sellers. Use a fictional document for testing.")}</p><label class="privacy-consent"><input type="checkbox" name="identityConfirmed"><span>${T("Je confirme que cette pièce correspond à mon identité et que les informations fournies sont exactes. *", "I confirm this document represents my identity and the supplied information is accurate. *")}</span></label></section>`;
 }
 const beforeVerificationRegister = showRegister;
 showRegister = function () {
@@ -196,13 +207,17 @@ showRegister = function () {
       needed = type !== "buyer",
       sameCheck =
         verificationState.check?.kind === type &&
-        !!verificationState.check?.fileName;
+        !!verificationState.check?.fileName &&
+        ["image/jpeg", "image/png"].includes(
+          verificationState.check?.documentMime,
+        );
     $("#identity-fields").hidden = !needed;
     $("#company-fields").hidden = type !== "seller";
     for (const name of [
       "companyName",
       "companyRcm",
       "documentType",
+      "issuingCountry",
       "identityDocument",
       "identityConfirmed",
     ]) {
@@ -215,6 +230,12 @@ showRegister = function () {
         (name !== "identityDocument" || !sameCheck) &&
         (name !== "companyRcm" || !form.elements.unregistered.checked);
     }
+    const permit = form.elements.documentType.querySelector(
+      '[value="licence-c"]',
+    );
+    permit.hidden = permit.disabled = type !== "courier";
+    if (type !== "courier" && form.elements.documentType.value === "licence-c")
+      form.elements.documentType.value = "";
     form.elements.unregistered.disabled = type !== "seller";
     form.elements.companyRcm.disabled =
       type !== "seller" || form.elements.unregistered.checked;
@@ -248,6 +269,7 @@ customerAPI = async function (body) {
       companyName: form.elements.companyName.value.trim(),
       companyRcm: form.elements.companyRcm.value.trim(),
       documentType: form.elements.documentType.value,
+      issuingCountry: form.elements.issuingCountry.value,
       unregistered: String(form.elements.unregistered.checked),
       sellerPlan:
         form.elements.sellerPlan?.value ||
@@ -264,6 +286,7 @@ customerAPI = async function (body) {
     if (
       !form.elements.identityConfirmed.checked ||
       !fields.documentType ||
+      !fields.issuingCountry ||
       (type === "seller" &&
         (!fields.companyName ||
           (fields.unregistered !== "true" && !fields.companyRcm)))
@@ -278,11 +301,18 @@ customerAPI = async function (body) {
       !file &&
       !(
         verificationState.check?.kind === type &&
-        verificationState.check?.fileName
+        verificationState.check?.fileName &&
+        ["image/jpeg", "image/png"].includes(
+          verificationState.check?.documentMime,
+        )
       )
     )
       throw Error(
         T("Joignez votre pièce d’identité.", "Attach your identity document."),
+      );
+    if (file && !["image/jpeg", "image/png"].includes(file.type))
+      throw Error(
+        T("Joignez une photo JPG ou PNG.", "Attach a JPG or PNG photo."),
       );
     if (file && file.size > 8 * 1024 * 1024)
       throw Error(
@@ -630,7 +660,7 @@ async function renderAdminVerification() {
       requests
         .map(
           (r) =>
-            `<article class="verification-request"><h3>${esc(r.name)}${r.publicId ? " · " + esc(r.publicId) : ""} · ${r.kind === "seller" ? T("Vendeur", "Seller") : T("Livreur", "Courier")}</h3><p>${esc(r.phone)} · ${r.userId.startsWith("cg:") ? "République du Congo" : "RDC"}</p>${r.kind === "courier" ? `<p>${T("Abonnement livreur : Standard · gratuit dans le MVP", "Courier plan: Standard · free during the MVP")}</p>` : ""}${r.kind === "seller" ? `<p>${esc(r.companyName)} · ${r.unregistered ? T("Petite entreprise non enregistrée · sans RCCM", "Unregistered small business · no RCCM") : "RCM/RCCM : " + esc(r.companyRcm)} · ${T("Forfait : ", "Plan: ")}${esc(r.sellerPlan)}</p>` : ""}<p>${T(...documentLabels[r.documentType])} · ${esc(r.status)}</p><a href="/api/verification/document?userId=${encodeURIComponent(r.userId)}&country=${window.YAVIYA_COUNTRY}" target="_blank" rel="noopener">${T("Consulter la pièce privée", "View private document")}</a>${r.status === "pending" ? `<form class="review-form" data-review-user="${esc(r.userId)}"><label><input name="identityChecked" type="checkbox">${T("J’ai contrôlé l’identité et la pièce.", "I have checked the identity and document.")}</label>${r.kind === "seller" ? `<label><input name="companyChecked" type="checkbox">${r.unregistered ? T("J’ai contrôlé l’activité déclarée de la petite entreprise non enregistrée.", "I have checked the declared unregistered small business activity.") : T("J’ai contrôlé le numéro RCM/RCCM et l’entreprise.", "I have checked the RCM/RCCM number and company.")}</label>` : ""}<label>${T("Commentaire / motif du refus", "Comment / rejection reason")}<textarea name="note" maxlength="500"></textarea></label><button class="primary" name="decision" value="approve">${T("Valider manuellement", "Approve manually")}</button><button class="add" name="decision" value="reject">${T("Refuser", "Reject")}</button><p class="review-error" role="alert"></p></form>` : `<p>${esc(r.note)}</p>`}</article>`,
+            `<article class="verification-request"><h3>${esc(r.name)}${r.publicId ? " · " + esc(r.publicId) : ""} · ${r.kind === "seller" ? T("Vendeur", "Seller") : T("Livreur", "Courier")}</h3><p>${esc(r.phone)} · ${r.userId.startsWith("cg:") ? "République du Congo" : "RDC"}</p>${r.kind === "courier" ? `<p>${T("Abonnement livreur : Standard · gratuit dans le MVP", "Courier plan: Standard · free during the MVP")}</p>` : ""}${r.kind === "seller" ? `<p>${esc(r.companyName)} · ${r.unregistered ? T("Petite entreprise non enregistrée · sans RCCM", "Unregistered small business · no RCCM") : "RCM/RCCM : " + esc(r.companyRcm)} · ${T("Forfait : ", "Plan: ")}${esc(r.sellerPlan)}</p>` : ""}<p>${esc(window.YAVIYA_MARKET_CONFIG.identityCountries.find((c) => c.code === r.issuingCountry)?.fr || "Pays à confirmer")} · ${T(...documentLabels[r.documentType])} · ${esc(r.status)}</p><a href="/api/verification/document?userId=${encodeURIComponent(r.userId)}&country=${window.YAVIYA_COUNTRY}" target="_blank" rel="noopener">${T("Consulter la pièce privée", "View private document")}</a>${r.status === "pending" ? `<form class="review-form" data-review-user="${esc(r.userId)}"><label><input name="identityChecked" type="checkbox">${T("J’ai contrôlé l’identité et la pièce.", "I have checked the identity and document.")}</label>${r.kind === "seller" ? `<label><input name="companyChecked" type="checkbox">${r.unregistered ? T("J’ai contrôlé l’activité déclarée de la petite entreprise non enregistrée.", "I have checked the declared unregistered small business activity.") : T("J’ai contrôlé le numéro RCM/RCCM et l’entreprise.", "I have checked the RCM/RCCM number and company.")}</label>` : ""}<label>${T("Commentaire / motif du refus", "Comment / rejection reason")}<textarea name="note" maxlength="500"></textarea></label><button class="primary" name="decision" value="approve">${T("Valider manuellement", "Approve manually")}</button><button class="add" name="decision" value="reject">${T("Refuser", "Reject")}</button><p class="review-error" role="alert"></p></form>` : `<p>${esc(r.note)}</p>`}</article>`,
         )
         .join("") ||
       `<p>${T("Aucun dossier soumis.", "No verification requests submitted.")}</p>`;

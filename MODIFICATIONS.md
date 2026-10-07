@@ -41,3 +41,13 @@ Les fiches et cartes du catalogue de démonstration affichent un nombre fictif d
 Après une commande effectivement enregistrée, une confirmation affiche la référence et un bouton « Suivre ma commande » pour accéder à l’article dans Mes commandes. Les étapes, événements et discussions restent partagés entre les participants autorisés. Une erreur serveur ne produit aucune fausse confirmation.
 
 Validation 1.5.0 : 25 tests automatisés passent ; compilation de 147 fichiers frontend. Les tests couvrent les nouvelles sous-catégories, les galeries, les compteurs démo annotés, l’ajout aux bases existantes et l’accès au suivi après confirmation. La limite du backend hébergé (HTTP 503 au moment du contrôle) reste distincte de la validation locale.
+
+## Version 1.6.0 — tarifs, compte acheteur et vérification
+
+Barème de Kinshasa harmonisé dans la configuration commune avec les derniers tarifs convenus : Lukunga 7 500 FC, Funa 9 000 FC, Mont-Amba 10 000 FC, Tshangu 12 500 FC, avec exceptions par commune. Lubumbashi conserve le tarif pilote de 7 500 FC. Les montants affichés et enregistrés utilisent la même configuration.
+
+L’inscription issue d’un achat sélectionne le compte acheteur et désactive vendeur/livreur dans ce parcours. Les espaces professionnels restent bloqués tant que le dossier n’est pas complet et approuvé. La démarche distincte « Devenir vendeur/livreur » est conservée.
+
+Pays d’émission obligatoire (249 codes de pays/territoires plus Kosovo), photo JPG/PNG obligatoire pour vendeur et livreur, document privé, permis C réservé aux livreurs. Un changement de pièce ou de pays relance la validation manuelle. Les dossiers antérieurs sans pays ou photo identifiée doivent être complétés à la connexion ; ils n’ouvrent plus les espaces professionnels. Migration 0016 obligatoire. Voir docs/IDENTITY_DELIVERY.md.
+
+Validation 1.6.0 : 27 tests passent (tarifs frontend/backend, création acheteur, autorisations professionnelles, pays et photo obligatoires, permis C, parcours partagés et double authentification). Compilation réussie. L’API hébergée doit être rétablie et la migration 0016 appliquée avant utilisation réelle.

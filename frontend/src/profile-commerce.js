@@ -623,7 +623,7 @@ async function buyNow(id) {
   }
   const selection = new Map([[id, 1]]);
   if (!customerProfile) {
-    showRegister();
+    showBuyerRegistration();
     const registration = $("#register-form");
     if (registration) {
       const save = registration.onsubmit;

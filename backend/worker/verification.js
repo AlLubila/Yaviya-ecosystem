@@ -1,3 +1,5 @@
+import { approvedIdentity } from "./identity-complete.js";
+import marketConfig from "../data/market-config.json" with { type: "json" };
 import { accountIdentifiers } from "./account-identifiers.js";
 const json = (v, status = 200) =>
   Response.json(v, { status, headers: { "Cache-Control": "no-store" } });
@@ -33,7 +35,7 @@ export async function handleVerification(request, env) {
       if (!isAdmin) return json({ error: "Administrator only" }, 403);
       if (request.method === "GET") {
         const result = await env.DB.prepare(
-          "SELECT i.user_id AS userId,i.kind,i.company_name AS companyName,i.company_rcm AS companyRcm,i.unregistered,i.seller_plan AS sellerPlan,i.courier_plan AS courierPlan,i.document_type AS documentType,i.file_name AS fileName,i.status,i.note,i.submitted_at AS submittedAt,c.name,c.phone FROM identity_checks i JOIN customers c ON c.user_id=i.user_id ORDER BY i.submitted_at DESC",
+          "SELECT i.user_id AS userId,i.kind,i.company_name AS companyName,i.company_rcm AS companyRcm,i.unregistered,i.seller_plan AS sellerPlan,i.courier_plan AS courierPlan,i.document_mime AS documentMime,i.issuing_country AS issuingCountry,i.document_type AS documentType,i.file_name AS fileName,i.status,i.note,i.submitted_at AS submittedAt,c.name,c.phone FROM identity_checks i JOIN customers c ON c.user_id=i.user_id ORDER BY i.submitted_at DESC",
         ).all();
         const rows = [];
         for (const row of result.results) {
@@ -61,6 +63,11 @@ export async function handleVerification(request, env) {
       if (
         d.decision === "approve" &&
         (d.identityChecked !== true ||
+          !["image/jpeg", "image/png"].includes(check.document_mime) ||
+          !marketConfig.identityCountries.some(
+            (c) => c.code === check.issuing_country,
+          ) ||
+          (check.document_type === "licence-c" && check.kind !== "courier") ||
           (check.kind === "seller" && d.companyChecked !== true))
       )
         return json(
@@ -125,7 +132,7 @@ export async function handleVerification(request, env) {
     if (path !== "/api/verification") return json({ error: "Not found" }, 404);
     if (request.method === "GET") {
       const check = await env.DB.prepare(
-        "SELECT kind,company_name AS companyName,company_rcm AS companyRcm,unregistered,seller_plan AS sellerPlan,courier_plan AS courierPlan,document_type AS documentType,file_name AS fileName,status,note,submitted_at AS submittedAt FROM identity_checks WHERE user_id=?",
+        "SELECT kind,company_name AS companyName,company_rcm AS companyRcm,unregistered,seller_plan AS sellerPlan,courier_plan AS courierPlan,document_mime AS documentMime,issuing_country AS issuingCountry,document_type AS documentType,file_name AS fileName,status,note,submitted_at AS submittedAt FROM identity_checks WHERE user_id=?",
       )
         .bind(user)
         .first();
@@ -135,16 +142,15 @@ export async function handleVerification(request, env) {
         .bind(user)
         .first();
       const activeCheck = check?.kind === profile?.account_type ? check : null;
-      const stores =
-        activeCheck?.status === "approved"
-          ? (
-              await env.DB.prepare(
-                "SELECT id,name,country FROM owned_stores WHERE user_id=?",
-              )
-                .bind(user)
-                .all()
-            ).results
-          : [];
+      const stores = approvedIdentity(activeCheck, profile?.account_type)
+        ? (
+            await env.DB.prepare(
+              "SELECT id,name,country FROM owned_stores WHERE user_id=?",
+            )
+              .bind(user)
+              .all()
+          ).results
+        : [];
       return json({ check: activeCheck, stores, isAdmin });
     }
     if (request.method !== "POST")
@@ -161,6 +167,7 @@ export async function handleVerification(request, env) {
       companyName = String(form.get("companyName") || "").trim(),
       companyRcm = String(form.get("companyRcm") || "").trim(),
       documentType = String(form.get("documentType") || ""),
+      issuingCountry = String(form.get("issuingCountry") || ""),
       file = form.get("document"),
       unregistered = kind === "seller" && form.get("unregistered") === "true",
       sellerPlan = String(form.get("sellerPlan") || "free"),
@@ -184,7 +191,11 @@ export async function handleVerification(request, env) {
         );
     }
     if (
-      !["identity", "passport", "licence-b", "voter"].includes(documentType) ||
+      !marketConfig.identityCountries.some((c) => c.code === issuingCountry) ||
+      !["identity", "passport", "licence-b", "licence-c", "voter"].includes(
+        documentType,
+      ) ||
+      (documentType === "licence-c" && kind !== "courier") ||
       (kind === "seller" && (!companyName || (!unregistered && !companyRcm))) ||
       companyName.length > 150 ||
       companyRcm.length > 100
@@ -203,14 +214,17 @@ export async function handleVerification(request, env) {
       .first();
     const newFile = file && typeof file.arrayBuffer === "function" && file.size;
     if (
-      (!newFile && previous?.kind !== kind) ||
+      (!newFile &&
+        (previous?.kind !== kind ||
+          !["image/jpeg", "image/png"].includes(previous?.document_mime))) ||
       (newFile && file.size > 8 * 1024 * 1024)
     )
       return json({ error: "Provide a document smaller than 8 MB" }, 400);
     if (form.get("identityConfirmed") !== "true")
       return json({ error: "Confirm identity document ownership" }, 400);
     let objectKey = previous?.object_key,
-      fileName = previous?.file_name;
+      fileName = previous?.file_name,
+      documentMime = previous?.document_mime;
     if (newFile) {
       const bytes = await file.arrayBuffer(),
         signature = new Uint8Array(bytes);
@@ -225,8 +239,9 @@ export async function handleVerification(request, env) {
             : new TextDecoder().decode(signature.slice(0, 5)) === "%PDF-"
               ? "application/pdf"
               : null;
-      if (!type || type !== file.type)
-        return json({ error: "Use a valid JPG, PNG or PDF document" }, 400);
+      if (!["image/jpeg", "image/png"].includes(type) || type !== file.type)
+        return json({ error: "Use a valid JPG or PNG identity photo" }, 400);
+      documentMime = type;
       objectKey = "identity/" + crypto.randomUUID();
       fileName = file.name.slice(0, 150);
       await env.IDENTITY_FILES.put(objectKey, bytes, {
@@ -251,6 +266,7 @@ export async function handleVerification(request, env) {
       previous.company_name === companyName &&
       previous.company_rcm === effectiveRcm &&
       previous.document_type === documentType &&
+      previous.issuing_country === issuingCountry &&
       !!previous.unregistered === unregistered
     ) {
       await env.DB.prepare(
@@ -262,7 +278,7 @@ export async function handleVerification(request, env) {
     }
     try {
       await env.DB.prepare(
-        "INSERT INTO identity_checks (user_id,kind,company_name,company_rcm,document_type,object_key,file_name,status,note,submitted_at,reviewed_at,unregistered,seller_plan,courier_plan) VALUES (?,?,?,?,?,?,?,'pending','',?,NULL,?,?,?) ON CONFLICT(user_id) DO UPDATE SET kind=excluded.kind,company_name=excluded.company_name,company_rcm=excluded.company_rcm,unregistered=excluded.unregistered,seller_plan=excluded.seller_plan,courier_plan=excluded.courier_plan,document_type=excluded.document_type,object_key=excluded.object_key,file_name=excluded.file_name,status='pending',note='',submitted_at=excluded.submitted_at,reviewed_at=NULL",
+        "INSERT INTO identity_checks (user_id,kind,company_name,company_rcm,document_type,object_key,file_name,status,note,submitted_at,reviewed_at,unregistered,seller_plan,courier_plan,issuing_country,document_mime) VALUES (?,?,?,?,?,?,?,'pending','',?,NULL,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET kind=excluded.kind,company_name=excluded.company_name,company_rcm=excluded.company_rcm,unregistered=excluded.unregistered,seller_plan=excluded.seller_plan,courier_plan=excluded.courier_plan,document_mime=excluded.document_mime,issuing_country=excluded.issuing_country,document_type=excluded.document_type,object_key=excluded.object_key,file_name=excluded.file_name,status='pending',note='',submitted_at=excluded.submitted_at,reviewed_at=NULL",
       )
         .bind(
           user,
@@ -276,6 +292,8 @@ export async function handleVerification(request, env) {
           unregistered ? 1 : 0,
           sellerPlan,
           courierPlan,
+          issuingCountry,
+          documentMime,
         )
         .run();
     } catch (e) {

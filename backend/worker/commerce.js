@@ -1,3 +1,4 @@
+import { approvedIdentity } from "./identity-complete.js";
 import marketConfig from "../data/market-config.json" with { type: "json" };
 import { accountIdentifiers } from "./account-identifiers.js";
 import {
@@ -36,13 +37,19 @@ export async function marketContext(env, user) {
     .bind(user)
     .first();
   const check = await env.DB.prepare(
-    "SELECT kind,status,seller_plan FROM identity_checks WHERE user_id=?",
+    "SELECT kind,status,seller_plan,issuing_country,document_type,document_mime FROM identity_checks WHERE user_id=?",
   )
     .bind(user)
     .first();
   const isAdmin = admin?.user_id === base,
     approved =
-      check?.status === "approved" && check.kind === profile?.account_type;
+      check?.status === "approved" &&
+      check.kind === profile?.account_type &&
+      ["image/jpeg", "image/png"].includes(check.document_mime) &&
+      marketConfig.identityCountries.some(
+        (c) => c.code === check.issuing_country,
+      ) &&
+      (check.document_type !== "licence-c" || check.kind === "courier");
   const stores = (
     await env.DB.prepare(
       "SELECT id,name,country FROM owned_stores WHERE user_id=? AND country=?",
@@ -217,11 +224,13 @@ async function state(env, ctx, view) {
     );
   const stores = (
     await env.DB.prepare(
-      "SELECT s.id,s.name,s.country,i.status FROM owned_stores s JOIN identity_checks i ON i.user_id=s.user_id WHERE s.country=? AND i.status=?",
+      "SELECT s.id,s.name,s.country,i.status,i.kind,i.document_type,i.document_mime,i.issuing_country FROM owned_stores s JOIN identity_checks i ON i.user_id=s.user_id WHERE s.country=? AND i.status=?",
     )
       .bind(ctx.country, "approved")
       .all()
-  ).results;
+  ).results
+    .filter((row) => approvedIdentity(row, "seller"))
+    .map(({ id, name, country, status }) => ({ id, name, country, status }));
   let ordersQuery = "SELECT DISTINCT o.* FROM market_orders o";
   let args = [];
   if (view !== "admin") {
@@ -279,11 +288,13 @@ async function state(env, ctx, view) {
     view === "admin"
       ? (
           await env.DB.prepare(
-            "SELECT c.user_id AS userId,c.name,m.available FROM customers c JOIN identity_checks i ON i.user_id=c.user_id JOIN market_couriers m ON m.user_id=c.user_id WHERE m.country=? AND c.account_type=? AND i.kind=? AND i.status=?",
+            "SELECT c.user_id AS userId,c.name,m.available,i.status,i.kind,i.document_type,i.document_mime,i.issuing_country FROM customers c JOIN identity_checks i ON i.user_id=c.user_id JOIN market_couriers m ON m.user_id=c.user_id WHERE m.country=? AND c.account_type=? AND i.kind=? AND i.status=?",
           )
             .bind(ctx.country, "courier", "courier", "approved")
             .all()
         ).results
+          .filter((row) => approvedIdentity(row, "courier"))
+          .map(({ userId, name, available }) => ({ userId, name, available }))
       : [];
   const profile = ctx.profile
     ? {
@@ -471,7 +482,13 @@ function deliveryFee(country, mode, city, commune, count) {
       : null;
   if (country === "CD" && city === "Kinshasa" && !tariff)
     fail("Commune non couverte");
-  return ((tariff?.[5] || 7500) + (mode === "express" ? 7500 : 0)) * count;
+  return (
+    ((tariff?.[5] ||
+      (country === "CD" ? marketConfig.deliveryRates[city]?.[commune] : null) ||
+      7500) +
+      (mode === "express" ? 7500 : 0)) *
+    count
+  );
 }
 async function createOrder(env, ctx, d) {
   if (!ctx.profile) fail("Créez votre compte avant de commander", 409);

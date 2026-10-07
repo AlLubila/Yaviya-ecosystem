@@ -1,3 +1,4 @@
+import { approvedIdentity } from "./identity-complete.js";
 import {
   validProductImage,
   validatePhotoReferences,
@@ -54,7 +55,7 @@ export async function handleDelivery(request, env) {
         .bind("owner")
         .first();
       const check = await env.DB.prepare(
-        "SELECT kind,status FROM identity_checks WHERE user_id=?",
+        "SELECT kind,status,document_type,document_mime,issuing_country FROM identity_checks WHERE user_id=?",
       )
         .bind(user)
         .first();
@@ -68,7 +69,7 @@ export async function handleDelivery(request, env) {
         !(
           profile?.account_type === "courier" &&
           check?.kind === "courier" &&
-          check.status === "approved"
+          approvedIdentity(check, "courier")
         )
       )
         return json({ error: "Verified courier or demo owner required" }, 403);

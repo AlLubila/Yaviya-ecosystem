@@ -56,7 +56,7 @@ test("shared product metrics deduplicate viewers and buyers, reject spoofing and
     ]) {
       await db
         .prepare(
-          "INSERT INTO identity_checks(user_id,kind,document_type,object_key,file_name,status,submitted_at) VALUES (?,'seller','identity','fixture','fixture','approved',?)",
+          "INSERT INTO identity_checks(user_id,kind,document_type,object_key,file_name,status,issuing_country,document_mime,submitted_at) VALUES (?,'seller','identity','fixture','fixture','approved','CD','image/jpeg',?)",
         )
         .bind(seller.id, Date.now())
         .run();

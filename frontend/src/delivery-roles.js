@@ -59,6 +59,8 @@ kinshasaDeliveryTariffs.push(
   [3, "Sud", "Kalamu", "À confirmer", "To confirm", 7500],
   [3, "Sud", "Ngiri-Ngiri", "À confirmer", "To confirm", 7500],
 );
+for (const row of kinshasaDeliveryTariffs)
+  row[5] = window.YAVIYA_MARKET_CONFIG.deliveryRates.Kinshasa[row[2]];
 function normalizedCommune(s) {
   return s
     .normalize("NFD")
@@ -76,7 +78,10 @@ function deliveryCost(mode, sellerCount, city = "", commune = "") {
   if (mode === "hand") return 0;
   if (mode === "relay") return 3500 * sellerCount;
   if (!city) return null;
-  let standard = 7500;
+  let standard =
+    window.YAVIYA_COUNTRY === "CD"
+      ? (window.YAVIYA_MARKET_CONFIG.deliveryRates[city]?.[commune] ?? 7500)
+      : 7500;
   if (window.YAVIYA_COUNTRY === "CD" && city === "Kinshasa") {
     const tariff = kinshasaTariff(commune);
     if (!tariff) return null;

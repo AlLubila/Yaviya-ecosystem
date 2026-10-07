@@ -215,6 +215,14 @@ test("new buyer returns to the selected purchase after completing the real regis
     await until(() => f.w.document.querySelector("#register-form"));
     const form = f.w.document.querySelector("#register-form"),
       buyer = form.querySelector('[name="accountType"][value="buyer"]');
+    assert.equal(
+      form.querySelector('[value="seller"][name="accountType"]').disabled,
+      true,
+    );
+    assert.equal(
+      form.querySelector('[value="courier"][name="accountType"]').disabled,
+      true,
+    );
     buyer.checked = true;
     buyer.dispatchEvent(new f.w.Event("change"));
     for (const [name, value] of Object.entries({
@@ -550,6 +558,44 @@ test("existing catalogues backfill missing demo references without overwriting s
       .first();
     assert.equal(JSON.parse(preserved.data).title, edited.title);
     assert.equal(preserved.stock, 7);
+    assert.deepEqual(f.errors, []);
+  } finally {
+    f.close();
+  }
+});
+
+test("commune delivery prices agree between checkout and persisted orders", async () => {
+  const f = await fixture();
+  try {
+    await until(() => f.run("marketReady"));
+    assert.equal(f.run('deliveryCost("home",2,"Kinshasa","Matete")'), 20000);
+    assert.equal(
+      f.run('deliveryCost("express",1,"Kinshasa","Kimbanseke")'),
+      20000,
+    );
+    assert.equal(f.run('deliveryCost("home",1,"Lubumbashi","Kenya")'), 7500);
+    for (const [commune, fee] of [
+      ["Matete", 10000],
+      ["Kimbanseke", 12500],
+    ]) {
+      const response = await f.direct(
+        "/api/marketplace/orders",
+        {
+          requestKey: randomUUID(),
+          items: [{ id: 1, q: 1 }],
+          city: "Kinshasa",
+          commune,
+          address: "Adresse fictive",
+          recipient: { name: "Test Buyer", phone: "+243999999999" },
+          paymentId: "cod",
+          delivery: { mode: "home" },
+        },
+        f.session,
+      );
+      assert.equal(response.status, 201, await response.clone().text());
+      const data = await response.json();
+      assert.equal(data.order.total, 85000 + fee);
+    }
     assert.deepEqual(f.errors, []);
   } finally {
     f.close();
