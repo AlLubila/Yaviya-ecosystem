@@ -1,10 +1,14 @@
-# YAVIYA — nouvelle version complète (1.6.0)
+# YAVIYA — nouvelle version complète (1.8.0)
+
+Version 1.8.0 : schéma PostgreSQL/Supabase de production, politiques RLS, stockage privé et fondations comptables pour paiements, commissions, remboursements et reversements.
 
 Version 1.7.0 : [12 catégories, coupons et préférences de profil](docs/PROFILE_CATEGORIES_COUPONS.md). La devise préférée ne convertit pas les prix.
 
 Version complète indépendante issue de la version 31 de YAVIYA « Votre marché, à portée de main », avec les corrections d’achat immédiat, la connexion indépendante, des fenêtres sans Retour flottant et des galeries sous plusieurs angles. Le catalogue comprend 60 références par marché, des nombres d’acheteurs marqués « démo » et une confirmation avec accès au suivi après commande. Frontend, backend, API, migrations, tests et photos sont accessibles comme fichiers séparés dans le dépôt public. L'ancienne vitrine de huit produits est conservée dans `legacy-vitrine/` ; le build principal utilise désormais la version complète.
 
 [Catalogue et couverture](docs/CATALOGUE_COVERAGE.md) · [Double authentification](docs/TWO_FACTOR.md) · [Rôle de chaque fichier](docs/FILES.md) · [Lancer et tester les parcours](docs/DEMO.md)
+
+La cible PostgreSQL/Supabase de production est définie dans `supabase/` avec RLS, stockage privé, tables de paiements, commissions, remboursements et reversements. Voir le [guide PostgreSQL/Supabase](docs/POSTGRESQL_SUPABASE.md). Le runtime actuel reste sur libSQL jusqu'à l'activation du projet Supabase et la migration de l'adaptateur API.
 
 ## Ce qui est conservé
 

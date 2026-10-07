@@ -1,0 +1,19 @@
+project_id = "yaviya-market"
+
+[api]
+enabled = true
+schemas = ["public", "storage"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+major_version = 17
+
+[auth]
+enabled = true
+site_url = "https://yaviya.cd"
+additional_redirect_urls = ["https://www.yaviya.cd", "https://yaviyaecosystem.vercel.app"]
+
+[storage]
+enabled = true
+file_size_limit = "8MiB"
