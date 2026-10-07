@@ -1,3 +1,4 @@
+textTranslations["Devenir partenaire YAVIYA"] = "Become a YAVIYA partner";
 heroSlides.push(
   {
     img: "partner-payment.jpg",
@@ -55,7 +56,16 @@ filteredHomeAds = function () {
   );
 };
 drawHomeAd();
+function showPartnership() {
+  open(
+    `<span class="eyebrow">${T("PARTENARIATS", "PARTNERSHIPS")}</span><h2>${T("Devenir partenaire YAVIYA", "Become a YAVIYA partner")}</h2><p>${T("Vous représentez une marque, une entreprise de livraison ou un prestataire de services ? Présentez-nous votre activité et le partenariat que vous souhaitez construire avec YAVIYA.", "Do you represent a brand, a delivery company or a service provider? Tell us about your business and the partnership you would like to build with YAVIYA.")}</p><p>${T("Indiquez le nom de votre entreprise, votre ville, vos coordonnées et votre proposition.", "Include your company name, city, contact details and proposal.")}</p><p><strong>${T("Contact partenariats", "Partnership contact")} :</strong> <a href="mailto:partenariat@yaviya.cd">partenariat@yaviya.cd</a></p><a class="primary" href="mailto:partenariat@yaviya.cd?subject=Proposition%20de%20partenariat%20YAVIYA">${T("Écrire à notre équipe", "Email our team")}</a>`,
+  );
+}
 function showCampaignInfo(info) {
+  if (info === "partnership") {
+    showPartnership();
+    return;
+  }
   if (info === "payments")
     open(
       `<span class="eyebrow">VODACOM · M-PESA</span><h2>${T("Paiement Mobile Money", "Mobile Money payments")}</h2><p>${T("Le parcours YAVIYA propose M-Pesa, Orange Money, Airtel Money et Afrimoney, ainsi que la carte bancaire et le paiement à la livraison.", "The YAVIYA flow offers M-Pesa, Orange Money, Airtel Money and Afrimoney, alongside bank cards and cash on delivery.")}</p><p>${T("Dans la démonstration, le paiement anticipé est retenu en escrow simulé jusqu’à votre confirmation de réception. Aucun fonds réel n’est détenu.", "In the demonstration, prepaid funds are held in simulated escrow until you confirm receipt. No real funds are held.")}</p><p class="demo-note">${T("Concept de publicité ; aucun partenariat commercial avec Vodacom n’est confirmé. Aucun accès à votre compte M-Pesa.", "Advertising concept; no commercial partnership with Vodacom is confirmed. No access to your M-Pesa account.")}</p>`,
@@ -69,12 +79,17 @@ function showCampaignInfo(info) {
 document.addEventListener(
   "click",
   (e) => {
+    if (e.target.closest("[data-partnership]")) {
+      e.preventDefault();
+      showPartnership();
+      return;
+    }
     const a = e.target.closest("a[href]");
     if (!a) return;
     const u = new URL(a.href, location.href),
       info = u.searchParams.get("info");
     if (
-      ["payments", "logistics", "benefits"].includes(info) &&
+      ["payments", "logistics", "benefits", "partnership"].includes(info) &&
       u.origin === location.origin
     ) {
       e.preventDefault();
