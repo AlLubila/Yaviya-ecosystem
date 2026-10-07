@@ -362,10 +362,7 @@ test("every demo product has distinct gallery views, clean windows and working p
           new f.w.KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }),
         );
       assert.equal(main.src, first);
-      assert.match(
-        doc.querySelector(".product-detail-info .demo-note").textContent,
-        /illustratives/,
-      );
+      assert.equal(doc.querySelector(".product-detail-info .demo-note"), null);
       doc.querySelector("#modal > .close").click();
       assert.equal(doc.querySelector("#modal").open, false);
     }
