@@ -1,3 +1,4 @@
+import marketConfig from "../data/market-config.json" with { type: "json" };
 export const seedCatalogue = [
   {
     id: 1,
@@ -1494,3 +1495,9 @@ export const deliveryCommunesCG = {
     "Ngoyo",
   ],
 };
+
+// Only unchanged illustrative seed galleries receive generated alternate views.
+for (const product of [...seedCatalogue, ...seedCatalogueCG]) {
+  const gallery = marketConfig.productGalleries[product.img];
+  if (gallery) product.images = [...gallery];
+}

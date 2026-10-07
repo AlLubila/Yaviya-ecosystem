@@ -10,7 +10,7 @@ Intégrations : base Turso persistante et migrations ; identifiants OAuth Google
 
 Validation : tests automatisés, compilation et présence de toutes les photos du catalogue. Connexion Google réelle et déploiement Vercel non vérifiés faute de configuration et d’accès autorisé au projet. Aucun paiement électronique activé.
 
-Navigation produit : flèche Retour visible sur ordinateur et mobile. Pendant la comparaison, retour à la fiche produit ou à la boutique précédente sans fermer la fenêtre ; galerie et boutons conservés. Retour en haut de chaque vue. Fichiers : frontend/page-navigation.js et frontend/style.css.
+Navigation produit : fenêtres sans bouton Retour flottant, fermeture par la croix et ouverture en haut de chaque vue.
 
 ## Version 1.2.0 — double authentification
 
@@ -19,3 +19,7 @@ Activation facultative par application TOTP avec QR code et clé manuelle, premi
 ## Version 1.3.0 — achat immédiat, catégories et couverture
 
 Le clic attend la synchronisation en cours et recharge explicitement le profil, puis vérifie le produit serveur. La reprise après inscription, une commande du seul article choisi et les erreurs persistantes sont testées avec les pages complètes et le backend SQLite. 19 familles, 72 sous-catégories, sélection dans l’éditeur vendeur et conservation côté serveur. Répertoire de 96 villes/agglomérations RDC ; seules Kinshasa et Lubumbashi sont ouvertes, avec refus des autres villes dans chaque mode, côté UI et serveur. Le répertoire est commercial et ne certifie pas les statuts administratifs actuels. Le backend du déploiement consulté répondait 503 et le projet n’était pas accessible par la connexion Vercel disponible.
+
+## Version 1.3.1 — fenêtres, FAQ et vues produits
+
+Suppression du bouton Retour flottant. 17 questions populaires bilingues, pliables, avec réponses pratiques et statut réel de la démonstration ; votes enregistrés pour les nouveaux sujets et réponses du chatbot associées. 30 vues alternatives générées à partir des photos originales : deux vues distinctes pour les 39 références de chaque marché, sans remplacer les galeries chargées par un vendeur. La configuration commune hydrate le catalogue initial et les anciennes données démo servies par l’API. Éditeur : jusqu’à 8 photos, couverture réordonnable, conseils face/profil/arrière/détails. Aucune garantie de conformité donnée par les images générées.

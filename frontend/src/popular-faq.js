@@ -2,111 +2,188 @@ const popularQuestions = [
   {
     id: "order",
     fr: [
-      "Comment passer une commande sur YAVIYA ?",
-      "Parcourez les produits, ajoutez-les à votre panier, puis rendez-vous sur la page de paiement. Remplissez vos informations de livraison et choisissez votre mode de paiement : Mobile Money, carte bancaire ou paiement à la livraison.",
+      "Comment acheter un produit en quelques étapes ?",
+      "Ouvrez la fiche du produit, consultez ses photos et ses caractéristiques, puis choisissez « Acheter maintenant » ou « Ajouter au panier ». Connectez-vous, complétez vos coordonnées et choisissez une ville ouverte à la livraison. Vérifiez le récapitulatif et les frais avant de confirmer : une commande enregistrée reçoit un numéro dans « Mes commandes ».",
     ],
     en: [
-      "How do I place an order on YAVIYA?",
-      "Browse products, add them to your cart and proceed to checkout. Enter your delivery details and choose Mobile Money, a bank card or cash on delivery.",
+      "How do I buy a product?",
+      "Open the product page, inspect its photos and specifications, then choose “Buy now” or “Add to cart”. Sign in, complete your contact details and choose a delivery city currently served. Review the summary and fees before confirming. A saved order receives a reference in “My orders”.",
     ],
   },
   {
-    id: "tracking",
+    id: "photos",
     fr: [
-      "Comment suivre ma commande ?",
-      "Ouvrez « Suivre ma commande » et entrez votre numéro de commande. Le statut et l’historique sont enregistrés dans votre scénario privé, y compris après rechargement.",
+      "Comment bien vérifier un article avant de commander ?",
+      "Parcourez toutes les miniatures : vue principale, autre angle et détails ajoutés par le vendeur. Comparez la couleur, la taille, les matières et le contenu du colis avec la description. Une photo seule ne garantit pas ces caractéristiques : demandez les précisions manquantes au vendeur avant de valider. Les vues générées du catalogue démo sont illustratives.",
     ],
     en: [
-      "How do I track my order?",
-      "Open “Track my order” and enter your order number to see its current status and tracking history. Status and history remain available in your private scenario after reloading.",
-    ],
-  },
-  {
-    id: "payment",
-    fr: [
-      "Quels sont les modes de paiement acceptés ?",
-      "Les modes prévus sont le Mobile Money (M-Pesa, Orange Money, Airtel Money), les cartes bancaires Visa et Mastercard et le paiement en espèces à la livraison. Afrimoney est également présenté dans la démo. Aucun paiement réel n’est encore activé.",
-    ],
-    en: [
-      "Which payment methods are accepted?",
-      "Planned methods are Mobile Money (M-Pesa, Orange Money, Airtel Money), Visa and Mastercard bank cards, and cash on delivery. Afrimoney is also shown in the demo. Real payments are not activated yet.",
-    ],
-  },
-  {
-    id: "delivery",
-    fr: [
-      "Quelles sont les zones de livraison ?",
-      "Les zones prévues sont Kinshasa et Lubumbashi, dans toutes les communes. Les frais définitifs varieront selon la commune ; les montants de la démo restent indicatifs. Livraison standard estimée sous 24 à 48 heures après validation, selon la disponibilité et la localité. L’express à domicile est proposé à 15 000 FC par colis vendeur, avec un délai provisoire de 6 à 12 heures selon la zone.",
-    ],
-    en: [
-      "Which areas are covered by delivery?",
-      "Planned coverage includes all communes of Kinshasa and Lubumbashi. Final fees will vary by commune; demo prices are illustrative. Standard delivery is estimated within 24–48 hours after confirmation, depending on availability and location. Express home delivery is offered at FC 15,000 per seller parcel, with a provisional 6–12-hour estimate depending on the area.",
-    ],
-  },
-  {
-    id: "returns",
-    fr: [
-      "Comment retourner un produit ?",
-      "La politique prévue vous accorde 7 jours pour demander le retour d’un produit défectueux ou non conforme. Contactez le service client pour initier la demande. Les conditions définitives seront publiées avant le lancement ; aucun retour réel n’est traité dans la démonstration.",
-    ],
-    en: [
-      "How do I return a product?",
-      "The planned policy allows 7 days to request a return of a defective or non-conforming product. Contact customer service to start the request. Final conditions will be published before launch; this demonstration does not process real returns.",
-    ],
-  },
-  {
-    id: "seller",
-    fr: [
-      "Comment devenir vendeur sur YAVIYA ?",
-      "Ouvrez la vue « Vendeur » en haut du site pour découvrir votre tableau de bord, votre catalogue et vos commandes. Au lancement, « Vendre à YAVIYA » permettra de créer un compte vendeur et d’ouvrir une boutique. Le formulaire par étapes enregistre votre dossier : coordonnées, activité, identité, puis abonnement. L’admin le valide manuellement. Aucun abonnement n’est facturé dans le MVP.",
-    ],
-    en: [
-      "How do I become a seller on YAVIYA?",
-      "Open the “Seller” view at the top of the site to explore your dashboard, catalogue and orders. At launch, “Sell on YAVIYA” will let you create a seller account and open a shop. The staged form saves your contact, business, identity and final plan choice. Administration reviews it manually. No subscription is billed in the MVP.",
+      "How can I inspect an item before buying?",
+      "Browse every thumbnail: main view, another angle and details uploaded by the seller. Compare colour, size, materials and package contents with the description. Photos alone do not guarantee these specifications: ask the seller for missing details before confirming. Generated demo catalogue views are illustrative.",
     ],
   },
   {
     id: "verified",
     fr: [
-      "Les vendeurs sont-ils vérifiés ?",
-      "La vérification des vendeurs est prévue avant leur admission sur YAVIYA. Les vendeurs vérifiés porteront un badge visible sur leurs produits et leur boutique. Dans la démonstration, les boutiques et les badges « Vérifié · démo » sont illustratifs.",
+      "Que signifie le badge vendeur vérifié ?",
+      "Le badge vous aide à repérer le statut de vérification de la boutique. Consultez aussi sa fiche, les informations disponibles et les avis : une vérification ne garantit pas à elle seule la qualité de chaque article. Les badges « Vérifié · démo » représentent des boutiques fictives et ne constituent pas une vérification réelle.",
     ],
     en: [
-      "Are sellers verified?",
-      "Seller verification is planned before admission to YAVIYA. Verified sellers will display a badge on their products and shops. In this demonstration, shops and “Verified · demo” badges are illustrative.",
+      "What does a verified seller badge mean?",
+      "The badge helps identify the store’s verification status. Also review its profile, available information and reviews: verification alone does not guarantee every item’s quality. “Verified · demo” badges represent fictional stores, not real verification.",
     ],
   },
   {
-    id: "contact",
+    id: "tracking",
     fr: [
-      "Comment contacter le service client ?",
-      "L’adresse de contact proposée est contact@yaviya.cd. Les horaires prévus sont de 8h à 20h, 7 jours sur 7. Le téléphone et WhatsApp restent à confirmer : +243 000 000 000 est un numéro provisoire. Le formulaire ci-dessous prépare un e-mail, sans l’envoyer automatiquement.",
+      "Où retrouver et suivre ma commande ?",
+      "Connectez-vous au compte utilisé lors de l’achat et ouvrez « Mes commandes » ou « Suivre ma commande ». Conservez votre numéro : il permet d’identifier le bon achat. Le vendeur, le livreur affecté et l’administration interviennent sur la même commande selon leur rôle. Si le service est indisponible, réessayez plus tard ; ne considérez pas une commande comme enregistrée sans confirmation.",
     ],
     en: [
-      "How do I contact customer service?",
-      "The proposed contact address is contact@yaviya.cd. Planned hours are 8am–8pm, seven days a week. Phone and WhatsApp details remain to be confirmed: +243 000 000 000 is a placeholder. The form below prepares an email without sending it automatically.",
+      "Where can I find and track my order?",
+      "Sign into the account used for the purchase and open “My orders” or “Track my order”. Keep your reference to identify the purchase. The seller, assigned courier and administrator act on the same order according to their roles. If the service is unavailable, retry later; an order is not saved until confirmed.",
     ],
   },
   {
-    id: "coins",
+    id: "delivery",
     fr: [
-      "Comment gagner et utiliser les Yavicoins ?",
-      "Vous gagnez 1 Yavicoin par tranche de 2 000 FC de produits reçus et confirmés. Ouvrez « Mes Yavicoins » pour consulter votre solde et échanger vos coins contre les produits de la sélection. La conversion provisoire reste 1 coin = 10 FC. Les coins sont de démonstration, sans valeur monétaire réelle.",
+      "Dans quelles villes de RDC puis-je commander ?",
+      "Le parcours accepte actuellement Kinshasa et Lubumbashi, avec sélection de la commune. Les autres villes du sélecteur sont indiquées « bientôt disponible » et restent bloquées jusqu’à l’ouverture de la livraison. Vous savez ainsi avant de confirmer si votre adresse est éligible.",
     ],
     en: [
-      "How do I earn and use Yavicoins?",
-      "Earn 1 Yavicoin for each FC 2,000 of products received and confirmed. Open “My Yavicoins” to see your balance and redeem coins for selected products. The provisional conversion remains 1 coin = FC 10. These are demo coins with no real monetary value.",
+      "Which DRC cities can I order from?",
+      "Checkout currently accepts Kinshasa and Lubumbashi, with commune selection. Other cities in the selector are marked “coming soon” and blocked until delivery opens there. You can check address eligibility before confirming.",
+    ],
+  },
+  {
+    id: "fees",
+    fr: [
+      "Comment connaître les frais et le délai de livraison ?",
+      "Sélectionnez votre ville, votre commune et le mode de livraison : le récapitulatif affiche les frais calculés pour votre commande. Plusieurs vendeurs peuvent nécessiter plusieurs colis. Les montants et délais de la démo sont indicatifs ; confirmez les conditions réelles avec le vendeur avant tout achat hors démonstration.",
+    ],
+    en: [
+      "How do I check delivery fees and timing?",
+      "Choose your city, commune and delivery method: the summary shows the calculated order fees. Multiple sellers can require multiple parcels. Demo fees and timing are illustrative; confirm actual terms with the seller before any real purchase.",
+    ],
+  },
+  {
+    id: "payment",
+    fr: [
+      "Puis-je payer par Mobile Money ou carte bancaire ?",
+      "Les commandes partagées proposent les espèces à réception. Mobile Money et les cartes bancaires restent prévus pour une future intégration : aucun débit électronique ni abonnement réel n’est activé. Vérifiez le total et le numéro de commande ; les déclarations de paiement à réception sont enregistrées séparément par l’acheteur et l’encaisseur.",
+    ],
+    en: [
+      "Can I pay by Mobile Money or bank card?",
+      "Shared orders support cash on receipt. Mobile Money and bank cards are planned for future integration: no electronic debit or real subscription is active. Check the total and order reference; cash receipt declarations are saved separately by the buyer and collector.",
     ],
   },
   {
     id: "escrow",
     fr: [
-      "Quand le paiement est-il remis au vendeur ?",
-      "Dans le parcours de démonstration, le paiement anticipé reste retenu en escrow jusqu’à votre confirmation de réception dans « Mes commandes ». Marquer un colis livré ne suffit pas à débloquer le solde vendeur. Aucun fonds réel n’est détenu.",
+      "Quand le vendeur reçoit-il le paiement ?",
+      "Pour les commandes partagées, l’encaissement à réception et le règlement manuel sont déclarés et conservés par commande. Aucun escrow électronique n’est activé et aucun fonds réel n’est détenu par YAVIYA dans la démo. Vérifiez le produit reçu et les informations de paiement avant de confirmer votre réception.",
     ],
     en: [
-      "When are funds released to the seller?",
-      "In the demonstration, prepaid funds are held in escrow until you confirm receipt in “My orders”. Marking a parcel delivered does not release the seller balance. No real funds are held.",
+      "When is payment released to the seller?",
+      "For shared orders, cash collection and manual settlement declarations are saved per order. Electronic escrow is not enabled and YAVIYA holds no real funds in the demo. Check the received product and payment details before confirming receipt.",
+    ],
+  },
+  {
+    id: "receipt",
+    fr: [
+      "Que dois-je vérifier à la réception du colis ?",
+      "Comparez le produit reçu avec votre commande : référence, quantité commandée, couleur, taille, état et accessoires. Si vous constatez un problème, gardez le numéro de commande et des photos du produit et de l’emballage, puis contactez le vendeur ou l’aide avant de confirmer la réception.",
+    ],
+    en: [
+      "What should I check when my parcel arrives?",
+      "Compare the item with your order: reference, ordered quantity, colour, size, condition and accessories. If something is wrong, keep the order reference and photos of the item and packaging, then contact the seller or help before confirming receipt.",
+    ],
+  },
+  {
+    id: "returns",
+    fr: [
+      "Que faire si le produit est abîmé ou ne correspond pas ?",
+      "Expliquez précisément le problème au vendeur ou au support avec votre numéro de commande et des photos. Conservez l’article et son emballage pendant l’examen de la demande. Les conditions définitives de retour et de remboursement doivent être publiées avant le lancement ; la démo ne traite aucun remboursement réel.",
+    ],
+    en: [
+      "What if an item is damaged or does not match?",
+      "Describe the issue to the seller or support with your order reference and photos. Keep the item and packaging while the request is reviewed. Final return and refund terms must be published before launch; the demo processes no real refunds.",
+    ],
+  },
+  {
+    id: "reviews",
+    fr: [
+      "Puis-je noter séparément le vendeur et le livreur ?",
+      "Oui, après la livraison, les parcours d’évaluation distinguent le vendeur et le livreur affecté à la commande. Décrivez la conformité du produit et la préparation pour le vendeur, puis la remise du colis pour le livreur. Un avis précis aide les prochains acheteurs à choisir avec plus d’informations.",
+    ],
+    en: [
+      "Can I rate the seller and courier separately?",
+      "Yes, after delivery, review flows distinguish the seller from the courier assigned to the order. Describe item accuracy and preparation for the seller, then parcel handover for the courier. Specific feedback helps future buyers make informed choices.",
+    ],
+  },
+  {
+    id: "security",
+    fr: [
+      "Comment mieux protéger mon compte ?",
+      "Dans les paramètres de sécurité, activez l’authentification à deux facteurs avec une application d’authentification, puis conservez vos codes de secours dans un endroit sûr. Utilisez un mot de passe unique. Ne communiquez jamais votre mot de passe, votre code à usage unique ou vos codes de secours au vendeur ou au livreur.",
+    ],
+    en: [
+      "How can I better protect my account?",
+      "Enable two-factor authentication with an authenticator app in security settings and store your recovery codes safely. Use a unique password. Never share your password, one-time code or recovery codes with a seller or courier.",
+    ],
+  },
+  {
+    id: "unavailable",
+    fr: [
+      "« Acheter maintenant » affiche une erreur : que faire ?",
+      "Si une connexion est demandée, connectez-vous puis complétez votre profil acheteur. Vérifiez aussi que l’article est disponible et que votre ville est ouverte à la livraison. Si le service de compte ou de commande est temporairement indisponible, utilisez « Réessayer » quand il revient. Vérifiez « Mes commandes » avant de recommencer après une confirmation incertaine.",
+    ],
+    en: [
+      "“Buy now” shows an error. What should I do?",
+      "Sign in if prompted and complete your buyer profile. Check item availability and delivery city eligibility. If the account or order service is temporarily unavailable, use “Retry” when it returns. Check “My orders” before repeating a purchase after an uncertain confirmation.",
+    ],
+  },
+  {
+    id: "seller",
+    fr: [
+      "Comment ouvrir une boutique et ajouter plusieurs photos ?",
+      "Choisissez le parcours vendeur et complétez les étapes : coordonnées, activité, identité puis abonnement. Le dossier est soumis à l’administration. Dans l’éditeur produit, ajoutez jusqu’à 8 photos et placez la meilleure en premier : elle devient la couverture. Ajoutez des angles différents et des détails utiles. Aucun abonnement réel n’est facturé dans le MVP.",
+    ],
+    en: [
+      "How do I open a store and add multiple photos?",
+      "Choose seller registration and complete contact, business, identity and final subscription steps. Administration reviews the application. In the product editor, add up to 8 photos and put the best first as the cover. Include different angles and useful details. No real subscription is billed in the MVP.",
+    ],
+  },
+  {
+    id: "courier",
+    fr: [
+      "Comment devenir livreur et consulter mes missions ?",
+      "Complétez les quatre étapes du parcours livreur : coordonnées, identité, avantages et rémunération, puis abonnement Standard gratuit et coordonnées de règlement. Après validation et affectation, votre espace présente vos livraisons et les informations de rémunération simulées. Les échanges avec l’administration permettent de préciser les missions ; aucun paiement réel n’est exécuté dans la démo.",
+    ],
+    en: [
+      "How do I become a courier and view assignments?",
+      "Complete the four courier registration steps: contact details, identity, benefits and earnings, then the free Standard subscription and settlement details. After approval and assignment, your workspace shows deliveries and simulated compensation information. Discussions with administration help clarify assignments; the demo executes no real payments.",
+    ],
+  },
+  {
+    id: "coins",
+    fr: [
+      "À quoi servent les Yavicoins ?",
+      "Consultez « Mes Yavicoins » pour voir le solde et les possibilités d’échange présentées dans le parcours. Les règles affichées expliquent comment ils sont gagnés après réception confirmée. Dans cette version, les coins sont des points de démonstration sans valeur monétaire réelle.",
+    ],
+    en: [
+      "What are Yavicoins for?",
+      "Open “My Yavicoins” for your balance and the redemption options shown in the flow. Displayed rules explain how points are earned after confirmed receipt. In this version, coins are demo points with no real monetary value.",
+    ],
+  },
+  {
+    id: "contact",
+    fr: [
+      "Comment demander de l’aide efficacement ?",
+      "Ouvrez « Aide » et indiquez votre numéro de commande, l’étape concernée et ce qui ne fonctionne pas. Une description précise permet d’identifier plus facilement le problème. Le formulaire prépare un e-mail : vous devez l’envoyer depuis votre messagerie. Les coordonnées et horaires proposés dans la démo restent à valider avant lancement.",
+    ],
+    en: [
+      "How can I get useful help?",
+      "Open Help and include your order reference, the affected step and what is not working. Specific details make the issue easier to identify. The form prepares an email; you must send it from your email app. Demo contact details and opening hours remain to be validated before launch.",
     ],
   },
 ];
@@ -154,7 +231,7 @@ if (isMarketPage) {
   };
   function openOrderTracker() {
     open(
-      `<h2>${pT("Suivre ma commande", "Track my order")}</h2><p>${pT("Entrez le numéro d’une commande créée pendant cette visite.", "Enter an order number created during this visit.")}</p><form id="track-order-form" class="editor"><label>${pT("Numéro de commande", "Order number")}<input id="track-order-id" required placeholder="YV-XXXXXXXX"></label><button class="primary">${pT("Rechercher ma commande", "Find my order")}</button></form><div id="track-order-result" aria-live="polite"></div>`,
+      `<h2>${pT("Suivre ma commande", "Track my order")}</h2><p>${pT("Connectez-vous au compte acheteur et entrez votre numéro de commande.", "Sign into your buyer account and enter your order reference.")}</p><form id="track-order-form" class="editor"><label>${pT("Numéro de commande", "Order number")}<input id="track-order-id" required placeholder="YV-XXXXXXXX"></label><button class="primary">${pT("Rechercher ma commande", "Find my order")}</button></form><div id="track-order-result" aria-live="polite"></div>`,
     );
     $("#track-order-form").onsubmit = (e) => {
       e.preventDefault();
@@ -162,7 +239,7 @@ if (isMarketPage) {
         o = orders.find((o) => o.id === id);
       $("#track-order-result").innerHTML = o
         ? `<section class="order-box"><h3>${o.id}</h3><p><b>${stages[o.step]}</b></p><ul>${o.events.map((x) => `<li>${esc(x)}</li>`).join("")}</ul><button class="add" data-action="tracking">${pT("Voir toutes mes commandes", "View all my orders")}</button></section>`
-        : `<p>${pT("Commande introuvable dans cette visite. Vérifiez le numéro. Les commandes de démonstration disparaissent au rechargement.", "Order not found during this visit. Check the number. Demo orders disappear when the page is reloaded.")}</p>`;
+        : `<p>${pT("Commande introuvable dans ce compte. Vérifiez le numéro et le compte utilisé lors de l’achat.", "Order not found in this account. Check the reference and the account used for the purchase.")}</p>`;
     };
   }
   document.addEventListener(
@@ -304,25 +381,39 @@ answerQuestion = function (q) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
-  const id = /coin|fidel|loyal/.test(t)
-    ? "coins"
-    : /escrow|retenu|release/.test(t)
-      ? "escrow"
-      : /track|suiv|numero/.test(t)
-        ? "tracking"
-        : /retour|return|refund|rembours/.test(t)
-          ? "returns"
-          : /verifi|badge|verified/.test(t)
-            ? "verified"
-            : /vendre|vendeur|seller/.test(t)
-              ? "seller"
-              : /pai|money|visa|master|payment/.test(t)
-                ? "payment"
-                : /livr|deliv|commune|zone/.test(t)
-                  ? "delivery"
-                  : /contact|support|client|telephone/.test(t)
-                    ? "contact"
-                    : "order";
+  const id = /photo|angle|image/.test(t)
+    ? "photos"
+    : /secur|2fa|facteur|authentificat/.test(t)
+      ? "security"
+      : /note|avis|review|rating/.test(t)
+        ? "reviews"
+        : /erreur|error|indispon|fonctionne/.test(t)
+          ? "unavailable"
+          : /frais|fee|delai|timing/.test(t)
+            ? "fees"
+            : /reception|receipt|colis recu/.test(t)
+              ? "receipt"
+              : /devenir livreur|become.*courier/.test(t)
+                ? "courier"
+                : /coin|fidel|loyal/.test(t)
+                  ? "coins"
+                  : /escrow|retenu|release/.test(t)
+                    ? "escrow"
+                    : /track|suiv|numero/.test(t)
+                      ? "tracking"
+                      : /retour|return|refund|rembours/.test(t)
+                        ? "returns"
+                        : /verifi|badge|verified/.test(t)
+                          ? "verified"
+                          : /vendre|vendeur|seller/.test(t)
+                            ? "seller"
+                            : /pai|money|visa|master|payment/.test(t)
+                              ? "payment"
+                              : /livr|deliv|commune|zone/.test(t)
+                                ? "delivery"
+                                : /contact|support|client|telephone/.test(t)
+                                  ? "contact"
+                                  : "order";
   return popularQuestions.find((x) => x.id === id)[pLang()][1];
 };
 

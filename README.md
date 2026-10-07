@@ -1,6 +1,6 @@
-# YAVIYA — nouvelle version complète (1.3.0)
+# YAVIYA — nouvelle version complète (1.3.1)
 
-Version complète indépendante issue de la version 31 de YAVIYA « Votre marché, à portée de main », avec les corrections d'achat immédiat, de connexion indépendante et de retour produit. Frontend, backend, API, migrations, tests et photos sont accessibles comme fichiers séparés dans le dépôt public. L'ancienne vitrine de huit produits est conservée dans `legacy-vitrine/` ; le build principal utilise désormais la version complète.
+Version complète indépendante issue de la version 31 de YAVIYA « Votre marché, à portée de main », avec les corrections d’achat immédiat, la connexion indépendante, des fenêtres sans Retour flottant et des galeries sous plusieurs angles. Frontend, backend, API, migrations, tests et photos sont accessibles comme fichiers séparés dans le dépôt public. L'ancienne vitrine de huit produits est conservée dans `legacy-vitrine/` ; le build principal utilise désormais la version complète.
 
 [Catalogue et couverture](docs/CATALOGUE_COVERAGE.md) · [Double authentification](docs/TWO_FACTOR.md) · [Rôle de chaque fichier](docs/FILES.md) · [Lancer et tester les parcours](docs/DEMO.md)
 
@@ -44,7 +44,7 @@ Le projet GitHub doit être relié au projet Vercel `yaviyaecosystem`, avec la r
 | `frontend/pages/`            | Cinq pages HTML, dont les portails RDC et Congo                                           |
 | `frontend/src/`              | Scripts classiques du catalogue, comptes et parcours métier                               |
 | `frontend/styles/`           | Styles responsive                                                                         |
-| `frontend/assets/images/`    | 34 images illustratives locales                                                           |
+| `frontend/assets/images/`    | 34 images originales et 30 vues produits supplémentaires                                                           |
 | `api/handler.js`             | Fonction Vercel : conversion HTTP vers les gestionnaires existants                        |
 | `backend/application.js`     | Session indépendante et identité injectée côté serveur                                    |
 | `backend/auth.js`            | Comptes, mots de passe scrypt, sessions serveur, déconnexion et limitation des tentatives |
@@ -75,3 +75,7 @@ Le bouton **Sécurité · 2FA** permet de configurer une application Authenticat
 ## Catalogue et couverture 1.3.0
 
 19 familles et 72 sous-catégories, avec sélection vendeur et classement persistant. Le formulaire affiche 96 villes/agglomérations de RDC ; seules Kinshasa et Lubumbashi acceptent les commandes. Les autres restent désactivées jusqu’à l’extension, avec contrôle serveur dans les quatre modes. Le clic Acheter maintenant est testé à travers les vrais scripts, formulaires et API : synchronisation concurrente, profil et commande du produit choisi. Voir [le guide](docs/CATALOGUE_COVERAGE.md). Le site en ligne consulté répondait encore HTTP 503 sur son API de compte ; la configuration du projet cible reste à vérifier.
+
+## Fenêtres, questions populaires et photos 1.3.1
+
+17 questions populaires bilingues, réponses pliables et votes, sans doublons entre les scripts. Les 39 références de chaque marché disposent de deux photos distinctes : les vues alternatives sont générées et indiquées comme illustratives. Les galeries téléversées par les vendeurs sont conservées, avec jusqu’à 8 photos réordonnables. Voir [la documentation des photos](docs/PRODUCT_PHOTOS.md). Le bouton Retour flottant a été retiré ; la croix de fermeture reste accessible.

@@ -315,5 +315,67 @@
         ["Premiers secours", "First aid", ""]
       ]
     ]
-  ]
+  ],
+  "productGalleries": {
+    "handbag.png": ["handbag.png", "handbag-angle-2.webp"],
+    "headphones.png": ["headphones.png", "headphones-angle-2.webp"],
+    "product-blazer.jpg": ["product-blazer.jpg", "product-blazer-angle-2.webp"],
+    "product-coffee.jpg": ["product-coffee.jpg", "product-coffee-angle-2.webp"],
+    "product-cosmetic.jpg": [
+      "product-cosmetic.jpg",
+      "product-cosmetic-angle-2.webp"
+    ],
+    "product-desk-fan.jpg": [
+      "product-desk-fan.jpg",
+      "product-desk-fan-angle-2.webp"
+    ],
+    "product-dinner-set.jpg": [
+      "product-dinner-set.jpg",
+      "product-dinner-set-angle-2.webp"
+    ],
+    "product-dress.jpg": ["product-dress.jpg", "product-dress-angle-2.webp"],
+    "product-frame.jpg": ["product-frame.jpg", "product-frame-angle-2.webp"],
+    "product-guitar.jpg": ["product-guitar.jpg", "product-guitar-angle-2.webp"],
+    "product-keyboard.jpg": [
+      "product-keyboard.jpg",
+      "product-keyboard-angle-2.webp"
+    ],
+    "product-kids-outfit.jpg": [
+      "product-kids-outfit.jpg",
+      "product-kids-outfit-angle-2.webp"
+    ],
+    "product-laptop.jpg": ["product-laptop.jpg", "product-laptop-angle-2.webp"],
+    "product-lotion.jpg": ["product-lotion.jpg", "product-lotion-angle-2.webp"],
+    "product-plates.jpg": ["product-plates.jpg", "product-plates-angle-2.webp"],
+    "product-power-strip.jpg": [
+      "product-power-strip.jpg",
+      "product-power-strip-angle-2.webp"
+    ],
+    "product-puzzle.jpg": ["product-puzzle.jpg", "product-puzzle-angle-2.webp"],
+    "product-rice.jpg": ["product-rice.jpg", "product-rice-angle-2.webp"],
+    "product-ringlight.jpg": [
+      "product-ringlight.jpg",
+      "product-ringlight-angle-2.webp"
+    ],
+    "product-scarf.jpg": ["product-scarf.jpg", "product-scarf-angle-2.webp"],
+    "product-shirt.jpg": ["product-shirt.jpg", "product-shirt-angle-2.webp"],
+    "product-smartphone.jpg": [
+      "product-smartphone.jpg",
+      "product-smartphone-angle-2.webp"
+    ],
+    "product-soap.jpg": ["product-soap.jpg", "product-soap-angle-2.webp"],
+    "product-standing-fan.jpg": [
+      "product-standing-fan.jpg",
+      "product-standing-fan-angle-2.webp"
+    ],
+    "product-tie.jpg": ["product-tie.jpg", "product-tie-angle-2.webp"],
+    "product-toys.jpg": ["product-toys.jpg", "product-toys-angle-2.webp"],
+    "product-usb-c.jpg": ["product-usb-c.jpg", "product-usb-c-angle-2.webp"],
+    "product-watch.jpg": ["product-watch.jpg", "product-watch-angle-2.webp"],
+    "product-womens-shoes.jpg": [
+      "product-womens-shoes.jpg",
+      "product-womens-shoes-angle-2.webp"
+    ],
+    "sneakers.png": ["sneakers.png", "sneakers-angle-2.webp"]
+  }
 }

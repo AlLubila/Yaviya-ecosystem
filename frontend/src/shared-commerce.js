@@ -817,16 +817,6 @@ openOrderTracker = function () {
         "</p>";
   };
 };
-const sharedFAQ = popularQuestions.find((q) => q.id === "tracking");
-sharedFAQ.fr[1] =
-  "Votre commande est partagée avec les boutiques concernées, le livreur affecté et YAVIYA. Ouvrez Mes commandes pour suivre les étapes et accéder à la discussion. Les anciens scénarios privés ne sont pas des commandes partagées.";
-sharedFAQ.en[1] =
-  "Your order is shared with the involved shops, assigned courier and YAVIYA. Open My orders to track progress and join the conversation. Older private scenarios are not shared orders.";
-const courierFAQ = popularQuestions.find((q) => q.id === "courier");
-courierFAQ.fr[1] =
-  "L’inscription livreur comprend quatre étapes : coordonnées, identité, avantages et rémunération, puis abonnement Standard gratuit et coordonnées de règlement. Après validation, activez votre disponibilité et acceptez une mission.";
-courierFAQ.en[1] =
-  "Courier registration has four steps: contact details, identity, benefits and earnings, then the free Standard plan and settlement details. Once approved, set your availability and accept an assignment.";
 document.querySelector(".demo-role-bar>span").textContent = T(
   "ESPACES DU COMPTE",
   "ACCOUNT AREAS",
@@ -851,22 +841,6 @@ setInterval(() => {
   loadMarket().finally(() => (marketPolling = false));
 }, 4000);
 
-for (const q of faqItems) {
-  if (/escrow/i.test(q[0])) {
-    q[2] =
-      "L’escrow n’est pas activé : aucun fonds électronique n’est retenu ni libéré. Les paiements électroniques nécessitent un compte marchand et un prestataire adapté. Le paiement en espèces à réception se confirme séparément par l’acheteur et l’encaisseur.";
-    q[3] =
-      "Escrow is not enabled: no electronic funds are held or released. Electronic payments require a merchant account and a suitable provider. Cash on receipt is confirmed separately by the buyer and collector.";
-  }
-}
-for (const q of popularQuestions) {
-  if (/paiement|escrow/i.test(q.fr[0])) {
-    q.fr[1] =
-      "Les commandes partagées proposent actuellement les espèces à réception. Les paiements Mobile Money, cartes et escrow ne sont pas activés : aucun débit, retenue ou libération électronique. Les déclarations d’encaissement et de règlement manuel sont conservées par commande.";
-    q.en[1] =
-      "Shared orders currently support cash on receipt. Mobile Money, cards and escrow are not enabled: no electronic debit, hold or release. Cash collection and manual settlement declarations are saved per order.";
-  }
-}
 $("#home-faq").dataset.language = "";
 applyLanguage();
 

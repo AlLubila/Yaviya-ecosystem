@@ -6,6 +6,15 @@ import { seedCatalogue } from "../backend/worker/catalogue-seeds.js";
 import { googleAuth } from "../backend/google-auth.js";
 test("all catalogue photographs are packaged", () => {
   for (const product of seedCatalogue) {
+    assert.ok(product.images.length >= 2, product.title);
+    for (const src of product.images) {
+      const photo = fs.readFileSync(
+        new URL("../frontend/assets/images/" + src, import.meta.url),
+      );
+      assert.ok(photo.length > 100, src);
+      if (src.endsWith(".webp"))
+        assert.equal(photo.toString("ascii", 8, 12), "WEBP");
+    }
     assert.ok(product.img, product.title);
     assert.ok(
       fs.existsSync(

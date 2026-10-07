@@ -4270,38 +4270,6 @@ button:disabled {
   color: var(--muted, #666);
 }
 
-#modal > .page-back {
-  position: fixed;
-  top: 14px;
-  left: max(16px, calc((100vw - 1180px) / 2));
-  z-index: 5;
-  background: #f1eaff;
-  border: 1px solid var(--line);
-  padding: 11px 18px;
-  border-radius: 8px;
-  font-size: 1rem;
-  min-height: 44px;
-}
-#modal > .page-back[hidden] {
-  display: none;
-}
-
-#modal > .page-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-#modal > .page-back svg {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .independent-auth {
   width: min(94vw, 480px);
   max-height: 90vh;

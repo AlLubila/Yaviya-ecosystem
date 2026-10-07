@@ -29,6 +29,13 @@ export async function handleFeedback(request, env) {
         "contact",
         "coins",
         "escrow",
+        "photos",
+        "fees",
+        "receipt",
+        "reviews",
+        "security",
+        "unavailable",
+        "courier",
       ].includes(data.question) ||
       typeof data.resolved !== "boolean"
     )

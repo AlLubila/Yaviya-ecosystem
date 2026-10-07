@@ -222,40 +222,6 @@ showCheckout = function (selection = cart) {
   };
 };
 
-const trackingFAQ = popularQuestions.find((q) => q.id === "tracking");
-trackingFAQ.fr[1] =
-  "Ouvrez « Mes commandes » dans Mon Yaviya, ou utilisez « Suivre ma commande » avec votre numéro. Le statut et l’historique sont enregistrés dans votre scénario privé et restent disponibles après rechargement.";
-trackingFAQ.en[1] =
-  "Open “My orders” in My Yaviya, or use “Track my order” with your order number. Status and history are saved in your private scenario and remain available after reloading.";
-const sellerFAQ = popularQuestions.find((q) => q.id === "seller");
-sellerFAQ.fr[1] =
-  "Ouvrez Mon Yaviya puis « Devenir vendeur ». Complétez vos coordonnées, votre activité et votre identité, puis choisissez l’abonnement à la dernière étape. L’admin contrôle le dossier avant d’activer la boutique. Aucun abonnement n’est facturé dans le MVP.";
-sellerFAQ.en[1] =
-  "Open My Yaviya and choose “Become a seller”. Complete your details, business and identity, then choose a plan at the final step. Administration reviews your request before enabling the shop. No subscription is billed in the MVP.";
-popularQuestions.push(
-  {
-    id: "courier",
-    fr: [
-      "Comment devenir livreur ?",
-      "Dans Mon Yaviya, choisissez « Devenir livreur ». Renseignez vos coordonnées, soumettez votre identité et sélectionnez le forfait Standard gratuit à la dernière étape. Après validation, indiquez votre disponibilité pour recevoir des missions.",
-    ],
-    en: [
-      "How do I become a courier?",
-      "Choose “Become a courier” in My Yaviya. Enter your details, submit identity verification and select the free Standard plan at the last step. Once approved, set your availability to receive assignments.",
-    ],
-  },
-  {
-    id: "reviews",
-    fr: [
-      "Comment noter mon vendeur et mon livreur ?",
-      "Après la livraison, confirmez la réception dans Mes commandes. Le formulaire vous demande une note de 1 à 5 pour chaque vendeur et pour le livreur affecté. Vous pouvez aussi laisser un commentaire. Une seule évaluation est enregistrée par commande.",
-    ],
-    en: [
-      "How do I rate my seller and courier?",
-      "After delivery, confirm receipt in My orders. Rate each seller and the assigned courier from 1 to 5, with an optional comment. Each order can be rated once.",
-    ],
-  },
-);
 const baseFinalAnswer = answerQuestion;
 answerQuestion = function (q) {
   const text = q

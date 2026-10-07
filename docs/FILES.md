@@ -116,7 +116,7 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `frontend/src/marketplace.js`                            | Vues métier et outils du catalogue multi-vendeurs.                                                         |
 | `frontend/src/mobile-nav.js`                             | Navigation adaptée aux petits écrans.                                                                      |
 | `frontend/src/mvp-final.js`                              | Finitions des parcours et affichages MVP.                                                                  |
-| `frontend/src/page-navigation.js`                        | Historique des fiches/comparaisons, bouton Retour et retour en haut.                                       |
+| `frontend/src/page-navigation.js`                        | Ouverture des fenêtres en haut, sans bouton Retour flottant.                                       |
 | `frontend/src/partner-campaigns.js`                      | Campagnes partenaires illustratives.                                                                       |
 | `frontend/src/popular-faq.js`                            | FAQ pliable et retours des utilisateurs.                                                                   |
 | `frontend/src/pricing-benefits.js`                       | Présentation des tarifs, avantages et formules.                                                            |
@@ -131,7 +131,7 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `frontend/src/shared-delivery.js`                        | Composants de suivi et compatibilité de l’ancien scénario.                                                 |
 | `frontend/src/support.js`                                | Centre d’aide et chatbot à réponses guidées.                                                               |
 | `frontend/src/yavicoins.js`                              | Interface de fidélité et récompenses fictives.                                                             |
-| `frontend/styles/style.css`                              | Styles du site, composants, responsive et navigation Retour.                                               |
+| `frontend/styles/style.css`                              | Styles du site, composants, responsive et galeries produit.                                               |
 | `legacy-vitrine/README.md`                               | Ancienne vitrine de huit produits : README.md. Conservée hors du build principal.                          |
 | `legacy-vitrine/app.js`                                  | Ancienne vitrine de huit produits : app.js. Conservée hors du build principal.                             |
 | `legacy-vitrine/catalog/catalog.js`                      | Ancienne vitrine de huit produits : catalog.js. Conservée hors du build principal.                         |
@@ -146,7 +146,7 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `legacy-vitrine/tests/catalog.test.mjs`                  | Ancienne vitrine de huit produits : catalog.test.mjs. Conservée hors du build principal.                   |
 | `legacy-vitrine/vercel.json`                             | Ancienne vitrine de huit produits : vercel.json. Conservée hors du build principal.                        |
 | `package-lock.json`                                      | Versions exactes utilisées par npm ci.                                                                     |
-| `package.json`                                           | Commandes npm, dépendances et version 1.3.0.                                                               |
+| `package.json`                                           | Commandes npm, dépendances et version 1.3.1.                                                               |
 | `scripts/build.mjs`                                      | Assemble les sources frontend classées en fichiers publics plats dans dist.                                |
 | `scripts/check.mjs`                                      | Syntaxe des sources et présence des assets référencés.                                                     |
 | `scripts/create-owner.mjs`                               | Crée le propriétaire admin dans un terminal de confiance.                                                  |
@@ -176,3 +176,5 @@ Fichiers ajoutés en version 1.3.0 :
 | `docs/CATALOGUE_COVERAGE.md` | Comportement, données géographiques, sources et diagnostic du déploiement. |
 
 Le build génère `dist/market-config.js` depuis le JSON ; ce fichier généré n’est pas une source à modifier.
+
+Fichiers ajoutés en version 1.3.1 : `docs/PRODUCT_PHOTOS.md` (provenance et usage des vues), et les 30 fichiers `frontend/assets/images/*-angle-2.webp` (vues alternatives illustratives). Mapping commun dans `backend/data/market-config.json` ; galerie vérifiée avec le backend par `tests/checkout-flow.test.mjs`.

@@ -78,6 +78,7 @@ async function fixture({ profile = true, offline = false } = {}) {
     }),
     w = dom.window;
   w.Request = Request;
+  w.URL.revokeObjectURL = () => {};
   w.matchMedia = () => ({
     matches: false,
     addEventListener() {},
@@ -328,6 +329,70 @@ test("expanded categories persist seller classification and open the matching pr
       [...form.elements.subcategory.options].some(
         (o) => o.value === "Irrigation",
       ),
+    );
+    assert.deepEqual(f.errors, []);
+  } finally {
+    f.close();
+  }
+});
+
+test("every demo product has distinct gallery views, clean windows and working popular FAQ feedback", async () => {
+  const f = await fixture();
+  try {
+    await until(() => f.run("marketReady && customerProfile!==null"));
+    const ids = JSON.parse(
+      f.run("JSON.stringify(products.filter(p => shopOf(p)).map(p=>p.id))"),
+    );
+    assert.ok(ids.length >= 39);
+    for (const id of ids) {
+      f.run(`showProductDetails(${id})`);
+      const doc = f.w.document;
+      assert.equal(doc.querySelector(".page-back"), null);
+      assert.ok(doc.querySelector("#modal > .close"));
+      const thumbs = [...doc.querySelectorAll("[data-gallery-index]")];
+      assert.ok(thumbs.length >= 2, "Product " + id);
+      const main = doc.querySelector("#product-gallery-image"),
+        first = main.src;
+      thumbs[1].click();
+      assert.notEqual(main.src, first);
+      assert.equal(thumbs[1].getAttribute("aria-pressed"), "true");
+      doc
+        .querySelector(".product-gallery")
+        .dispatchEvent(
+          new f.w.KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }),
+        );
+      assert.equal(main.src, first);
+      assert.match(
+        doc.querySelector(".product-detail-info .demo-note").textContent,
+        /illustratives/,
+      );
+      doc.querySelector("#modal > .close").click();
+      assert.equal(doc.querySelector("#modal").open, false);
+    }
+    const questions = [...f.w.document.querySelectorAll("#home-faq details")];
+    assert.equal(questions.length, 17);
+    const photoQuestion = questions.find(
+      (x) => x.dataset.popularQuestion === "photos",
+    );
+    photoQuestion.open = true;
+    assert.match(photoQuestion.textContent, /angles|angle/);
+    photoQuestion.querySelector('[data-resolved="true"]').click();
+    await until(() =>
+      photoQuestion
+        .querySelector(".faq-vote-status")
+        .textContent.includes("enregistré"),
+    );
+    const feedback = await f.direct("/api/faq-feedback", undefined, f.session);
+    assert.ok(
+      (await feedback.json()).some(
+        (x) => x.question === "photos" && x.resolved,
+      ),
+    );
+    f.run('language="en"; applyLanguage()');
+    assert.match(
+      f.w.document.querySelector('[data-popular-question="security"]')
+        .textContent,
+      /two-factor/,
     );
     assert.deepEqual(f.errors, []);
   } finally {

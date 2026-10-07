@@ -175,7 +175,9 @@ function productData(row) {
   const demo = (row.country === "CG" ? seedCatalogueCG : seedCatalogue).find(
     (seed) => seed.id === product.id && seed.title === product.title,
   );
-  if (!product.images.length && demo?.img) product.images = [demo.img];
+  if (!product.images.length && demo?.img) product.images = [...demo.images];
+  if (demo && product.images.length === 1 && product.images[0] === demo.img)
+    product.images = [...demo.images];
   product.img = product.images[0] || null;
   return product;
 }
