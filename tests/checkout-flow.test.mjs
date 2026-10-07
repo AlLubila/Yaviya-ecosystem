@@ -190,6 +190,18 @@ test("real catalogue click waits for ongoing synchronization and saves exactly t
     assert.equal(order.items[0].id, 1);
     assert.equal(order.items[0].q, 1);
     assert.equal(order.city, "Kinshasa");
+    const follow = f.w.document.querySelector("[data-follow-order]");
+    assert.ok(follow);
+    assert.equal(follow.dataset.followOrder, order.id);
+    assert.match(
+      f.w.document.querySelector(".order-confirmation").textContent,
+      /Commande enregistrée/,
+    );
+    f.run("showTracking()");
+    const refreshedFollow = f.w.document.querySelector("[data-follow-order]");
+    assert.equal(refreshedFollow.dataset.followOrder, order.id);
+    refreshedFollow.click();
+    assert.ok(f.w.document.querySelector(`[data-shared-order="${order.id}"]`));
     assert.deepEqual(f.errors, []);
   } finally {
     f.close();
@@ -397,14 +409,14 @@ test("every demo product has distinct gallery views, clean windows and working p
   }
 });
 
-test("product help opens the chatbot inside the dialog, buyer counts come from the API and admin metrics render", async () => {
+test("product help opens the chatbot inside the dialog, fictional demo counts stay labelled and admin metrics render", async () => {
   const f = await fixture();
   try {
     await until(() => f.run("marketReady && customerProfile!==null"));
     await until(() =>
       f.w.document
         .querySelector('[data-product-buyers="1"]')
-        ?.textContent.includes("0 acheteur"),
+        ?.textContent.includes("acheteurs · démo"),
     );
     f.run("showProductDetails(1)");
     const modal = f.w.document.querySelector("#modal");
@@ -420,15 +432,13 @@ test("product help opens the chatbot inside the dialog, buyer counts come from t
       f.w.document.querySelector(".bot-message:last-child").textContent,
       /miniatures/,
     );
-    f.w.document
-      .querySelector("#chat-panel")
-      .dispatchEvent(
-        new f.w.KeyboardEvent("keydown", {
-          key: "Escape",
-          bubbles: true,
-          cancelable: true,
-        }),
-      );
+    f.w.document.querySelector("#chat-panel").dispatchEvent(
+      new f.w.KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
     assert.equal(modal.open, true);
     assert.equal(f.w.document.querySelector("#chat-panel").hidden, true);
     assert.equal(
@@ -465,6 +475,81 @@ test("product help opens the chatbot inside the dialog, buyer counts come from t
     period.value = "7";
     period.dispatchEvent(new f.w.Event("change", { bubbles: true }));
     await until(() => f.w.document.querySelector(".product-insights table"));
+    assert.deepEqual(f.errors, []);
+  } finally {
+    f.close();
+  }
+});
+
+test("expanded demo catalogue stays browsable without API and each new subcategory opens its products", async () => {
+  const f = await fixture({ offline: true });
+  try {
+    assert.equal(
+      f.run("products.filter(p => p.id >= 600 && p.id <= 620).length"),
+      21,
+    );
+    for (const seed of config.demoCatalogue) {
+      const section = config.categorySections.findIndex(
+        ([cat, , , children]) =>
+          cat === seed.category &&
+          children.some(([label]) => label === seed.subcategory),
+      );
+      assert.ok(section >= 0, seed.title);
+      const item = config.categorySections[section][3].findIndex(
+        ([label]) => label === seed.subcategory,
+      );
+      f.run(`showCategoryProducts(${section}, ${item})`);
+      assert.ok(
+        f.w.document.querySelector(`[data-detail="${seed.id}"]`),
+        seed.title,
+      );
+      f.run(`showProductDetails(${seed.id})`);
+      assert.equal(
+        f.w.document.querySelectorAll("[data-gallery-index]").length,
+        2,
+        seed.title,
+      );
+      assert.match(
+        f.w.document.querySelector(`[data-product-buyers="${seed.id}"]`)
+          .textContent,
+        /\d+ acheteurs · démo/,
+      );
+    }
+    assert.deepEqual(f.errors, []);
+  } finally {
+    f.close();
+  }
+});
+
+test("existing catalogues backfill missing demo references without overwriting seller edits", async () => {
+  const f = await fixture();
+  try {
+    await until(() => f.run("marketReady"));
+    const row = await f.db
+      .prepare("SELECT data FROM market_products WHERE key='CD:1'")
+      .first();
+    const edited = {
+      ...JSON.parse(row.data),
+      title: "Titre modifié par le vendeur",
+    };
+    await f.db
+      .prepare("UPDATE market_products SET data=?,stock=7 WHERE key='CD:1'")
+      .bind(JSON.stringify(edited))
+      .run();
+    await f.db.prepare("DELETE FROM market_products WHERE key='CD:600'").run();
+    await f.run("loadMarket(false)");
+    const restored = await f.db
+      .prepare("SELECT data FROM market_products WHERE key='CD:600'")
+      .first();
+    assert.equal(
+      JSON.parse(restored.data).title,
+      config.demoCatalogue[0].title,
+    );
+    const preserved = await f.db
+      .prepare("SELECT data,stock FROM market_products WHERE key='CD:1'")
+      .first();
+    assert.equal(JSON.parse(preserved.data).title, edited.title);
+    assert.equal(preserved.stock, 7);
     assert.deepEqual(f.errors, []);
   } finally {
     f.close();

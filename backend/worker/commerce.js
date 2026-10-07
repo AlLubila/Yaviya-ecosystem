@@ -71,17 +71,19 @@ export async function marketContext(env, user) {
 }
 export async function ensureSeeds(env, ctx) {
   if (!ctx.owner) return;
-  if (
-    (await env.DB.prepare("SELECT key FROM market_products WHERE key=?")
-      .bind(ctx.country + ":1")
-      .first()) ||
-    (await env.DB.prepare("SELECT key FROM market_products WHERE key=?")
-      .bind(ctx.country + ":101")
-      .first())
-  )
-    return;
   const seeds = ctx.country === "CG" ? seedCatalogueCG : seedCatalogue,
     owner = ctx.country === "CG" ? "cg:" + ctx.owner : ctx.owner;
+  const existing = new Set(
+    (
+      await env.DB.prepare(
+        "SELECT product_id FROM market_products WHERE country=?",
+      )
+        .bind(ctx.country)
+        .all()
+    ).results.map((p) => p.product_id),
+  );
+  const missing = seeds.filter((p) => !p.crossMarket && !existing.has(p.id));
+  if (!missing.length) return;
   const prior = await env.DB.prepare(
     "SELECT snapshot FROM delivery_scenarios WHERE user_id=?",
   )
@@ -101,11 +103,9 @@ export async function ensureSeeds(env, ctx) {
     (ctx.country === "CG" ? seedShopsCG : seedShops).map((s) => s.id),
   );
   owned.forEach((id) => ids.add(id));
-  const catalogue = new Map(
-    seeds.filter((p) => !p.crossMarket).map((p) => [p.id, { ...p }]),
-  );
+  const catalogue = new Map(missing.map((p) => [p.id, { ...p }]));
   for (const p of priorCatalogue) {
-    if (!ids.has(p.seller) || p.crossMarket) continue;
+    if (!ids.has(p.seller) || p.crossMarket || existing.has(p.id)) continue;
     const restored = { ...p, images: p.images || [p.img].filter(Boolean) };
     restored.img = restored.images[0] || null;
     if (!restored.img && catalogue.get(p.id)?.img) {

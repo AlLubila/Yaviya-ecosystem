@@ -1496,6 +1496,20 @@ export const deliveryCommunesCG = {
   ],
 };
 
+// One canonical expansion feeds both the static preview and persisted catalogues.
+seedCatalogue.push(
+  ...marketConfig.demoCatalogue.map((p) => ({ ...p, images: [...p.images] })),
+);
+seedCatalogueCG.push(
+  ...marketConfig.demoCatalogue.map((p) => ({
+    ...p,
+    id: p.id + 100,
+    seller: p.seller + 100,
+    price: Math.round(p.price / 4),
+    images: [...p.images],
+  })),
+);
+
 // Only unchanged illustrative seed galleries receive generated alternate views.
 for (const product of [...seedCatalogue, ...seedCatalogueCG]) {
   const gallery = marketConfig.productGalleries[product.img];

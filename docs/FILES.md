@@ -187,3 +187,5 @@ Fichiers ajoutés en version 1.4.0 :
 | `database/migrations/0015_product_insights.sql` | Événements de consultation persistants et index. |
 | `frontend/src/product-insights.js` | Compteurs produits, chatbot sur les fiches et statistiques centralisées. |
 | `tests/product-insights.test.mjs` | Déduplication, isolation des boutiques, marchés et agrégats. |
+
+Fichiers de la version 1.5.0 : `frontend/src/demo-catalogue.js` initialise les nouvelles références avant connexion ; `backend/data/market-config.json` contient le catalogue supplémentaire et les nombres fictifs annotés ; les 42 fichiers `frontend/assets/images/catalogue-*.webp` alimentent les galeries. Le suivi après confirmation est dans `frontend/src/shared-commerce.js`. Les statistiques réelles restent dans `backend/worker/product-insights.js`.

@@ -4376,3 +4376,14 @@ body.chat-open #chat-panel {
 .product-insights select {
   max-width: 100%;
 }
+
+.order-confirmation {
+  padding: 20px;
+  margin-bottom: 24px;
+  background: #edf8f1;
+  border: 1px solid #b4d9c0;
+  border-radius: 16px;
+}
+.order-confirmation h2 {
+  margin-top: 0;
+}

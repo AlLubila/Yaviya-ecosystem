@@ -31,3 +31,13 @@ Suppression du bouton Retour flottant. 17 questions populaires bilingues, pliabl
 Chaque carte et fiche affiche les comptes acheteurs distincts avec réception confirmée, commandes annulées exclues. Les vues sont enregistrées à l’ouverture d’une fiche, dédupliquées par compte/navigateur et tranche de 30 minutes ; propriétaire et admin exclus. Migration 0015, routes `/api/product-insights`, rapport vendeur limité aux boutiques autorisées et rapport admin centralisé sur les deux marchés. Filtres période, marché et boutique. Totaux distincts dédupliqués entre produits et marchés. Le frontend ne fabrique pas de chiffres lorsque le backend est indisponible.
 
 Validation : 23 tests, dont métriques persistantes, droits, agrégats, chatbot dans le dialogue, affichage des compteurs et tableau admin. Migration et configuration de base requises sur l’hébergement.
+
+## Version 1.5.0 — catalogue élargi et suivi après commande
+
+21 références supplémentaires par marché, réparties dans les boutiques existantes : batteries acoustiques, bijoux, microphones, parfums, couverts et bols, sport, sacs scolaires et étudiants, pièces automobiles, tenues traditionnelles et éclairages vidéo. Les guitares, laits et cosmétiques existants restent disponibles. Deux photos par référence. Configuration commune dans backend/data/market-config.json ; ajout idempotent des nouvelles références dans les bases déjà initialisées, sans écraser les produits modifiés.
+
+Les fiches et cartes du catalogue de démonstration affichent un nombre fictif d’acheteurs, clairement identifié « démo ». Ces nombres sont indépendants des mesures réelles conservées par l’API et ne créent aucun faux compte, événement ou achat. Les produits ajoutés par les vendeurs utilisent les mesures serveur.
+
+Après une commande effectivement enregistrée, une confirmation affiche la référence et un bouton « Suivre ma commande » pour accéder à l’article dans Mes commandes. Les étapes, événements et discussions restent partagés entre les participants autorisés. Une erreur serveur ne produit aucune fausse confirmation.
+
+Validation 1.5.0 : 25 tests automatisés passent ; compilation de 147 fichiers frontend. Les tests couvrent les nouvelles sous-catégories, les galeries, les compteurs démo annotés, l’ajout aux bases existantes et l’accès au suivi après confirmation. La limite du backend hébergé (HTTP 503 au moment du contrôle) reste distincte de la validation locale.

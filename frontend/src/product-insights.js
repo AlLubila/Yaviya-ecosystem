@@ -1,4 +1,4 @@
-// Server-backed product metrics. An unavailable service is never displayed as zero.
+// Actual server metrics stay separate from explicitly fictional demo buyer counts.
 const productBuyerCounts = new Map();
 let insightCountPending = false,
   insightCountQueued = false;
@@ -8,6 +8,10 @@ function insightUrl(path, country = window.YAVIYA_COUNTRY || "CD") {
   return url;
 }
 function buyerCountMarkup(id) {
+  const demo = window.YAVIYA_MARKET_CONFIG.demoBuyerCounts?.[id];
+  const product = products.find((p) => p.id === id);
+  if (demo && product?.title === demo.title)
+    return `<p class="product-buyers" data-product-buyers="${id}" title="${T("Nombre fictif pour illustrer le catalogue ; exclu des statistiques réelles", "Fictional catalogue example; excluded from actual statistics")}">${demo.count} ${T("acheteurs · démo", "buyers · demo")}</p>`;
   const count = productBuyerCounts.get(id);
   return `<p class="product-buyers" data-product-buyers="${id}" ${Number.isSafeInteger(count) ? 'title="' + T("Comptes distincts ayant confirmé la réception · parcours de démonstration", "Distinct accounts with confirmed receipt · demonstration flow") + '"' : ""}>${Number.isSafeInteger(count) ? count + " " + T("acheteur(s) · réception confirmée", "buyer(s) · confirmed receipt") : T("Achats : données indisponibles", "Purchases: data unavailable")}</p>`;
 }

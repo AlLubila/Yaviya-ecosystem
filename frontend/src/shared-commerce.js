@@ -265,12 +265,38 @@ sharedOrderMarkup = function (o) {
       "",
     )}</div><p><b>${esc(o.paymentState)}</b></p><p class="demo-note">${T("Escrow non activé : aucun fonds électronique n’est retenu ou libéré.", "Escrow is not enabled: no electronic funds are held or released.")}</p>${proofMarkup(o)}${["courier", "admin"].includes(activeRole) && o.requestedCourier ? earningsMarkup(o, activeRole === "courier") : ""}<button class="add" data-order-chat="${o.id}">${T("Discussion de la commande", "Order conversation")}</button><details><summary>${T("Historique", "History")}</summary><ul>${o.events.map((e) => `<li>${esc(e)}</li>`).join("")}</ul></details></article>`;
 };
+let confirmedOrderId = null;
+function renderOrderConfirmation() {
+  if (
+    !confirmedOrderId ||
+    !orders.some((order) => order.id === confirmedOrderId)
+  )
+    return;
+  $("#modal-content").insertAdjacentHTML(
+    "afterbegin",
+    `<section class="order-confirmation" role="status"><h2>${T("Commande enregistrée", "Order saved")}</h2><p>${T("Votre référence", "Your reference")} : <strong>${esc(confirmedOrderId)}</strong></p><p>${T("Suivez la validation du vendeur, la préparation, la prise en charge et la livraison depuis Mes commandes.", "Follow seller acceptance, preparation, pickup and delivery in My orders.")}</p><button type="button" class="primary" data-follow-order="${esc(confirmedOrderId)}">${T("Suivre ma commande", "Track my order")}</button></section>`,
+  );
+  $("[data-follow-order]").onclick = () => {
+    const orderId = confirmedOrderId;
+    confirmedOrderId = null;
+    showTracking();
+    const item = [...document.querySelectorAll("[data-shared-order]")].find(
+      (el) => el.dataset.sharedOrder === orderId,
+    );
+    if (item) {
+      item.tabIndex = -1;
+      item.focus();
+      item.scrollIntoView?.({ block: "start", behavior: "smooth" });
+    }
+  };
+}
 showTracking = function () {
   openCustomerPage(() =>
     open(
       `<h2>${T("Mes commandes", "My orders")}</h2><p>${T("Le suivi et la discussion sont partagés avec les vendeurs concernés, le livreur affecté et YAVIYA.", "Tracking and conversations are shared with the involved sellers, assigned courier and YAVIYA.")}</p>${orders.map((o) => sharedOrderMarkup(o) + (!o.cancelled && o.step === 3 && !o.buyerConfirmed ? `<button class="primary" data-receipt="${o.id}">${T("Confirmer la réception et évaluer", "Confirm receipt and rate")}</button>` : o.buyerConfirmed ? `<p>${T("Réception confirmée", "Receipt confirmed")}</p>${!o.cashBuyerConfirmed ? `<button class="add" data-commerce-action="cash_buyer" data-order-id="${o.id}">${T("Confirmer mon paiement en espèces", "Confirm cash payment")}</button>` : ""}` : "")).join("") || `<p>${marketError ? esc(marketError) : T("Aucune commande pour votre compte.", "No orders for your account.")}</p>`}`,
     ),
   );
+  renderOrderConfirmation();
   renderBuyerReviewButtons();
   refreshReviews("buyer");
 };
@@ -361,7 +387,10 @@ showCheckout = function (selection = cart) {
       });
       selection.clear();
       updateCount();
+      confirmedOrderId = data.order?.id || null;
       await loadMarket(false);
+      if (data.order && !orders.some((order) => order.id === data.order.id))
+        orders.unshift(data.order);
       showTracking();
       toast(T("Commande partagée enregistrée", "Shared order saved"));
     } catch (e) {

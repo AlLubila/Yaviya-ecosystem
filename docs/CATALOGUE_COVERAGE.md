@@ -40,3 +40,9 @@ Aucune migration SQL supplémentaire n'est requise pour les catégories et ville
 Il couvre la synchronisation concurrente, la reprise après le profil, l'erreur d'hébergement, le refus des destinations fermées dans les quatre modes et le classement produit administré. L'enregistrement et le suivi de commande sont validés avec une installation locale complète. Cela ne prouve pas la configuration du serveur Vercel existant.
 
 Constat sur le déploiement consulté : `/api/auth/session` répondait HTTP 503. L'accès Vercel disponible ne renvoyait ni le projet YAVIYA ni une équipe contenant ce projet. Il faut reconnecter le compte/équipe disposant de ce projet, lire ses journaux et vérifier la connexion à la base, les migrations et le propriétaire. Le message HTTP seul ne permet pas d'attribuer précisément le problème à une variable ou une migration.
+
+### Extension 1.5.0
+
+Le catalogue contient 60 références par marché, dont 21 nouvelles réparties dans les boutiques existantes. Les sous-catégories des produits ajoutés ouvrent directement leur sélection. Les anciennes bases reçoivent les références manquantes sans écraser les modifications des vendeurs. Les guitares, laits de beauté et soins déjà présents restent accessibles.
+
+Les nombres d’acheteurs du catalogue initial sont fictifs et portent la mention « démo ». Ils servent uniquement à présenter l’interface. L’API de statistiques, les tableaux de bord vendeur/admin et les commandes restent fondés sur les enregistrements réels de l’application.
