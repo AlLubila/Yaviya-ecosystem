@@ -1,4 +1,4 @@
-# YAVIYA — nouvelle version complète (1.3.1)
+# YAVIYA — nouvelle version complète (1.4.0)
 
 Version complète indépendante issue de la version 31 de YAVIYA « Votre marché, à portée de main », avec les corrections d’achat immédiat, la connexion indépendante, des fenêtres sans Retour flottant et des galeries sous plusieurs angles. Frontend, backend, API, migrations, tests et photos sont accessibles comme fichiers séparés dans le dépôt public. L'ancienne vitrine de huit produits est conservée dans `legacy-vitrine/` ; le build principal utilise désormais la version complète.
 
@@ -79,3 +79,9 @@ Le bouton **Sécurité · 2FA** permet de configurer une application Authenticat
 ## Fenêtres, questions populaires et photos 1.3.1
 
 17 questions populaires bilingues, réponses pliables et votes, sans doublons entre les scripts. Les 39 références de chaque marché disposent de deux photos distinctes : les vues alternatives sont générées et indiquées comme illustratives. Les galeries téléversées par les vendeurs sont conservées, avec jusqu’à 8 photos réordonnables. Voir [la documentation des photos](docs/PRODUCT_PHOTOS.md). Le bouton Retour flottant a été retiré ; la croix de fermeture reste accessible.
+
+## Chatbot et statistiques produits 1.4.0
+
+« Besoin d’aide » ouvre le chatbot, également depuis chaque fiche produit. Les cartes et fiches présentent le nombre de comptes acheteurs ayant confirmé la réception ; les annulations sont exclues. Les statistiques vendeur montrent les visiteurs distincts et les achats de ses boutiques ; l’admin centralise les deux marchés, avec filtres par période et boutique. Les données sont enregistrées sur le serveur, sans exemples chiffrés dans ce nouvel onglet. Voir [les endpoints et définitions](docs/API.md#statistiques-produits-140).
+
+Avant l’activation sur l’hébergement : configurer la base persistante puis appliquer les migrations, notamment `0015_product_insights.sql`, avec `npm run db:migrate`. Tant que le service serveur est indisponible, les compteurs l’indiquent au lieu d’afficher zéro.

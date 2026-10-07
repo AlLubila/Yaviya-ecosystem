@@ -23,3 +23,11 @@ Le clic attend la synchronisation en cours et recharge explicitement le profil, 
 ## Version 1.3.1 — fenêtres, FAQ et vues produits
 
 Suppression du bouton Retour flottant. 17 questions populaires bilingues, pliables, avec réponses pratiques et statut réel de la démonstration ; votes enregistrés pour les nouveaux sujets et réponses du chatbot associées. 30 vues alternatives générées à partir des photos originales : deux vues distinctes pour les 39 références de chaque marché, sans remplacer les galeries chargées par un vendeur. La configuration commune hydrate le catalogue initial et les anciennes données démo servies par l’API. Éditeur : jusqu’à 8 photos, couverture réordonnable, conseils face/profil/arrière/détails. Aucune garantie de conformité donnée par les images générées.
+
+## Version 1.4.0 — chatbot et statistiques produits partagées
+
+« Besoin d’aide » ouvre le chatbot ; un bouton est présent sur les fiches produits. Le chatbot est inséré dans le dialogue ouvert pour rester utilisable dans la couche modale du navigateur. Fermer le chat ou appuyer sur Échap revient au produit. Les raccourcis FAQ utilisent les réponses actuelles.
+
+Chaque carte et fiche affiche les comptes acheteurs distincts avec réception confirmée, commandes annulées exclues. Les vues sont enregistrées à l’ouverture d’une fiche, dédupliquées par compte/navigateur et tranche de 30 minutes ; propriétaire et admin exclus. Migration 0015, routes `/api/product-insights`, rapport vendeur limité aux boutiques autorisées et rapport admin centralisé sur les deux marchés. Filtres période, marché et boutique. Totaux distincts dédupliqués entre produits et marchés. Le frontend ne fabrique pas de chiffres lorsque le backend est indisponible.
+
+Validation : 23 tests, dont métriques persistantes, droits, agrégats, chatbot dans le dialogue, affichage des compteurs et tableau admin. Migration et configuration de base requises sur l’hébergement.

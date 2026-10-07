@@ -27,3 +27,13 @@ Les routes `mfa-status`, `mfa-setup`, `mfa-enable`, `mfa-challenge`, `mfa-verify
 ## Classement et destinations
 
 `/api/marketplace/catalogue` accepte une `subcategory` facultative parmi les sous-catégories de la famille choisie et la conserve. `/api/marketplace/orders` refuse toute destination RDC hors Kinshasa/Lubumbashi, même pour `hand` et `relay`. La source unique est `backend/data/market-config.json` ; voir [CATALOGUE_COVERAGE.md](CATALOGUE_COVERAGE.md).
+
+## Statistiques produits (1.4.0)
+
+- `GET /api/product-insights?country=CD&ids=1,2` : comptes acheteurs distincts des produits publics, réception confirmée, commandes annulées exclues. Maximum 100 IDs par appel. Aucun identifiant d’acheteur ni de visiteur n’est exposé.
+- `POST /api/product-insights/view?country=CD` avec `{ "productId": 1 }` : consultation d’une fiche publique, origine identique obligatoire. Une consultation par compte ou navigateur, produit et tranche de 30 minutes ; propriétaire et admin exclus. Cookie HttpOnly `yaviya_visitor` pour les visiteurs non connectés, seul son SHA-256 est enregistré. Un compte/navigateur peut enregistrer au maximum 100 consultations dans une tranche. Cette mesure représente des identifiants distincts, pas une certification de personnes physiques.
+- `GET /api/product-insights/report?country=CD&period=30&sellerId=1` : agrégats privés. Un vendeur validé accède uniquement à ses propres boutiques du marché courant ; l’admin accède à tous les produits, avec `country=ALL` pour centraliser les deux marchés. Périodes : `7`, `30`, `quarter` (90 jours), `semester` (180 jours), `year` (365 jours), `all`.
+
+Le rapport présente visiteurs distincts, consultations, acheteurs distincts, commandes avec réception confirmée et quantités reçues. Les achats sont filtrés par date de création de commande ; les vues par date de consultation. Les totaux distincts ne sont pas des sommes de lignes : un compte achetant plusieurs produits ou dans les deux marchés ne compte qu’une fois dans le total global.
+
+Appliquer **`0015_product_insights.sql`** avec `npm run db:migrate` sur la base cible avant d’activer ces endpoints. Ces fonctions nécessitent une base persistante configurée, comme le reste du backend. La compilation frontend ne lance pas les migrations de production. Une erreur serveur affiche « données indisponibles », jamais un faux compteur à zéro.

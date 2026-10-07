@@ -59,17 +59,52 @@ document.body.insertAdjacentHTML(
 );
 const toggle = document.querySelector("#chat-toggle"),
   panel = document.querySelector("#chat-panel");
+let chatReturnFocus = null;
 function setChat(show) {
+  const dialog = document.querySelector("#modal[open]");
+  if (show) {
+    chatReturnFocus = document.activeElement;
+    // A child of the open dialog remains interactive in the browser top layer.
+    (dialog || document.body).append(panel);
+  }
   document.body.classList.toggle("chat-open", show);
   panel.hidden = !show;
   toggle.setAttribute("aria-expanded", String(show));
   if (show) document.querySelector("#chat-input").focus();
-  else toggle.focus();
+  else {
+    document.body.append(panel);
+    const target = chatReturnFocus?.isConnected ? chatReturnFocus : toggle;
+    target.focus();
+  }
 }
+document.addEventListener(
+  "click",
+  (event) => {
+    const trigger = event.target.closest("[data-open-chat]");
+    if (!trigger) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    setChat(true);
+  },
+  true,
+);
+document.querySelector("#modal")?.addEventListener("close", () => {
+  if (document.querySelector("#modal").open) return;
+  if (panel.parentElement !== document.body) {
+    panel.hidden = true;
+    document.body.classList.remove("chat-open");
+    toggle.setAttribute("aria-expanded", "false");
+    document.body.append(panel);
+  }
+});
 toggle.onclick = () => setChat(panel.hidden);
 document.querySelector("#chat-close").onclick = () => setChat(false);
 panel.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") setChat(false);
+  if (e.key === "Escape") {
+    e.preventDefault();
+    e.stopPropagation();
+    setChat(false);
+  }
 });
 function chatReply(q, a) {
   const messages = document.querySelector("#chat-messages");
@@ -96,7 +131,7 @@ document.querySelectorAll("[data-topic]").forEach(
   (b) =>
     (b.onclick = () => {
       const t = helpTopics[Number(b.dataset.topic)];
-      chatReply(t[0], t[1]);
+      chatReply(t[0], answerQuestion(t[0]));
     }),
 );
 const faq = document.querySelector("#faq");

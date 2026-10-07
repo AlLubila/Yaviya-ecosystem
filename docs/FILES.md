@@ -146,7 +146,7 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `legacy-vitrine/tests/catalog.test.mjs`                  | Ancienne vitrine de huit produits : catalog.test.mjs. Conservée hors du build principal.                   |
 | `legacy-vitrine/vercel.json`                             | Ancienne vitrine de huit produits : vercel.json. Conservée hors du build principal.                        |
 | `package-lock.json`                                      | Versions exactes utilisées par npm ci.                                                                     |
-| `package.json`                                           | Commandes npm, dépendances et version 1.3.1.                                                               |
+| `package.json`                                           | Commandes npm, dépendances et version 1.4.0.                                                               |
 | `scripts/build.mjs`                                      | Assemble les sources frontend classées en fichiers publics plats dans dist.                                |
 | `scripts/check.mjs`                                      | Syntaxe des sources et présence des assets référencés.                                                     |
 | `scripts/create-owner.mjs`                               | Crée le propriétaire admin dans un terminal de confiance.                                                  |
@@ -178,3 +178,12 @@ Fichiers ajoutés en version 1.3.0 :
 Le build génère `dist/market-config.js` depuis le JSON ; ce fichier généré n’est pas une source à modifier.
 
 Fichiers ajoutés en version 1.3.1 : `docs/PRODUCT_PHOTOS.md` (provenance et usage des vues), et les 30 fichiers `frontend/assets/images/*-angle-2.webp` (vues alternatives illustratives). Mapping commun dans `backend/data/market-config.json` ; galerie vérifiée avec le backend par `tests/checkout-flow.test.mjs`.
+
+Fichiers ajoutés en version 1.4.0 :
+
+| Fichier | Rôle |
+| --- | --- |
+| `backend/worker/product-insights.js` | Comptage des vues et achats ; rapports vendeur/admin avec droits côté serveur. |
+| `database/migrations/0015_product_insights.sql` | Événements de consultation persistants et index. |
+| `frontend/src/product-insights.js` | Compteurs produits, chatbot sur les fiches et statistiques centralisées. |
+| `tests/product-insights.test.mjs` | Déduplication, isolation des boutiques, marchés et agrégats. |

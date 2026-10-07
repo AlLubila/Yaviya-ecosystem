@@ -69,7 +69,7 @@ export async function marketContext(env, user) {
     owner: admin?.user_id,
   };
 }
-async function ensureSeeds(env, ctx) {
+export async function ensureSeeds(env, ctx) {
   if (!ctx.owner) return;
   if (
     (await env.DB.prepare("SELECT key FROM market_products WHERE key=?")

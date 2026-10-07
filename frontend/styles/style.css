@@ -4352,3 +4352,27 @@ header .header-actions {
     flex: 1 1 210px;
   }
 }
+
+/* Chat stays visible and interactive when launched inside a product dialog. */
+body.chat-open #chat-panel {
+  visibility: visible !important;
+}
+#chat-panel[hidden] {
+  display: none !important;
+}
+.product-buyers {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.product-help {
+  margin-top: 12px;
+}
+.product-insights th,
+.product-insights td {
+  padding: 12px;
+  text-align: left;
+}
+.product-insights select {
+  max-width: 100%;
+}

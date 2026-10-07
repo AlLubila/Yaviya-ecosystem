@@ -1,3 +1,4 @@
+import { handleProductInsights } from "./product-insights.js";
 import { accountIdentifiers } from "./account-identifiers.js";
 import assets from "./assets.js";
 import { handleMarketplace } from "./commerce.js";
@@ -23,6 +24,8 @@ export default {
       headers.set("yaviya-user-id", "cg:" + headers.get("yaviya-user-id"));
       request = new Request(request, { headers });
     }
+    if (url.pathname.startsWith("/api/product-insights"))
+      return handleProductInsights(request, env);
     if (url.pathname.startsWith("/api/marketplace"))
       return handleMarketplace(request, env);
     if (url.pathname.startsWith("/api/product-photos"))

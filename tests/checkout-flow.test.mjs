@@ -399,3 +399,77 @@ test("every demo product has distinct gallery views, clean windows and working p
     f.close();
   }
 });
+
+test("product help opens the chatbot inside the dialog, buyer counts come from the API and admin metrics render", async () => {
+  const f = await fixture();
+  try {
+    await until(() => f.run("marketReady && customerProfile!==null"));
+    await until(() =>
+      f.w.document
+        .querySelector('[data-product-buyers="1"]')
+        ?.textContent.includes("0 acheteur"),
+    );
+    f.run("showProductDetails(1)");
+    const modal = f.w.document.querySelector("#modal");
+    f.w.document.querySelector(".product-help").click();
+    assert.equal(modal.querySelector("#chat-panel").hidden, false);
+    assert.equal(f.w.document.activeElement.id, "chat-input");
+    const form = f.w.document.querySelector("#chat-form");
+    form.querySelector("input").value = "Comment vérifier les photos ?";
+    form.dispatchEvent(
+      new f.w.Event("submit", { bubbles: true, cancelable: true }),
+    );
+    assert.match(
+      f.w.document.querySelector(".bot-message:last-child").textContent,
+      /miniatures/,
+    );
+    f.w.document
+      .querySelector("#chat-panel")
+      .dispatchEvent(
+        new f.w.KeyboardEvent("keydown", {
+          key: "Escape",
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    assert.equal(modal.open, true);
+    assert.equal(f.w.document.querySelector("#chat-panel").hidden, true);
+    assert.equal(
+      f.w.document.querySelector("#chat-panel").parentElement,
+      f.w.document.body,
+    );
+    const events = () =>
+      f.db
+        .prepare("SELECT COUNT(*) AS total FROM product_view_events")
+        .first("total");
+    for (let i = 0; i < 200 && (await events()) !== 1; i++) await pause();
+    assert.equal(await events(), 1);
+    modal.close();
+    f.setSession(f.adminSession);
+    f.run('activeRole="admin"');
+    await f.run("loadMarket(false)");
+    f.run("showAdmin()");
+    f.w.document.querySelector('[data-dashboard-tab="productStats"]').click();
+    await until(() => f.w.document.querySelector(".product-insights table"));
+    assert.equal(
+      f.w.document.querySelector('[data-dashboard-panel="productStats"]')
+        .hidden,
+      false,
+    );
+    assert.match(
+      f.w.document.querySelector(".product-insights").textContent,
+      /Visiteurs distincts/,
+    );
+    const country = f.w.document.querySelector("[data-insight-country]");
+    country.value = "CD";
+    country.dispatchEvent(new f.w.Event("change", { bubbles: true }));
+    await until(() => f.w.document.querySelector(".product-insights table"));
+    const period = f.w.document.querySelector("[data-insight-period]");
+    period.value = "7";
+    period.dispatchEvent(new f.w.Event("change", { bubbles: true }));
+    await until(() => f.w.document.querySelector(".product-insights table"));
+    assert.deepEqual(f.errors, []);
+  } finally {
+    f.close();
+  }
+});
