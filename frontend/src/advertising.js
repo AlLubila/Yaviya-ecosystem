@@ -115,8 +115,8 @@ campaigns.push(
       "Your shopping deserves rewards.",
     ],
     copy: [
-      "Yavicoins, abonnements de livraison et réception confirmée avant libération des fonds : découvrez les avantages du parcours YAVIYA en démonstration.",
-      "Yavicoins, delivery subscriptions and buyer confirmation before funds are released: discover benefits in the YAVIYA demo experience.",
+      "Coupons, abonnements de livraison et réception confirmée avant libération des fonds : découvrez les avantages du parcours YAVIYA en démonstration.",
+      "Coupons, delivery subscriptions and buyer confirmation before funds are released: discover benefits in the YAVIYA demo experience.",
     ],
     cta: ["Découvrir YAVIYA Benefits", "Discover YAVIYA Benefits"],
     link: "index.html?info=benefits",

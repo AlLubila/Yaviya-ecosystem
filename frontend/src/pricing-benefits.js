@@ -37,7 +37,7 @@ function primeBenefits() {
     ["Accès anticipé aux promotions", "Early access to promotions"],
     ["Support prioritaire", "Priority support"],
     ["Offres partenaires", "Partner offers"],
-    ["Programme de fidélité Yavicoins", "Yavicoins loyalty programme"],
+    ["Programme de fidélité Coupons", "Coupons loyalty programme"],
   ];
 }
 function primeMarkup() {

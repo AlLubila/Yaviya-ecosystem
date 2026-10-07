@@ -1,3 +1,4 @@
+import { normalizeCategory } from "./product-categories.js";
 import marketConfig from "../data/market-config.json" with { type: "json" };
 export const seedCatalogue = [
   {
@@ -1512,6 +1513,7 @@ seedCatalogueCG.push(
 
 // Only unchanged illustrative seed galleries receive generated alternate views.
 for (const product of [...seedCatalogue, ...seedCatalogueCG]) {
+  normalizeCategory(product);
   const gallery = marketConfig.productGalleries[product.img];
   if (gallery) product.images = [...gallery];
 }

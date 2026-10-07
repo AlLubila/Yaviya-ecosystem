@@ -15,7 +15,7 @@
 | `/api/product-photos`, `/api/product-photos/image`                     | `product-photos.js`       | Photos et galerie de produit possédé                |
 | `/api/delivery-reviews`                                                | `delivery-reviews.js`     | Notes après réception, livreur affecté côté serveur |
 | `/api/seller-messages`, `/api/courier-messages`                        | Gestionnaires de messages | Discussions privées avec l'admin                    |
-| `/api/yavicoins`, `/api/faq-feedback`                                  | `coins.js`, `feedback.js` | Fidélité fictive et retours FAQ                     |
+| `/api/coupons` (alias historique `/api/yavicoins`), `/api/faq-feedback`                                  | `coins.js`, `feedback.js` | Fidélité fictive et retours FAQ                     |
 | `/api/delivery`                                                        | `delivery.js`             | Compatibilité avec l'ancien scénario isolé          |
 
 Les requêtes JSON et multipart exigent les droits du compte, la bonne origine et, pour les transitions, la révision courante. Les prix et stocks sont relus côté serveur. Les détails exacts et des appels exécutables figurent dans `tests/independent.test.mjs`. Les comptes ne doivent pas pouvoir choisir leur identité serveur ni devenir admin par inscription.

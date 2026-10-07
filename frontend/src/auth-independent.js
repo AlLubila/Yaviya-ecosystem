@@ -142,6 +142,15 @@
         .then((profile) => {
           if (profile) {
             customerProfile = profile;
+            if (["fr", "en"].includes(profile.preferredLanguage)) {
+              language = profile.preferredLanguage;
+              try {
+                localStorage.setItem("yaviya-language", language);
+              } catch {}
+              applyLanguage();
+              const selector = document.querySelector("#site-language");
+              if (selector) selector.value = language;
+            }
             wishes.clear();
             profile.wishlist.forEach((id) => wishes.add(id));
             decorateHearts();

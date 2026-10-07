@@ -167,12 +167,12 @@ const popularQuestions = [
   {
     id: "coins",
     fr: [
-      "À quoi servent les Yavicoins ?",
-      "Consultez « Mes Yavicoins » pour voir le solde et les possibilités d’échange présentées dans le parcours. Les règles affichées expliquent comment ils sont gagnés après réception confirmée. Dans cette version, les coins sont des points de démonstration sans valeur monétaire réelle.",
+      "À quoi servent les coupons ?",
+      "Consultez « Mes coupons » pour voir le solde et les possibilités d’échange présentées dans le parcours. Les règles affichées expliquent comment ils sont gagnés après réception confirmée. Dans cette version, les coupons sont des récompenses de démonstration sans valeur monétaire réelle.",
     ],
     en: [
-      "What are Yavicoins for?",
-      "Open “My Yavicoins” for your balance and the redemption options shown in the flow. Displayed rules explain how points are earned after confirmed receipt. In this version, coins are demo points with no real monetary value.",
+      "What are Coupons for?",
+      "Open “My coupons” for your balance and the redemption options shown in the flow. Displayed rules explain how points are earned after confirmed receipt. In this version, coupons are demo rewards with no real monetary value.",
     ],
   },
   {

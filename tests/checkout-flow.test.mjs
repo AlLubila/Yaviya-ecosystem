@@ -315,9 +315,28 @@ test("expanded categories persist seller classification and open the matching pr
     f.run("showCategories()");
     assert.equal(
       f.w.document.querySelectorAll(".category-tree section").length,
-      20,
+      12,
     );
-    const section = config.categorySections.findIndex((s) => s[0] === "Sport");
+    assert.deepEqual(
+      config.categorySections.map((s) => s[0]),
+      [
+        "Alimentation & épicerie",
+        "Automobile",
+        "Beauté & soins",
+        "Bébé & enfants",
+        "Industrie & commerce",
+        "Maison & cuisine",
+        "Mode",
+        "Musique & divertissement",
+        "Santé & bien-être",
+        "Sports & plein air",
+        "Voyage & bagages",
+        "Électronique",
+      ],
+    );
+    const section = config.categorySections.findIndex(
+      (s) => s[0] === "Sports & plein air",
+    );
     f.w.document
       .querySelector(
         `[data-category-section="${section}"][data-category-item="0"]`,
@@ -342,8 +361,8 @@ test("expanded categories persist seller classification and open the matching pr
     f.run("editProduct(1)");
     const form = f.w.document.querySelector("#product-form");
     assert.ok(form);
-    assert.equal(form.elements.category.options.length, 19);
-    form.elements.category.value = "Agriculture";
+    assert.equal(form.elements.category.options.length, 12);
+    form.elements.category.value = "Industrie & commerce";
     form.elements.category.dispatchEvent(new f.w.Event("change"));
     assert.ok(
       [...form.elements.subcategory.options].some(
@@ -596,6 +615,83 @@ test("commune delivery prices agree between checkout and persisted orders", asyn
       const data = await response.json();
       assert.equal(data.order.total, 85000 + fee);
     }
+    assert.deepEqual(f.errors, []);
+  } finally {
+    f.close();
+  }
+});
+
+test("buyer country, currency and language survive reload without changing checkout market", async () => {
+  const f = await fixture();
+  try {
+    await until(() => f.run("marketReady"));
+    f.run("showRegister()");
+    const form = f.w.document.querySelector("#register-form");
+    assert.equal(form.elements.residenceCountry.options.length, 250);
+    assert.equal(form.elements.currency.options.length, 4);
+    const original = await (
+      await f.direct("/api/customer", undefined, f.session)
+    ).json();
+    const body = {
+      ...original,
+      privacyConsent: true,
+      residenceCountry: "FR",
+      currency: "USD",
+      preferredLanguage: "en",
+    };
+    let response = await f.direct("/api/customer", body, f.session);
+    assert.equal(response.status, 200, await response.clone().text());
+    const saved = await (
+      await f.direct("/api/customer", undefined, f.session)
+    ).json();
+    assert.equal(saved.residenceCountry, "FR");
+    assert.equal(saved.currency, "USD");
+    assert.equal(saved.preferredLanguage, "en");
+    await f.run(`customerAPI(${JSON.stringify(body)})`);
+    assert.equal(f.run("language"), "en");
+    await f.run("loadMarket(false)");
+    f.run("showRegister()");
+    assert.equal(
+      f.w.document.querySelector("#register-form").elements.currency.value,
+      "USD",
+    );
+    assert.equal(f.run("window.YAVIYA_COUNTRY"), "CD");
+    assert.match(f.run("money(10000)"), /FC/);
+    for (const patch of [
+      { residenceCountry: "ZZ" },
+      { currency: "FAKE" },
+      { preferredLanguage: "zz" },
+    ]) {
+      response = await f.direct(
+        "/api/customer",
+        { ...body, ...patch },
+        f.session,
+      );
+      assert.equal(response.status, 400);
+    }
+    response = await f.direct(
+      "/api/customer",
+      {
+        ...original,
+        privacyConsent: true,
+        residenceCountry: undefined,
+        currency: undefined,
+        preferredLanguage: undefined,
+      },
+      f.session,
+    );
+    assert.equal(response.status, 200);
+    const retained = await (
+      await f.direct("/api/customer", undefined, f.session)
+    ).json();
+    assert.equal(retained.currency, "USD");
+    const coupons = await f.direct("/api/coupons", undefined, f.session);
+    assert.equal(coupons.status, 200);
+    f.run("showMyYaviya()");
+    assert.match(
+      f.w.document.querySelector(".profile-preferences-summary").textContent,
+      /France.*USD.*English/,
+    );
     assert.deepEqual(f.errors, []);
   } finally {
     f.close();

@@ -115,7 +115,7 @@ export async function handleCoins(request, env) {
     }
     return reply({ ...(await wallet(env, userId)), eventId: id });
   } catch (e) {
-    console.error("Yavicoins unavailable", e);
+    console.error("Coupons unavailable", e);
     return reply({ error: "Wallet temporarily unavailable" }, 503);
   }
 }

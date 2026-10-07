@@ -10,4 +10,5 @@ for (const seed of window.YAVIYA_MARKET_CONFIG.demoCatalogue || []) {
   };
   if (!products.some((p) => p.id === product.id)) products.push(product);
 }
+for (const p of products) p.category = window.yaviyaCategory(p);
 render();

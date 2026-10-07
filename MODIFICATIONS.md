@@ -1,5 +1,9 @@
 # Mise à jour complète YAVIYA
 
+## Version 1.7.0
+
+Douze catégories demandées, conservation des sous-catégories, coupons à la place de Yavicoin et préférences pays/devise/langue dans le profil. Migration 0017 et validation des valeurs côté backend. [Détails](docs/PROFILE_CATEGORIES_COUPONS.md).
+
 Site original v31 avec ses 34 images, deux marchés et espaces acheteur, vendeur, livreur et administrateur.
 
 Fichiers concernés : frontend/ (site et photos originales), backend/worker/ (catalogue et métier), backend/database.js, backend/auth.js, backend/google-auth.js, frontend/auth-independent.js, frontend/profile-commerce.js, api/handler.js, database/migrations/, scripts/, tests/, package.json, package-lock.json, vercel.json, .env.example, README.md.

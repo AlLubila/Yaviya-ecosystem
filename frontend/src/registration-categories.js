@@ -264,10 +264,8 @@ function categoryProducts(section, item) {
     )
       return false;
     const title = normalize(p.title);
-    if (section === 1 && /femme|enfant|bebe/.test(title)) return false;
-    if (section === 2 && /homme|enfant|bebe/.test(title)) return false;
     if (p.subcategory) return p.subcategory === children[item][0];
-    if (!term && section >= 9) return false;
+    if (!term) return false;
     return terms.some((t) => title.includes(t));
   });
 }
@@ -279,16 +277,7 @@ function showCategoryProducts(section, item) {
   const child = Number.isInteger(item) ? group[3][item] : null;
   if (Number.isInteger(item) && !child) return;
   categoryPageSelection = { section, item };
-  const heading = child
-    ? T(child[0], child[1]) +
-      (section === 1
-        ? T(" homme", " · men")
-        : section === 2
-          ? T(" femme", " · women")
-          : section === 5 && item === 2
-            ? T(" enfants", " · kids")
-            : "")
-    : T(group[1], group[2]);
+  const heading = child ? T(child[0], child[1]) : T(group[1], group[2]);
   let list = child
     ? categoryProducts(section, item)
     : products.filter(
@@ -296,9 +285,7 @@ function showCategoryProducts(section, item) {
           p.category === group[0] &&
           p.visible &&
           p.approved &&
-          sellerInCurrentMarket(shopOf(p)) &&
-          (section !== 1 || !/femme|enfant|bebe/.test(p.title.toLowerCase())) &&
-          (section !== 2 || !/homme|enfant|bebe/.test(p.title.toLowerCase())),
+          sellerInCurrentMarket(shopOf(p)),
       );
 
   if (categoryPageSort === "rating")

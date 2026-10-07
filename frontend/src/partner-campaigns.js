@@ -32,8 +32,8 @@ heroSlides.push(
     eyebrow: ["YAVIYA BENEFITS", "YAVIYA BENEFITS"],
     title: ["Vos achats vous récompensent.", "Your shopping rewards you."],
     copy: [
-      "Gagnez des Yavicoins et échangez-les contre des produits de démonstration. Découvrez aussi les abonnements de livraison.",
-      "Earn Yavicoins and redeem them for demonstration products. Explore delivery subscriptions too.",
+      "Gagnez des coupons et échangez-les contre des produits de démonstration. Découvrez aussi les abonnements de livraison.",
+      "Earn Coupons and redeem them for demonstration products. Explore delivery subscriptions too.",
     ],
     link: "index.html?info=benefits",
     cta: ["Découvrir mes avantages", "Explore my benefits"],
@@ -73,7 +73,7 @@ function showCampaignInfo(info) {
   else if (info === "logistics") open(content.delivery);
   else if (info === "benefits")
     open(
-      `<span class="eyebrow">YAVIYA BENEFITS</span><h2>${T("Les avantages de Mon Yaviya", "My Yaviya benefits")}</h2><div class="benefit-list"><section><h3>Yavicoins</h3><p>${T("Des points gagnés après confirmation de réception et échangeables contre des produits de démonstration.", "Points earned after receipt confirmation and redeemable for demo products.")}</p><button class="primary" data-coins="wallet">${T("Ouvrir mon portefeuille", "Open my wallet")}</button></section><section><h3>${T("Abonnements de livraison", "Delivery subscriptions")}</h3><p>${T("YAVIYA Prime : 250 000 FC/an, livraisons gratuites selon conditions, réductions exclusives, accès anticipé aux promotions, support prioritaire, offres partenaires et fidélité.", "YAVIYA Prime: FC 250,000/year, free deliveries subject to conditions, exclusive discounts, early promotion access, priority support, partner offers and loyalty.")}</p><button class="add" data-client="subscriptions">${T("Voir les abonnements", "View subscriptions")}</button></section><section><h3>${T("Confirmation de réception", "Receipt confirmation")}</h3><p>${T("Dans le parcours d’escrow simulé, le solde vendeur est libéré après votre confirmation de réception.", "In the simulated escrow flow, seller funds are released after you confirm receipt.")}</p><button class="add" data-action="tracking">${T("Mes commandes", "My orders")}</button></section></div>`,
+      `<span class="eyebrow">YAVIYA BENEFITS</span><h2>${T("Les avantages de Mon Yaviya", "My Yaviya benefits")}</h2><div class="benefit-list"><section><h3>Coupons</h3><p>${T("Des points gagnés après confirmation de réception et échangeables contre des produits de démonstration.", "Points earned after receipt confirmation and redeemable for demo products.")}</p><button class="primary" data-coins="wallet">${T("Ouvrir mon portefeuille", "Open my wallet")}</button></section><section><h3>${T("Abonnements de livraison", "Delivery subscriptions")}</h3><p>${T("YAVIYA Prime : 250 000 FC/an, livraisons gratuites selon conditions, réductions exclusives, accès anticipé aux promotions, support prioritaire, offres partenaires et fidélité.", "YAVIYA Prime: FC 250,000/year, free deliveries subject to conditions, exclusive discounts, early promotion access, priority support, partner offers and loyalty.")}</p><button class="add" data-client="subscriptions">${T("Voir les abonnements", "View subscriptions")}</button></section><section><h3>${T("Confirmation de réception", "Receipt confirmation")}</h3><p>${T("Dans le parcours d’escrow simulé, le solde vendeur est libéré après votre confirmation de réception.", "In the simulated escrow flow, seller funds are released after you confirm receipt.")}</p><button class="add" data-action="tracking">${T("Mes commandes", "My orders")}</button></section></div>`,
     );
 }
 document.addEventListener(

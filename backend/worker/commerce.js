@@ -1,3 +1,4 @@
+import { normalizeCategory } from "./product-categories.js";
 import { approvedIdentity } from "./identity-complete.js";
 import marketConfig from "../data/market-config.json" with { type: "json" };
 import { accountIdentifiers } from "./account-identifiers.js";
@@ -165,6 +166,7 @@ function productData(row) {
     stock: row.stock,
     revision: row.revision,
   };
+  normalizeCategory(product);
   const supplied =
     Array.isArray(product.images) && product.images.length
       ? product.images
@@ -301,6 +303,9 @@ async function state(env, ctx, view) {
         ...(await accountIdentifiers(env, ctx.user, ctx.profile.account_type)),
         name: ctx.profile.name,
         firstName: ctx.profile.first_name,
+        residenceCountry: ctx.profile.country_code,
+        currency: ctx.profile.currency,
+        preferredLanguage: ctx.profile.preferred_language,
         lastName: ctx.profile.last_name,
         phone: ctx.profile.phone,
         email: ctx.profile.email,
@@ -345,6 +350,7 @@ async function state(env, ctx, view) {
   };
 }
 function validateProduct(p) {
+  if (p) normalizeCategory(p);
   if (
     !p ||
     !Number.isSafeInteger(p.id) ||
@@ -367,6 +373,8 @@ function validateProduct(p) {
     p.desc.length > 5000
   )
     fail("Produit invalide");
+  if (!marketConfig.categorySections.some((s) => s[0] === p.category))
+    fail("Catégorie invalide");
   if (
     p.subcategory &&
     (typeof p.subcategory !== "string" ||

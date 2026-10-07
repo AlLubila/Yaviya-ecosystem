@@ -55,17 +55,7 @@ const faqItems = [
     "No real purchase is made in this version. Return and refund policies will be published before commercial launch.",
   ],
 ];
-const categoryNames = {
-  Tout: "All products",
-  "High-tech": "Electronics",
-  Mode: "Clothing & accessories",
-  Maison: "Home & household",
-  Beauté: "Beauty",
-  Enfants: "Kids & baby",
-  Épicerie: "Groceries",
-  Création: "Photo & lighting",
-  Musique: "Musical instruments",
-};
+const categoryNames = { Tout: "All products" };
 for (const [cat, fr, en] of window.YAVIYA_MARKET_CONFIG.categorySections) {
   if (!categoryNames[cat]) categoryNames[cat] = en;
 }
@@ -108,7 +98,7 @@ function renderMenu() {
       )
       .join(
         "",
-      )}</div><h3>${T("Mon espace client", "My customer area")}</h3><div class="menu-links"><button data-client="register">${T(customerProfile ? "Mon profil" : "Créer un compte", customerProfile ? "My profile" : "Create an account")}</button><button data-action="tracking">${T("Mes commandes", "My orders")}</button><button data-client="wishlist">${T("Mes favoris · liste des souhaits", "My favourites · wishlist")} (${wishes.size})</button><button data-coins="wallet">${T("Mes Yavicoins", "My Yavicoins")}</button><button data-client="subscriptions">${T("Abonnements de livraison", "Delivery subscriptions")}</button><button data-client="faq">${T("Questions fréquentes", "Frequently asked questions")}</button><button data-client="support">${T("Contactez le support", "Contact support")}</button><button data-client="about">${T("À propos de YAVIYA", "About YAVIYA")}</button></div>`;
+      )}</div><h3>${T("Mon espace client", "My customer area")}</h3><div class="menu-links"><button data-client="register">${T(customerProfile ? "Mon profil" : "Créer un compte", customerProfile ? "My profile" : "Create an account")}</button><button data-action="tracking">${T("Mes commandes", "My orders")}</button><button data-client="wishlist">${T("Mes favoris · liste des souhaits", "My favourites · wishlist")} (${wishes.size})</button><button data-coins="wallet">${T("Mes coupons", "My coupons")}</button><button data-client="subscriptions">${T("Abonnements de livraison", "Delivery subscriptions")}</button><button data-client="faq">${T("Questions fréquentes", "Frequently asked questions")}</button><button data-client="support">${T("Contactez le support", "Contact support")}</button><button data-client="about">${T("À propos de YAVIYA", "About YAVIYA")}</button></div>`;
 }
 function accountIdentifiersMarkup(profile = customerProfile) {
   if (!profile) return "";

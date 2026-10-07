@@ -100,159 +100,13 @@
   "deliverableCities": ["Kinshasa", "Lubumbashi"],
   "categorySections": [
     [
-      "High-tech",
-      "High-tech",
-      "Electronics",
-      [
-        ["Téléphones", "Phones", "téléphone"],
-        ["Casques & écouteurs", "Headphones & earphones", "casque"],
-        ["Câbles & accessoires", "Cables & accessories", "câble"],
-        ["Informatique", "Computing", "ordinateur"]
-      ]
-    ],
-    [
-      "Mode",
-      "Habits homme",
-      "Men’s clothing",
-      [
-        ["Chemises", "Shirts", "chemise"],
-        ["Cravates", "Ties", "cravate"],
-        ["Complets & vestes", "Suits & jackets", "veste"],
-        ["Baskets & chaussures", "Trainers & shoes", "baskets"],
-        ["Montres", "Watches", "montre"],
-        ["Habits traditionnels", "Traditional clothing", "traditionnel"],
-        ["Bagues de fiançailles", "Engagement rings", "fiançailles"],
-        ["Bagues de mariage", "Wedding rings", "mariage"]
-      ]
-    ],
-    [
-      "Mode",
-      "Habits femme",
-      "Women’s clothing",
-      [
-        ["Robes", "Dresses", "robe"],
-        ["Sacs à main", "Handbags", "sac à main"],
-        ["Chaussures", "Shoes", "baskets"],
-        ["Accessoires", "Accessories", "accessoire"],
-        ["Habits traditionnels", "Traditional clothing", "traditionnel"],
-        ["Bagues de fiançailles", "Engagement rings", "fiançailles"],
-        ["Bagues de mariage", "Wedding rings", "mariage"]
-      ]
-    ],
-    [
-      "Maison",
-      "Maison & quotidien",
-      "Home & household",
-      [
-        ["Vaisselle", "Tableware", "assiettes"],
-        ["Ventilateurs", "Fans", "ventilateur"],
-        [
-          "Électricité & rallonges",
-          "Electrical items & extension leads",
-          "rallonge"
-        ],
-        ["Décoration", "Decor", "photo personnalisée"],
-        ["Couverts & cuillères", "Cutlery & spoons", "cuillère"],
-        ["Bols & récipients", "Bowls & containers", "bol"]
-      ]
-    ],
-    [
-      "Beauté",
-      "Beauté & soins",
-      "Beauty & care",
-      [
-        ["Savons", "Soap", "savon"],
-        ["Laits & soins du corps", "Body lotions & care", "lait"],
-        ["Cosmétiques", "Cosmetics", "cosmétique"],
-        ["Parfums", "Perfumes", "parfum"]
-      ]
-    ],
-    [
-      "Enfants",
-      "Enfants & bébé",
-      "Kids & baby",
-      [
-        ["Jouets", "Toys", "jouets"],
-        ["Jeux éducatifs", "Educational games", "jeu éducatif"],
-        ["Habits enfants", "Kids’ clothing", "habit"]
-      ]
-    ],
-    [
-      "Épicerie",
-      "Épicerie",
-      "Groceries",
+      "Alimentation & épicerie",
+      "Alimentation & épicerie",
+      "Food & groceries",
       [
         ["Riz & céréales", "Rice & cereals", "riz"],
         ["Café & boissons", "Coffee & drinks", "café"],
         ["Produits alimentaires", "Food products", ""]
-      ]
-    ],
-    [
-      "Création",
-      "Photo & création",
-      "Photo & creativity",
-      [
-        ["Éclairage & ring lights", "Lighting & ring lights", "ring light"],
-        ["Photos personnalisées", "Custom photos", "photo personnalisée"],
-        ["Micros cravate", "Lavalier microphones", "micro cravate"],
-        ["Panneaux LED", "LED panels", "panneau led"]
-      ]
-    ],
-    [
-      "Musique",
-      "Musique",
-      "Music",
-      [
-        ["Guitares", "Guitars", "guitare"],
-        ["Claviers", "Keyboards", "clavier"],
-        ["Instruments", "Instruments", ""],
-        ["Batteries & percussions", "Drums & percussion", "batterie"],
-        ["Micros avec fil", "Wired microphones", "microphone avec"],
-        ["Micros sans fil", "Wireless microphones", "microphones sans"]
-      ]
-    ],
-    [
-      "Électroménager",
-      "Électroménager",
-      "Home appliances",
-      [
-        ["Réfrigérateurs", "Refrigerators", "réfrigérateur"],
-        ["Lave-linge", "Washing machines", "lave-linge"],
-        ["Climatiseurs", "Air conditioners", "climatiseur"],
-        ["Petits appareils", "Small appliances", ""]
-      ]
-    ],
-    [
-      "Bricolage",
-      "Bricolage",
-      "DIY & tools",
-      [
-        ["Outils manuels", "Hand tools", "outil"],
-        ["Outillage électrique", "Power tools", "perceuse"],
-        ["Matériaux de construction", "Building supplies", ""],
-        ["Plomberie", "Plumbing", ""]
-      ]
-    ],
-    [
-      "Jardin",
-      "Jardin",
-      "Garden & outdoor",
-      [
-        ["Mobilier extérieur", "Outdoor furniture", ""],
-        ["Outils de jardin", "Garden tools", ""],
-        ["Plantes & semences", "Plants & seeds", ""]
-      ]
-    ],
-    [
-      "Sport",
-      "Sport",
-      "Sports & leisure",
-      [
-        ["Fitness & musculation", "Fitness & strength", ""],
-        ["Football & sports collectifs", "Football & team sports", ""],
-        ["Vélos & accessoires", "Bikes & accessories", "vélo"],
-        ["Camping & randonnée", "Camping & hiking", ""],
-        ["Tenues de sport", "Sportswear", "tenue de sport"]
       ]
     ],
     [
@@ -267,55 +121,43 @@
       ]
     ],
     [
-      "Bureau",
-      "Bureau",
-      "Office & school",
+      "Beauté & soins",
+      "Beauté & soins",
+      "Beauty & care",
       [
+        ["Savons", "Soap", "savon"],
+        ["Laits & soins du corps", "Body lotions & care", "lait"],
+        ["Cosmétiques", "Cosmetics", "cosmétique"],
+        ["Parfums", "Perfumes", "parfum"]
+      ]
+    ],
+    [
+      "Bébé & enfants",
+      "Bébé & enfants",
+      "Baby & kids",
+      [
+        ["Jouets", "Toys", "jouets"],
+        ["Jeux éducatifs", "Educational games", "jeu éducatif"],
+        ["Habits enfants", "Kids’ clothing", "habit"]
+      ]
+    ],
+    [
+      "Industrie & commerce",
+      "Industrie & commerce",
+      "Industry & commerce",
+      [
+        ["Outils manuels", "Hand tools", "outil"],
+        ["Outillage électrique", "Power tools", "perceuse"],
+        ["Matériaux de construction", "Building supplies", ""],
+        ["Plomberie", "Plumbing", ""],
         ["Fournitures scolaires", "School supplies", ""],
         ["Papeterie", "Stationery", ""],
         ["Mobilier de bureau", "Office furniture", ""],
         ["Imprimantes & consommables", "Printers & supplies", ""],
-        ["Sacs à dos scolaires", "School backpacks", "sac à dos élève"],
-        ["Sacs à dos étudiants", "Student backpacks", "sac à dos étudiant"]
-      ]
-    ],
-    [
-      "Livres",
-      "Livres",
-      "Books & entertainment",
-      [
-        ["Livres & romans", "Books & novels", ""],
-        ["Manuels scolaires", "Textbooks", ""],
-        ["Jeux vidéo", "Video games", ""],
-        ["Arts & loisirs créatifs", "Arts & crafts", ""]
-      ]
-    ],
-    [
-      "Animaux",
-      "Animaux",
-      "Pet supplies",
-      [
-        ["Alimentation animale", "Pet food", ""],
-        ["Accessoires animaux", "Pet accessories", ""],
-        ["Hygiène & soins", "Pet hygiene & care", ""]
-      ]
-    ],
-    [
-      "Agriculture",
-      "Agriculture",
-      "Agriculture",
-      [
         ["Semences & plants", "Seeds & seedlings", ""],
         ["Équipements agricoles", "Agricultural equipment", ""],
         ["Irrigation", "Irrigation", ""],
-        ["Élevage", "Livestock supplies", ""]
-      ]
-    ],
-    [
-      "Professionnel",
-      "Professionnel",
-      "Business & industry",
-      [
+        ["Élevage", "Livestock supplies", ""],
         ["Équipements de commerce", "Retail equipment", ""],
         ["Machines & équipements", "Machinery & equipment", ""],
         ["Emballages", "Packaging", ""],
@@ -323,13 +165,114 @@
       ]
     ],
     [
-      "Santé",
-      "Santé",
+      "Maison & cuisine",
+      "Maison & cuisine",
+      "Home & kitchen",
+      [
+        ["Vaisselle", "Tableware", "assiettes"],
+        ["Ventilateurs", "Fans", "ventilateur"],
+        [
+          "Électricité & rallonges",
+          "Electrical items & extension leads",
+          "rallonge"
+        ],
+        ["Décoration", "Decor", "photo personnalisée"],
+        ["Couverts & cuillères", "Cutlery & spoons", "cuillère"],
+        ["Bols & récipients", "Bowls & containers", "bol"],
+        ["Photos personnalisées", "Custom photos", "photo personnalisée"],
+        ["Réfrigérateurs", "Refrigerators", "réfrigérateur"],
+        ["Lave-linge", "Washing machines", "lave-linge"],
+        ["Climatiseurs", "Air conditioners", "climatiseur"],
+        ["Petits appareils", "Small appliances", ""],
+        ["Mobilier extérieur", "Outdoor furniture", ""],
+        ["Outils de jardin", "Garden tools", ""],
+        ["Plantes & semences", "Plants & seeds", ""],
+        ["Alimentation animale", "Pet food", ""],
+        ["Accessoires animaux", "Pet accessories", ""],
+        ["Hygiène & soins", "Pet hygiene & care", ""]
+      ]
+    ],
+    [
+      "Mode",
+      "Mode",
+      "Fashion",
+      [
+        ["Chemises", "Shirts", "chemise"],
+        ["Cravates", "Ties", "cravate"],
+        ["Complets & vestes", "Suits & jackets", "veste"],
+        ["Baskets & chaussures", "Trainers & shoes", "baskets"],
+        ["Montres", "Watches", "montre"],
+        ["Habits traditionnels", "Traditional clothing", "traditionnel"],
+        ["Bagues de fiançailles", "Engagement rings", "fiançailles"],
+        ["Bagues de mariage", "Wedding rings", "mariage"],
+        ["Robes", "Dresses", "robe"],
+        ["Sacs à main", "Handbags", "sac à main"],
+        ["Chaussures", "Shoes", "baskets"],
+        ["Accessoires", "Accessories", "accessoire"]
+      ]
+    ],
+    [
+      "Musique & divertissement",
+      "Musique & divertissement",
+      "Music & entertainment",
+      [
+        ["Guitares", "Guitars", "guitare"],
+        ["Claviers", "Keyboards", "clavier"],
+        ["Instruments", "Instruments", ""],
+        ["Batteries & percussions", "Drums & percussion", "batterie"],
+        ["Micros avec fil", "Wired microphones", "microphone avec"],
+        ["Micros sans fil", "Wireless microphones", "microphones sans"],
+        ["Livres & romans", "Books & novels", ""],
+        ["Manuels scolaires", "Textbooks", ""],
+        ["Jeux vidéo", "Video games", ""],
+        ["Arts & loisirs créatifs", "Arts & crafts", ""]
+      ]
+    ],
+    [
+      "Santé & bien-être",
+      "Santé & bien-être",
       "Health & wellbeing",
       [
         ["Hygiène & bien-être", "Hygiene & wellbeing", ""],
         ["Accessoires de mobilité", "Mobility accessories", ""],
         ["Premiers secours", "First aid", ""]
+      ]
+    ],
+    [
+      "Sports & plein air",
+      "Sports & plein air",
+      "Sports & outdoors",
+      [
+        ["Fitness & musculation", "Fitness & strength", ""],
+        ["Football & sports collectifs", "Football & team sports", ""],
+        ["Vélos & accessoires", "Bikes & accessories", "vélo"],
+        ["Camping & randonnée", "Camping & hiking", ""],
+        ["Tenues de sport", "Sportswear", "tenue de sport"]
+      ]
+    ],
+    [
+      "Voyage & bagages",
+      "Voyage & bagages",
+      "Travel & luggage",
+      [
+        ["Sacs à dos scolaires", "School backpacks", "sac à dos élève"],
+        ["Sacs à dos étudiants", "Student backpacks", "sac à dos étudiant"],
+        ["Valises & sacs de voyage", "Suitcases & travel bags", "valise"],
+        ["Accessoires de voyage", "Travel accessories", "voyage"]
+      ]
+    ],
+    [
+      "Électronique",
+      "Électronique",
+      "Electronics",
+      [
+        ["Téléphones", "Phones", "téléphone"],
+        ["Casques & écouteurs", "Headphones & earphones", "casque"],
+        ["Câbles & accessoires", "Cables & accessories", "câble"],
+        ["Informatique", "Computing", "ordinateur"],
+        ["Éclairage & ring lights", "Lighting & ring lights", "ring light"],
+        ["Micros cravate", "Lavalier microphones", "micro cravate"],
+        ["Panneaux LED", "LED panels", "panneau led"]
       ]
     ]
   ],
@@ -483,7 +426,7 @@
     {
       "id": 600,
       "title": "Batterie acoustique 5 fûts",
-      "category": "Musique",
+      "category": "Musique & divertissement",
       "price": 980000,
       "seller": 10,
       "subcategory": "Batteries & percussions",
@@ -537,7 +480,7 @@
     {
       "id": 603,
       "title": "Micro cravate pour smartphone",
-      "category": "Création",
+      "category": "Électronique",
       "price": 35000,
       "seller": 9,
       "subcategory": "Micros cravate",
@@ -553,7 +496,7 @@
     {
       "id": 604,
       "title": "Microphone avec fil et câble",
-      "category": "Musique",
+      "category": "Musique & divertissement",
       "price": 55000,
       "seller": 10,
       "subcategory": "Micros avec fil",
@@ -572,7 +515,7 @@
     {
       "id": 605,
       "title": "Duo de microphones sans fil",
-      "category": "Musique",
+      "category": "Musique & divertissement",
       "price": 185000,
       "seller": 10,
       "subcategory": "Micros sans fil",
@@ -591,7 +534,7 @@
     {
       "id": 606,
       "title": "Parfum Ambre 100 ml",
-      "category": "Beauté",
+      "category": "Beauté & soins",
       "price": 65000,
       "seller": 5,
       "subcategory": "Parfums",
@@ -607,7 +550,7 @@
     {
       "id": 607,
       "title": "Cuillères inox — lot de 6",
-      "category": "Maison",
+      "category": "Maison & cuisine",
       "price": 16000,
       "seller": 4,
       "subcategory": "Couverts & cuillères",
@@ -623,7 +566,7 @@
     {
       "id": 608,
       "title": "Tenue de sport survêtement",
-      "category": "Sport",
+      "category": "Sports & plein air",
       "price": 78000,
       "seller": 3,
       "subcategory": "Tenues de sport",
@@ -642,7 +585,7 @@
     {
       "id": 609,
       "title": "Kit fitness : haltères et tapis",
-      "category": "Sport",
+      "category": "Sports & plein air",
       "price": 140000,
       "seller": 3,
       "subcategory": "Fitness & musculation",
@@ -658,7 +601,7 @@
     {
       "id": 610,
       "title": "Ballon de football et cône",
-      "category": "Sport",
+      "category": "Sports & plein air",
       "price": 38000,
       "seller": 3,
       "subcategory": "Football & sports collectifs",
@@ -674,7 +617,7 @@
     {
       "id": 611,
       "title": "Sac à dos élève",
-      "category": "Bureau",
+      "category": "Voyage & bagages",
       "price": 42000,
       "seller": 6,
       "subcategory": "Sacs à dos scolaires",
@@ -693,7 +636,7 @@
     {
       "id": 612,
       "title": "Sac à dos étudiant avec compartiments",
-      "category": "Bureau",
+      "category": "Voyage & bagages",
       "price": 68000,
       "seller": 2,
       "subcategory": "Sacs à dos étudiants",
@@ -712,7 +655,7 @@
     {
       "id": 613,
       "title": "Bols alimentaires — lot de 3",
-      "category": "Maison",
+      "category": "Maison & cuisine",
       "price": 28000,
       "seller": 4,
       "subcategory": "Bols & récipients",
@@ -801,7 +744,7 @@
     {
       "id": 618,
       "title": "Ring light compact 16 cm",
-      "category": "Création",
+      "category": "Électronique",
       "price": 35000,
       "seller": 9,
       "subcategory": "Éclairage & ring lights",
@@ -820,7 +763,7 @@
     {
       "id": 619,
       "title": "Ring light studio 45 cm",
-      "category": "Création",
+      "category": "Électronique",
       "price": 165000,
       "seller": 9,
       "subcategory": "Éclairage & ring lights",
@@ -839,7 +782,7 @@
     {
       "id": 620,
       "title": "Panneau LED vidéo sur trépied",
-      "category": "Création",
+      "category": "Électronique",
       "price": 85000,
       "seller": 9,
       "subcategory": "Panneaux LED",
@@ -2470,5 +2413,26 @@
       "Lubumbashi": 7500,
       "Ruashi": 7500
     }
-  }
+  },
+  "categoryAliases": {
+    "Épicerie": "Alimentation & épicerie",
+    "Beauté": "Beauté & soins",
+    "Enfants": "Bébé & enfants",
+    "Professionnel": "Industrie & commerce",
+    "Bureau": "Industrie & commerce",
+    "Agriculture": "Industrie & commerce",
+    "Bricolage": "Industrie & commerce",
+    "Maison": "Maison & cuisine",
+    "Électroménager": "Maison & cuisine",
+    "Jardin": "Maison & cuisine",
+    "Animaux": "Maison & cuisine",
+    "Musique": "Musique & divertissement",
+    "Livres": "Musique & divertissement",
+    "Santé": "Santé & bien-être",
+    "Sport": "Sports & plein air",
+    "High-tech": "Électronique",
+    "Création": "Électronique"
+  },
+  "profileCurrencies": ["CDF", "XAF", "USD", "EUR"],
+  "profileLanguages": ["fr", "en"]
 }

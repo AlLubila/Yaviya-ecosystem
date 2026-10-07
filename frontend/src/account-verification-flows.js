@@ -330,12 +330,24 @@ customerAPI = async function (body) {
       "phone",
       "email",
       "address",
+      "residenceCountry",
+      "currency",
+      "preferredLanguage",
       "accountType",
       "privacyConsent",
       "privacyVersion",
     ].map((k) => [k, body[k]]),
   );
   const saved = await profileBeforeVerification(allowed);
+  if (allowed.preferredLanguage) {
+    language = allowed.preferredLanguage;
+    try {
+      localStorage.setItem("yaviya-language", language);
+    } catch {}
+    applyLanguage();
+    const selector = $("#site-language");
+    if (selector) selector.value = language;
+  }
   customerProfile = {
     ...allowed,
     accountIds: saved.accountIds,

@@ -72,3 +72,13 @@ window.checkoutCityOptions = () => {
   );
   return `<optgroup label="${T("Commandes ouvertes", "Orders open")}">${active.map((c) => `<option value="${c}">${c}</option>`).join("")}</optgroup><optgroup label="${T("Extension à venir — commandes fermées", "Upcoming expansion — orders closed")}">${future.map((c) => `<option value="${c}" disabled>${c} · ${T("bientôt disponible", "coming soon")}</option>`).join("")}</optgroup>`;
 };
+
+window.yaviyaCategory = (p) => {
+  if (/^Sacs à dos/.test(p.subcategory || "")) return "Voyage & bagages";
+  if (
+    p.subcategory === "Photos personnalisées" ||
+    (p.category === "Création" && /photo personnalisée/i.test(p.title || ""))
+  )
+    return "Maison & cuisine";
+  return window.YAVIYA_MARKET_CONFIG.categoryAliases[p.category] || p.category;
+};

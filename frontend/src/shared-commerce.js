@@ -73,6 +73,7 @@ function applyMarket(data, redraw = true) {
     else shops.push(fields);
   }
   products.splice(0, products.length, ...data.catalogue);
+  for (const p of products) p.category = window.yaviyaCategory(p);
   hydrateProductPhotos();
   orders.splice(0, orders.length, ...data.orders);
   courierAvailable = !!data.courierSettings?.available;
