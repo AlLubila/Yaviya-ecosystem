@@ -367,6 +367,6 @@ test("original shared buyer/seller/courier/admin delivery, private proof and rat
   }
 });
 
-test("serverless production refuses ephemeral storage when remote credentials are missing", async () => {
-  await assert.rejects(createDatabase({ VERCEL: "1" }), /TURSO_DATABASE_URL/);
+test("serverless production refuses ephemeral storage when PostgreSQL credentials are missing", async () => {
+  await assert.rejects(createDatabase({ VERCEL: "1" }), /POSTGRES_URL/);
 });

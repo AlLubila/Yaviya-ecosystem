@@ -351,7 +351,7 @@ export async function handleTwoFactor(request, db, action) {
       ...codes.map((code) =>
         db
           .prepare(
-            "INSERT OR IGNORE INTO auth_mfa_recovery SELECT user_id,? FROM auth_mfa WHERE user_id=? AND generation=? AND enabled=1 AND last_step=?",
+            "INSERT INTO auth_mfa_recovery SELECT user_id,? FROM auth_mfa WHERE user_id=? AND generation=? AND enabled=1 AND last_step=? ON CONFLICT DO NOTHING",
           )
           .bind(
             hash(`${user.id}:${code.replaceAll("-", "")}`),

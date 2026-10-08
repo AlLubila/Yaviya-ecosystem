@@ -1,6 +1,6 @@
-# YAVIYA — nouvelle version complète (1.8.1)
+# YAVIYA — nouvelle version complète (1.9.0)
 
-Version 1.8.1 : base PostgreSQL/Supabase créée à Paris, migrations appliquées, droits Data API explicites et audit de sécurité sans anomalie.
+Version 1.9.0 : adaptateur PostgreSQL activable sur Vercel, schéma d’exécution privé et rôle Supabase à privilèges minimaux. SQLite reste disponible uniquement pour le développement et les tests locaux.
 
 Version 1.7.0 : [12 catégories, coupons et préférences de profil](docs/PROFILE_CATEGORIES_COUPONS.md). La devise préférée ne convertit pas les prix.
 
@@ -8,7 +8,7 @@ Version complète indépendante issue de la version 31 de YAVIYA « Votre march�
 
 [Catalogue et couverture](docs/CATALOGUE_COVERAGE.md) · [Double authentification](docs/TWO_FACTOR.md) · [Rôle de chaque fichier](docs/FILES.md) · [Lancer et tester les parcours](docs/DEMO.md)
 
-La base PostgreSQL/Supabase de production est active et définie dans `supabase/` avec RLS, stockage privé, tables de paiements, commissions, remboursements et reversements. Voir le [guide PostgreSQL/Supabase](docs/POSTGRESQL_SUPABASE.md). Le runtime actuel reste sur libSQL jusqu'à la migration de l'adaptateur API.
+La base PostgreSQL/Supabase de production est active et définie dans `supabase/` avec RLS, stockage privé, tables de paiements, commissions, remboursements et reversements. L’API sélectionne PostgreSQL dès que `POSTGRES_URL` est présent ; elle refuse le stockage local éphémère sur Vercel. Voir le [guide PostgreSQL/Supabase](docs/POSTGRESQL_SUPABASE.md).
 
 ## Ce qui est conservé
 
@@ -35,9 +35,9 @@ npm start
 
 Le projet GitHub doit être relié au projet Vercel `yaviyaecosystem`, avec la racine du dépôt comme Root Directory. `vercel.json` configure `npm run build`, le dossier `dist` et la fonction API indépendante. Utiliser Node.js 24.
 
-1. Créer ou connecter une base **Turso/libSQL** dédiée à cette installation. Elle conserve le SQL SQLite du backend original et évite une réécriture des règles métier.
-2. Ajouter `TURSO_DATABASE_URL` et `TURSO_AUTH_TOKEN` aux environnements Production et Preview du projet Vercel. Idéalement utiliser une base distincte pour les previews ; ne pas exposer ces valeurs au frontend.
-3. Copier `.env.example` vers `.env` dans un terminal local de confiance et renseigner les mêmes valeurs, puis exécuter `npm run db:migrate`. La migration est idempotente et refuse les erreurs plutôt que de continuer avec un schéma partiel.
+1. Utiliser le projet Supabase `yaviya-production` et sa connexion **Transaction pooler** sur le port 6543.
+2. Ajouter `POSTGRES_URL` comme Secret Vercel côté serveur. La valeur utilise le rôle limité `yaviya_runtime` et ne doit jamais être préfixée par `NEXT_PUBLIC_`.
+3. Les migrations Supabase sont versionnées dans `supabase/migrations/`. Les migrations SQLite de `database/migrations/` servent uniquement au démarrage local.
 4. Pour créer le propriétaire administrateur, renseigner un identifiant distinct `OWNER_LOGIN` et un mot de passe choisi par le propriétaire dans `.env`, puis exécuter `npm run db:owner`. Cette opération ne peut pas être effectuée depuis le navigateur. Supprimer ensuite ces deux valeurs de `.env` ; elles ne sont pas nécessaires au serveur.
 5. Déployer la branche validée, puis vérifier la connexion, le profil, les documents, commandes et messages sur la preview avant la fusion dans `main`.
 
@@ -54,7 +54,7 @@ Le projet GitHub doit être relié au projet Vercel `yaviyaecosystem`, avec la r
 | `api/handler.js`             | Fonction Vercel : conversion HTTP vers les gestionnaires existants                        |
 | `backend/application.js`     | Session indépendante et identité injectée côté serveur                                    |
 | `backend/auth.js`            | Comptes, mots de passe scrypt, sessions serveur, déconnexion et limitation des tentatives |
-| `backend/database.js`        | Adaptation D1 vers libSQL : requêtes, transactions et stockage privé des fichiers         |
+| `backend/database.js`        | Adaptation D1 vers PostgreSQL en production et SQLite pour le développement local          |
 | `backend/worker/`            | Gestionnaires métier de la version 31, avec identités YAVIYA indépendantes                |
 | `database/migrations/`       | Migrations originales et tables des accès indépendants                                    |
 | `scripts/`                   | Serveur local, build, migrations, création propriétaire et contrôles                      |
@@ -68,7 +68,7 @@ Cette installation est indépendante de ChatGPT : elle n'utilise ni sa connexion
 
 Les produits et boutiques initiaux sont illustratifs. Les paiements Mobile Money/carte, l'escrow financier, les reversements automatiques, les abonnements payants et l'envoi d'e-mails ne sont pas activés. Google est intégré au code, mais exige la configuration du client OAuth avant de fonctionner. La connexion indépendante n'ajoute pas de vérification e-mail/SMS ni de récupération automatique du mot de passe. Les paiements à réception et règlements manuels conservent leurs déclarations de suivi, sans transfert automatique de fonds. L'assistant reste celui du site original.
 
-Validation locale : syntaxe des sources, fichiers référencés, migrations, transactions atomiques, session/CSRF, isolation des profils, refus d'identité falsifiée, pièces privées, validation manuelle vendeur/livreur, création de produit, commande idempotente, acceptation, préparation, affectation livreur, preuve privée, réception et notes vendeur/livreur. La configuration et les ressources réelles Vercel/Turso doivent encore être activées et testées à distance. Les formulaires 2FA sont testés avec jsdom contre le backend réel ; aucun test visuel dans un navigateur complet n’a été exécuté dans cet environnement.
+Validation locale : syntaxe des sources, fichiers référencés, migrations, transactions atomiques, session/CSRF, isolation des profils, refus d'identité falsifiée, pièces privées, validation manuelle vendeur/livreur, création de produit, commande idempotente, acceptation, préparation, affectation livreur, preuve privée, réception et notes vendeur/livreur. Les formulaires 2FA sont testés avec jsdom contre le backend réel. La connexion distante doit être vérifiée après chaque changement de Secret Vercel.
 
 ## Connexion Google / Gmail
 

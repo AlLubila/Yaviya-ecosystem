@@ -1,6 +1,6 @@
 # PostgreSQL/Supabase pour YAVIYA
 
-Le dossier `supabase/` contient la base PostgreSQL de production préparée pour YAVIYA. Il est indépendant des migrations SQLite/libSQL actuelles : le site continue à utiliser Turso tant que l'adaptateur serveur Supabase et les secrets de production ne sont pas activés.
+Le dossier `supabase/` contient la base PostgreSQL de production de YAVIYA. L’adaptateur serveur utilise PostgreSQL lorsque `POSTGRES_URL` est configuré. SQLite/libSQL est conservé uniquement pour les tests et le développement local.
 
 ## Contenu
 
@@ -21,11 +21,11 @@ Les montants sont enregistrés comme entiers dans la plus petite unité monétai
 
 1. Le projet `yaviya-production` est créé dans l'organisation YAVIYA, en région Paris (`eu-west-3`), avec la référence `ngaoyevncsocyqmlmbdw`.
 2. Relier le dépôt avec `supabase link --project-ref ngaoyevncsocyqmlmbdw` depuis un terminal de confiance.
-3. Les trois migrations ont été appliquées le 8 octobre 2026 et contrôlées avec les outils d'audit Supabase.
+3. Les cinq migrations ont été appliquées le 8 octobre 2026 et contrôlées avec les outils d'audit Supabase.
 4. Pour les changements futurs, vérifier d'abord une branche Supabase ou un projet de test, puis appliquer les nouvelles migrations.
-5. Configurer uniquement côté serveur : `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` et `DATABASE_URL`.
-6. Créer deux projets distincts pour Preview et Production. Ne jamais employer la clé `service_role` dans le navigateur.
-7. Adapter ensuite l'API YAVIYA de libSQL vers PostgreSQL/Supabase et lancer la recette à quatre comptes avant de modifier le domaine public.
+5. Configurer `POSTGRES_URL` uniquement côté serveur avec la connexion Transaction pooler et le rôle `yaviya_runtime`.
+6. Utiliser une base ou une branche distincte pour Preview avant l’ouverture commerciale. Ne jamais employer une clé `service_role` dans le navigateur.
+7. Lancer la recette à quatre comptes après chaque changement de schéma ou de variable de production.
 
 ## Paiements
 
@@ -33,4 +33,4 @@ Les écritures dans `payment_transactions`, `ledger_entries` et `payouts` sont i
 
 ## État au 8 octobre 2026
 
-La base hébergée est active à Paris : 26 tables publiques avec RLS, 12 catégories, 3 buckets et 44 politiques. L'audit de sécurité Supabase ne signale aucune anomalie. Les avis d'index inutilisés sont attendus sur une base vide. L'API hébergée existante reste sur Turso/libSQL jusqu'à la migration de l'adaptateur serveur ; la création de cette base ne suffit donc pas encore à supprimer l'erreur 503 du site.
+La base hébergée est active à Paris : 26 tables publiques avec RLS, 12 catégories, 3 buckets et 44 politiques. Un schéma `runtime` non exposé contient les tables nécessaires à l’API historique et n’est accessible qu’au rôle limité `yaviya_runtime`. L'audit de sécurité Supabase ne signale aucune anomalie. Les avis d'index inutilisés sont attendus sur une base encore peu alimentée.

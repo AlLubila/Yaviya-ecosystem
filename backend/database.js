@@ -9,15 +9,118 @@ function result(rows, changes = 0, lastRowId = 0) {
   };
 }
 
+function safeValue(value) {
+  if (typeof value === "bigint") return Number(value);
+  if (typeof value === "string" && /^-?\d+$/.test(value)) {
+    const number = Number(value);
+    if (Number.isSafeInteger(number)) return number;
+  }
+  return value;
+}
+
+function postgresQuery(source) {
+  let index = 0,
+    quote = "",
+    output = "";
+  for (let position = 0; position < source.length; position += 1) {
+    const character = source[position];
+    if (quote) {
+      output += character;
+      if (character === quote) {
+        if (source[position + 1] === quote) output += source[++position];
+        else quote = "";
+      }
+    } else if (character === "'" || character === '"') {
+      quote = character;
+      output += character;
+    } else if (character === "?") output += `$${++index}`;
+    else output += character;
+  }
+  // PostgreSQL folds unquoted aliases to lower-case; the API contract does not.
+  return output.replace(/\bAS\s+([a-z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*)\b/g, 'AS "$1"');
+}
+
+function postgresResult(rows) {
+  const normalized = rows.map((row) =>
+    Object.fromEntries(
+      Object.entries(row).map(([column, value]) => [column, safeValue(value)]),
+    ),
+  );
+  const changes = rows.command === "SELECT" ? 0 : Number(rows.count || 0);
+  return result(normalized, changes);
+}
+
+export async function createPostgresDatabase(config = process.env) {
+  const url = config.POSTGRES_URL || config.DATABASE_URL;
+  if (!url) throw new Error("POSTGRES_URL must be configured");
+  const endpoint = new URL(url);
+  if (!/^postgres(?:ql)?:$/.test(endpoint.protocol) || !endpoint.username)
+    throw new Error("Configure a valid PostgreSQL connection URL");
+  const { default: postgres } = await import("postgres");
+  const client = postgres(url, {
+    max: 1,
+    prepare: false,
+    connect_timeout: 10,
+    idle_timeout: 20,
+    ssl: "require",
+    connection: { application_name: "yaviya-api" },
+  });
+  const execute = (statement, transaction = client) =>
+    transaction.unsafe(postgresQuery(statement.sql), statement.args);
+  const scoped = async (callback) =>
+    client.begin(async (transaction) => {
+      await transaction.unsafe(
+        "set local search_path to runtime, public; set local statement_timeout to '8s'",
+      );
+      return callback(transaction);
+    });
+  return {
+    dialect: "postgres",
+    prepare(sql) {
+      return {
+        sql,
+        args: [],
+        bind(...args) {
+          return { ...this, args };
+        },
+        async all() {
+          return scoped(async (transaction) =>
+            postgresResult(await execute(this, transaction)),
+          );
+        },
+        async first(column) {
+          const row = (await this.all()).results[0] || null;
+          return column ? (row?.[column] ?? null) : row;
+        },
+        async run() {
+          return this.all();
+        },
+      };
+    },
+    async batch(statements) {
+      if (!statements.length) return [];
+      return scoped(async (transaction) => {
+        const values = [];
+        for (const statement of statements)
+          values.push(postgresResult(await execute(statement, transaction)));
+        return values;
+      });
+    },
+    close() {
+      return client.end({ timeout: 2 });
+    },
+  };
+}
+
 // Adapt the original D1 contract to SQLite/libSQL without changing SQL handlers.
 export async function createDatabase(config = process.env) {
+  if (config.POSTGRES_URL || config.DATABASE_URL)
+    return createPostgresDatabase(config);
   const { createClient } = await import("@libsql/client");
   let url = config.TURSO_DATABASE_URL;
   if (!url) {
     if (config.VERCEL || config.NODE_ENV === "production")
-      throw new Error(
-        "TURSO_DATABASE_URL and TURSO_AUTH_TOKEN must be configured",
-      );
+      throw new Error("POSTGRES_URL must be configured");
     const path = config.SQLITE_PATH || ".local/yaviya.sqlite";
     if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
     url = path === ":memory:" ? "file::memory:" : `file:${path}`;
@@ -45,6 +148,7 @@ export async function createDatabase(config = process.env) {
   const parameters = (args) =>
     args.map((value) => (typeof value === "boolean" ? Number(value) : value));
   return {
+    dialect: "sqlite",
     prepare(sql) {
       return {
         sql,

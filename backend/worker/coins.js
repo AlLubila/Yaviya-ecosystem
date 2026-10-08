@@ -91,7 +91,7 @@ export async function handleCoins(request, env) {
       });
     }
     const inserted = await env.DB.prepare(
-      "INSERT OR IGNORE INTO coin_events (id,user_id,kind,delta,reference,created_at) SELECT ?,?,?,?,?,? WHERE ? >= 0 OR COALESCE((SELECT SUM(delta) FROM coin_events WHERE user_id=?),0) + ? >= 0",
+      "INSERT INTO coin_events (id,user_id,kind,delta,reference,created_at) SELECT ?,?,?,?,?,? WHERE ? >= 0 OR COALESCE((SELECT SUM(delta) FROM coin_events WHERE user_id=?),0) + ? >= 0 ON CONFLICT DO NOTHING",
     )
       .bind(
         id,

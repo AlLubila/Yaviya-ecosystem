@@ -14,6 +14,8 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `supabase/migrations/20261007231856_yaviya_core.sql`     | Schéma PostgreSQL, fonctions, RLS et données de référence.                                                  |
 | `supabase/migrations/20261007231914_yaviya_storage.sql`  | Buckets et politiques des fichiers publics et privés.                                                       |
 | `supabase/migrations/20261007232019_advisor_hardening.sql` | Index et durcissement issus des audits Supabase.                                                          |
+| `supabase/migrations/20261007233426_runtime_postgres_adapter.sql` | Schéma privé de compatibilité pour l’API PostgreSQL.                                                |
+| `supabase/migrations/20261007235502_runtime_fk_indexes.sql` | Index des relations du schéma privé recommandés par l’audit.                                             |
 | `tests/postgresql-schema.test.mjs`                       | Contrôle des domaines métier, de la RLS et du stockage privé PostgreSQL.                                    |
 | `YAVIYA-Backend-Documentation-v30.zip`                   | Archive préexistante conservée ; les fichiers de la nouvelle version sont désormais dépliés dans le dépôt. |
 | `YAVIYA-Frontend-v30.zip`                                | Archive préexistante conservée ; les fichiers de la nouvelle version sont désormais dépliés dans le dépôt. |
@@ -22,7 +24,7 @@ Les sources de la version complète sont classées par fonction. Les scripts fro
 | `api/handler.js`                                         | Entrée HTTP Vercel et conversion vers Request/Response.                                                    |
 | `backend/application.js`                                 | Session indépendante et identité injectée côté serveur.                                                    |
 | `backend/auth.js`                                        | Comptes, mots de passe scrypt, sessions et limitation des tentatives.                                      |
-| `backend/database.js`                                    | Adaptation D1 à libSQL et fichiers privés en base.                                                         |
+| `backend/database.js`                                    | Adaptation D1 à PostgreSQL/SQLite et fichiers privés en base.                                              |
 | `backend/google-auth.js`                                 | Google OAuth : état, PKCE, nonce, validation JWT et session.                                               |
 | `backend/worker/account-identifiers.js`                  | Identifiants courts YVC, YVYS et YVYC.                                                                     |
 | `backend/worker/assets.js`                               | Table vide : les fichiers publics sont servis séparément, sans images dupliquées dans l’API.               |

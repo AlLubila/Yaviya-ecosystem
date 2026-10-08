@@ -1,6 +1,6 @@
 {
   "name": "yaviya-market",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "private": true,
   "scripts": {
     "dev": "npm run build && node --env-file-if-exists=.env scripts/dev.mjs --dist",
@@ -19,6 +19,7 @@
     "@libsql/client": "^0.18.0",
     "jose": "^6.2.12",
     "otpauth": "^9.5.2",
+    "postgres": "3.4.9",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {

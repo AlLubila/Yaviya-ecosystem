@@ -16,7 +16,7 @@ const periods = {
   year: 365,
   all: null,
 };
-function queryParts(country, sellerIds, ids, publicOnly) {
+function queryParts(country, sellerIds, ids, publicOnly, dialect) {
   const clauses = [],
     args = [];
   if (country !== "ALL") {
@@ -33,7 +33,9 @@ function queryParts(country, sellerIds, ids, publicOnly) {
   }
   if (publicOnly)
     clauses.push(
-      "json_extract(p.data,'$.visible')=1 AND json_extract(p.data,'$.approved')=1",
+      dialect === "postgres"
+        ? "(p.data::jsonb->>'visible')::boolean IS TRUE AND (p.data::jsonb->>'approved')::boolean IS TRUE"
+        : "json_extract(p.data,'$.visible')=1 AND json_extract(p.data,'$.approved')=1",
     );
   return {
     where: clauses.length ? "WHERE " + clauses.join(" AND ") : "",
@@ -42,7 +44,14 @@ function queryParts(country, sellerIds, ids, publicOnly) {
 }
 async function metrics(env, filter, since) {
   // Pre-aggregate views and orders separately to avoid multiplying either count.
-  const common = `WITH eligible AS (SELECT p.* FROM market_products p ${filter.where}),
+  const common = env.DB.dialect === "postgres"
+    ? `WITH eligible AS (SELECT p.* FROM market_products p ${filter.where}),
+    viewed AS (SELECT v.* FROM product_view_events v JOIN eligible p ON p.country=v.country AND p.product_id=v.product_id WHERE v.viewed_at>=?),
+    bought AS (SELECT o.id,CASE WHEN o.buyer_user_id LIKE 'cg:%' THEN substr(o.buyer_user_id,4) ELSE o.buyer_user_id END AS buyer_user_id,o.country,(i.value->>'id')::integer AS product_id,(i.value->>'q')::integer AS quantity
+      FROM market_orders o CROSS JOIN LATERAL jsonb_array_elements(o.snapshot::jsonb->'items') AS i(value)
+      JOIN eligible p ON p.country=o.country AND p.product_id=(i.value->>'id')::integer
+      WHERE o.created_at>=? AND COALESCE((o.snapshot::jsonb->>'cancelled')::boolean,false)=false AND (o.snapshot::jsonb->>'buyerConfirmed')::boolean IS TRUE)`
+    : `WITH eligible AS (SELECT p.* FROM market_products p ${filter.where}),
     viewed AS (SELECT v.* FROM product_view_events v JOIN eligible p ON p.country=v.country AND p.product_id=v.product_id WHERE v.viewed_at>=?),
     bought AS (SELECT o.id,CASE WHEN o.buyer_user_id LIKE 'cg:%' THEN substr(o.buyer_user_id,4) ELSE o.buyer_user_id END AS buyer_user_id,o.country,json_extract(i.value,'$.id') AS product_id,json_extract(i.value,'$.q') AS quantity
       FROM market_orders o,json_each(o.snapshot,'$.items') i
@@ -52,7 +61,7 @@ async function metrics(env, filter, since) {
   const rows = (
     await env.DB.prepare(
       common +
-        ` SELECT p.country,p.product_id AS productId,p.seller_id AS sellerId,json_extract(p.data,'$.title') AS title,
+        ` SELECT p.country,p.product_id AS productId,p.seller_id AS sellerId,${env.DB.dialect === "postgres" ? "p.data::jsonb->>'title'" : "json_extract(p.data,'$.title')"} AS title,
     (SELECT COUNT(DISTINCT visitor_hash) FROM viewed v WHERE v.country=p.country AND v.product_id=p.product_id) AS uniqueViewers,
     (SELECT COUNT(*) FROM viewed v WHERE v.country=p.country AND v.product_id=p.product_id) AS views,
     (SELECT COUNT(DISTINCT buyer_user_id) FROM bought b WHERE b.country=p.country AND b.product_id=p.product_id) AS buyerCount,
@@ -139,7 +148,7 @@ export async function handleProductInsights(request, env) {
       }
       const data = await metrics(
         env,
-        queryParts(country, sellerIds, null, false),
+        queryParts(country, sellerIds, null, false, env.DB.dialect),
         since,
       );
       const stores = (
@@ -173,7 +182,13 @@ export async function handleProductInsights(request, env) {
         fail("Produits invalides");
       const data = await metrics(
         env,
-        queryParts(country, null, [...new Set(parts.map(Number))], true),
+        queryParts(
+          country,
+          null,
+          [...new Set(parts.map(Number))],
+          true,
+          env.DB.dialect,
+        ),
         0,
       );
       // Public endpoint only exposes aggregates, never visitor or buyer identities.
@@ -192,7 +207,9 @@ export async function handleProductInsights(request, env) {
     if (!Number.isSafeInteger(d.productId) || d.productId < 1)
       fail("Produit invalide");
     const product = await env.DB.prepare(
-      "SELECT * FROM market_products WHERE country=? AND product_id=? AND json_extract(data,'$.visible')=1 AND json_extract(data,'$.approved')=1",
+      env.DB.dialect === "postgres"
+        ? "SELECT * FROM market_products WHERE country=? AND product_id=? AND (data::jsonb->>'visible')::boolean IS TRUE AND (data::jsonb->>'approved')::boolean IS TRUE"
+        : "SELECT * FROM market_products WHERE country=? AND product_id=? AND json_extract(data,'$.visible')=1 AND json_extract(data,'$.approved')=1",
     )
       .bind(country, d.productId)
       .first();
