@@ -101,10 +101,9 @@ showRegister = function () {
     last = customerProfile?.lastName || legacy.slice(1).join(" ");
   name.closest("label").outerHTML =
     `<div class="name-fields"><label>${T("Prénom *", "First name *")}<input name="firstName" autocomplete="given-name" maxlength="100" required value="${esc(first)}"></label><label>${T("Nom *", "Last name *")}<input name="lastName" autocomplete="family-name" maxlength="100" required value="${esc(last)}"></label><input type="hidden" name="name" value="${esc(customerProfile?.name || "")}"></div>`;
-  form.querySelector(".demo-note").textContent = T(
-    "Vendeur ou livreur : identité à vérifier manuellement par l’admin. Une petite entreprise non enregistrée peut déclarer qu’elle n’a pas de numéro RCCM.",
-    "Seller or courier: identity is manually checked by the administrator. An unregistered small business may declare it has no RCCM number.",
-  );
+  const accountGuidance = form.querySelector(".demo-note");
+  accountGuidance.classList.add("account-guidance");
+  accountGuidance.setAttribute("aria-live", "polite");
   const addressLabel = form.elements.address.closest("label");
   addressLabel.insertAdjacentHTML("afterend", `<label class="privacy-consent professional-address-confirmation" hidden><input type="checkbox" name="professionalAddressConfirmed"><span></span></label>`);
   const addressConfirmation = form.elements.professionalAddressConfirmed;
@@ -117,6 +116,12 @@ showRegister = function () {
     const type = form.querySelector("[name=accountType]:checked")?.value || "buyer";
     const seller = type === "seller";
     const professional = type !== "buyer";
+    accountGuidance.hidden = !professional;
+    accountGuidance.textContent = seller
+      ? T("Pour ouvrir votre boutique, confirmez votre adresse de retrait et joignez votre pièce d’identité. Votre dossier sera vérifié par l’équipe YAVIYA. Si votre activité n’est pas enregistrée, indiquez que vous ne disposez pas de numéro RCCM.", "To open your shop, confirm your pickup address and attach your identity document. The YAVIYA team will review your request. If your business is unregistered, indicate that you do not have an RCCM number.")
+      : type === "courier"
+        ? T("Pour rejoindre les livreurs YAVIYA, confirmez votre adresse opérationnelle et joignez votre pièce d’identité. L’équipe YAVIYA vérifiera votre dossier avant l’accès aux missions. Sélectionnez le permis C si vous utilisez ce document pour votre inscription.", "To join YAVIYA couriers, confirm your operational address and attach your identity document. The YAVIYA team will review your request before granting access to assignments. Select a category C licence if you use that document for registration.")
+        : "";
     addressLabel.firstChild.textContent = seller
       ? T("Adresse complète de la boutique / point de retrait *", "Full shop / pickup address *")
       : type === "courier"
