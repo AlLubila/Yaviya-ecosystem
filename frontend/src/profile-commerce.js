@@ -509,7 +509,7 @@ document.addEventListener("keydown", (e) => {
 });
 // Keep the catalogue menu focused on categories; account services open from Profil.
 document
-  .querySelectorAll(".market-navigation>*:not(#all)")
+  .querySelectorAll(".market-navigation>*:not(#all):not(.header-language)")
   .forEach((el) => el.remove());
 Object.assign(textTranslations, {
   Catégories: "Categories",
