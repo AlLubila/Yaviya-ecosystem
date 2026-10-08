@@ -35,7 +35,7 @@ async function fixture() {
   const signup = async (login) => {
     const response = await call("/api/auth/signup", "", {
       login,
-      password: "a-fictitious-password-2026",
+      password: "A-fictitious-password-2026!",
     });
     assert.equal(response.status, 200, await response.clone().text());
     return {
@@ -60,6 +60,32 @@ async function fixture() {
   };
   return { db, call, signup, profile };
 }
+
+test("signup accepts eight strong characters and rejects missing complexity", async () => {
+  const { db, call } = await fixture();
+  try {
+    const accepted = await call("/api/auth/signup", "", {
+      login: "eight@example.test",
+      password: "Aa1!aaaa",
+    });
+    assert.equal(accepted.status, 200, await accepted.clone().text());
+    for (const [suffix, password] of [
+      ["upper", "aa1!aaaa"],
+      ["lower", "AA1!AAAA"],
+      ["number", "Aaa!aaaa"],
+      ["special", "Aaa1aaaa"],
+      ["length", "Aa1!aaa"],
+    ]) {
+      const response = await call("/api/auth/signup", "", {
+        login: `${suffix}@example.test`,
+        password,
+      });
+      assert.equal(response.status, 400, suffix);
+    }
+  } finally {
+    db.close();
+  }
+});
 
 test("sessions, CSRF, profile isolation, spoofed identity, logout and persistence", async () => {
   const { db, call, signup, profile } = await fixture();
@@ -119,7 +145,7 @@ test("sessions, CSRF, profile isolation, spoofed identity, logout and persistenc
     assert.equal((await call("/api/customer", alice.cookie)).status, 401);
     const login = await call("/api/auth/login", "", {
       login: "alice@example.test",
-      password: "a-fictitious-password-2026",
+      password: "A-fictitious-password-2026!",
     });
     assert.equal(login.status, 200);
     const cookie = login.headers.get("set-cookie").split(";")[0];

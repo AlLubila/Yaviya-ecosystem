@@ -18,7 +18,7 @@ Les vendeurs peuvent choisir toutes ces familles et une sous-catégorie dans l'�
 
 Le répertoire comprend **96 villes et agglomérations de RDC**. Les choix sont divisés en deux groupes :
 
-- **Commandes ouvertes : Kinshasa et Lubumbashi**. Les 24 et 7 communes existantes et leurs règles de tarifs sont conservées.
+- **Commandes ouvertes : Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma**. Les communes proposées et leurs tarifs indicatifs sont contrôlés côté interface et côté serveur.
 - **Extension à venir : les 94 autres destinations**. Elles sont visibles, désactivées et marquées « bientôt disponible ».
 
 Le serveur refuse toute ville hors de la liste des deux villes ouvertes, même si une requête est construite manuellement. Cela vaut pour domicile, express, retrait chez le vendeur et point relais. Ajouter une ville au répertoire ne l'ouvre pas aux commandes. Une extension exige aussi des communes, tarifs et paramètres opérationnels valides.

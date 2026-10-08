@@ -12,7 +12,7 @@ La base PostgreSQL/Supabase de production est active et définie dans `supabase/
 
 ## Ce qui est conservé
 
-Catalogue multi-vendeurs, catégories, favoris, comparateur, galerie de photos, recherche, panier, deux marchés, français/anglais, communes de Kinshasa et Lubumbashi, FAQ, assistant local, inscriptions vendeur/livreur, vérification manuelle, commandes partagées, disponibilité et rémunération indicative du livreur, messages, preuve de livraison privée et évaluations. Les règles métier du backend original sont conservées.
+Catalogue multi-vendeurs, catégories, favoris, comparateur, galerie de photos, recherche, panier, deux marchés, français/anglais, communes de Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma, FAQ, assistant local, inscriptions vendeur/livreur, vérification manuelle, commandes partagées, disponibilité et rémunération indicative du livreur, messages, preuve de livraison privée et évaluations. Les règles métier du backend original sont conservées.
 
 ## Installation locale
 
@@ -76,11 +76,11 @@ Créer un client OAuth Google de type Web. Ajouter exactement GOOGLE_REDIRECT_UR
 
 ## Double authentification
 
-Le bouton **Sécurité · 2FA** permet de configurer une application Authenticator, confirmer un premier code et télécharger 8 codes de secours. Les connexions par mot de passe et Google passent par le second facteur pour les comptes protégés. Configurer `MFA_ENCRYPTION_KEY` et appliquer la migration 0014 avant le déploiement. Les étapes, garanties et limites figurent dans [le guide 2FA](docs/TWO_FACTOR.md).
+Dans **Profil → Paramètres → Sécurité du compte**, l’option 2FA permet de configurer une application Authenticator, confirmer un premier code et télécharger 8 codes de secours. Les connexions par mot de passe et Google passent par le second facteur pour les comptes protégés. Configurer `MFA_ENCRYPTION_KEY` et appliquer la migration 0014 avant le déploiement. Les étapes, garanties et limites figurent dans [le guide 2FA](docs/TWO_FACTOR.md).
 
 ## Catalogue et couverture 1.3.0
 
-19 familles et 72 sous-catégories, avec sélection vendeur et classement persistant. Le formulaire affiche 96 villes/agglomérations de RDC ; seules Kinshasa et Lubumbashi acceptent les commandes. Les autres restent désactivées jusqu’à l’extension, avec contrôle serveur dans les quatre modes. Le clic Acheter maintenant est testé à travers les vrais scripts, formulaires et API : synchronisation concurrente, profil et commande du produit choisi. Voir [le guide](docs/CATALOGUE_COVERAGE.md). Le site en ligne consulté répondait encore HTTP 503 sur son API de compte ; la configuration du projet cible reste à vérifier.
+19 familles et 72 sous-catégories, avec sélection vendeur et classement persistant. Le formulaire affiche 96 villes/agglomérations de RDC ; seules Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma acceptent les commandes. Les autres restent désactivées jusqu’à l’extension, avec contrôle serveur dans les quatre modes. Le clic Acheter maintenant est testé à travers les vrais scripts, formulaires et API : synchronisation concurrente, profil et commande du produit choisi. Voir [le guide](docs/CATALOGUE_COVERAGE.md). Le site en ligne consulté répondait encore HTTP 503 sur son API de compte ; la configuration du projet cible reste à vérifier.
 
 ## Fenêtres, questions populaires et photos 1.3.1
 

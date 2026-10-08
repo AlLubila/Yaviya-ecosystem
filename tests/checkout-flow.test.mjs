@@ -8,7 +8,7 @@ import { createDatabase } from "../backend/database.js";
 import { createApplication } from "../backend/application.js";
 import { migrate } from "../scripts/migrate.mjs";
 import config from "../backend/data/market-config.json" with { type: "json" };
-const password = "checkout-fixture-password-2026";
+const password = "Checkout-fixture-password-2026!";
 const pause = () => new Promise((r) => setTimeout(r, 10));
 async function until(check) {
   for (let i = 0; i < 200; i++) {
@@ -285,7 +285,7 @@ test("all future DRC destinations are rejected for every delivery mode, includin
         assert.equal(response.status, 400, city + " " + mode);
         assert.match(
           (await response.json()).error,
-          /uniquement à Kinshasa et Lubumbashi/,
+          /Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma/,
         );
       }
     assert.equal(
@@ -593,6 +593,9 @@ test("commune delivery prices agree between checkout and persisted orders", asyn
       20000,
     );
     assert.equal(f.run('deliveryCost("home",1,"Lubumbashi","Kenya")'), 7500);
+    assert.equal(f.run('deliveryCost("home",1,"Kolwezi","Dilala")'), 9000);
+    assert.equal(f.run('deliveryCost("home",1,"Matadi","Mvuzi")'), 8500);
+    assert.equal(f.run('deliveryCost("home",1,"Boma","Kabondo")'), 8500);
     for (const [commune, fee] of [
       ["Matete", 10000],
       ["Kimbanseke", 12500],

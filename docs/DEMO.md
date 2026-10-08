@@ -20,7 +20,7 @@ Le catalogue initial appartient au propriétaire admin et reste illustratif. Pou
 
 ## Navigation et autres écrans
 
-Ouvrir une fiche produit, comparer des produits et utiliser la flèche Retour : elle conserve la vue précédente et remet la fenêtre en haut. Ouvrir les catégories, la FAQ pliable, l'aide et le chatbot à réponses guidées. Les communes de Kinshasa et Lubumbashi sont disponibles dans les formulaires. Le portail Congo utilise `/congo.html?country=CG` avec ses données séparées.
+Ouvrir une fiche produit et comparer des produits. Ouvrir les catégories, la FAQ pliable, l'aide et le chatbot à réponses guidées. Les communes de Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma sont disponibles dans les formulaires. Le portail Congo utilise `/congo.html?country=CG` avec ses données séparées.
 
 ## Validation et activation distante
 

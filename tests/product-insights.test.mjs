@@ -24,7 +24,7 @@ test("shared product metrics deduplicate viewers and buyers, reject spoofing and
   async function signup(login, role = "buyer") {
     const r = await call("/api/auth/signup", "", {
       login,
-      password: "product-statistics-fixture-2026",
+      password: "Product-statistics-fixture-2026!",
     });
     const user = (await r.json()).user;
     const cookie = r.headers.getSetCookie()[0].split(";")[0];

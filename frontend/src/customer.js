@@ -213,7 +213,7 @@ function showSupport() {
 }
 function showAbout() {
   open(
-    `<h2>${T("À propos de YAVIYA", "About YAVIYA")}</h2><p>${T("YAVIYA est un projet de marketplace congolaise qui réunit acheteurs, commerçants et artisans autour d’un catalogue varié : habits, maison, high-tech, beauté et bien plus.", "YAVIYA is a Congolese marketplace project bringing buyers, merchants and artisans together through a varied catalogue: clothing, home, electronics, beauty and more.")}</p><p>${T("Notre ambition : faciliter les achats et valoriser les commerces locaux, en commençant par Kinshasa et Lubumbashi.", "Our ambition is to make shopping easier and support local businesses, starting with Kinshasa and Lubumbashi.")}</p><p>${T("Cette version est une démonstration. Les produits, boutiques et prix sont illustratifs.", "This version is a demonstration. Products, shops and prices are illustrative.")}</p>`,
+    `<h2>${T("À propos de YAVIYA", "About YAVIYA")}</h2><p>${T("YAVIYA est un projet de marketplace congolaise qui réunit acheteurs, commerçants et artisans autour d’un catalogue varié : habits, maison, high-tech, beauté et bien plus.", "YAVIYA is a Congolese marketplace project bringing buyers, merchants and artisans together through a varied catalogue: clothing, home, electronics, beauty and more.")}</p><p>${T("Notre ambition : faciliter les achats et valoriser les commerces locaux, en commençant par Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma.", "Our ambition is to make shopping easier and support local businesses, starting with Kinshasa, Lubumbashi, Kolwezi, Matadi and Boma.")}</p><p>${T("Cette version est une démonstration. Les produits, boutiques et prix sont illustratifs.", "This version is a demonstration. Products, shops and prices are illustrative.")}</p>`,
   );
 }
 document.addEventListener(
@@ -263,8 +263,8 @@ function decorateHearts() {
   });
 }
 const textTranslations = {
-  "Votre marché à Kinshasa et Lubumbashi.":
-    "Your marketplace in Kinshasa and Lubumbashi.",
+  "Votre marché à Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma.":
+    "Your marketplace in Kinshasa, Lubumbashi, Kolwezi, Matadi and Boma.",
   "Découvrir YAVIYA": "About YAVIYA",
   Rechercher: "Search",
   "Mon compte": "My account",

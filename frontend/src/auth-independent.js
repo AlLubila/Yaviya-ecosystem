@@ -31,7 +31,7 @@
     pendingLogin = new Promise((resolve, reject) => {
       const dialog = document.createElement("dialog");
       dialog.className = "independent-auth";
-      dialog.innerHTML = `<button type="button" class="close" aria-label="${translate("Fermer", "Close")}">×</button><h2>${translate("Mon compte YAVIYA", "My YAVIYA account")}</h2><p>${translate("Connectez-vous ou créez votre accès personnel.", "Sign in or create your personal account.")}</p><a class="add" href="/api/auth/google">Continuer avec Google / Gmail</a><form class="editor"><label>${translate("Mode de connexion", "Sign-in method")}<select name="loginMethod"><option value="email">E-mail</option><option value="phone">${translate("Téléphone", "Phone")}</option></select></label><label class="auth-country" hidden>${translate("Pays du numéro", "Phone country")}<select name="phoneCountry"><option value="CD">RD Congo (+243)</option><option value="CG">République du Congo (+242)</option></select></label><label><span class="auth-login-label">E-mail</span><input name="login" required maxlength="150" autocomplete="username" type="email"></label><label>${translate("Mot de passe · 12 caractères minimum", "Password · minimum 12 characters")}<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="current-password"></label><div class="sms-access" hidden><button class="add sms-send" type="button">${translate("Recevoir un code SMS", "Send an SMS code")}</button><label hidden class="sms-code">${translate("Code SMS", "SMS code")}<input name="smsCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label><button class="add sms-verify" type="button" hidden>${translate("Vérifier le code SMS", "Verify SMS code")}</button></div><p class="auth-error" role="alert"></p><button class="primary" type="submit">${translate("Se connecter", "Sign in")}</button><button class="add auth-signup" type="button">${translate("Créer mon accès YAVIYA", "Create my YAVIYA login")}</button></form>`;
+      dialog.innerHTML = `<button type="button" class="close" aria-label="${translate("Fermer", "Close")}">×</button><h2>${translate("Mon compte YAVIYA", "My YAVIYA account")}</h2><p>${translate("Connectez-vous ou créez votre accès personnel.", "Sign in or create your personal account.")}</p><form class="editor"><label>${translate("Mode de connexion", "Sign-in method")}<select name="loginMethod"><option value="email">E-mail</option><option value="phone">${translate("Téléphone", "Phone")}</option></select></label><label class="auth-country" hidden>${translate("Pays du numéro", "Phone country")}<select name="phoneCountry"><option value="CD">RD Congo (+243)</option><option value="CG">République du Congo (+242)</option></select></label><label><span class="auth-login-label">E-mail</span><input name="login" required maxlength="150" autocomplete="username" type="email"></label><label>${translate("Mot de passe", "Password")}<input name="password" type="password" required minlength="8" maxlength="128" autocomplete="current-password" aria-describedby="password-rules"></label><small id="password-rules" class="password-rules">${translate("Pour créer un compte : 8 caractères minimum, avec une majuscule, une minuscule, un chiffre et un caractère spécial.", "To create an account: at least 8 characters with an uppercase letter, a lowercase letter, a number and a special character.")}</small><div class="sms-access" hidden><button class="add sms-send" type="button">${translate("Recevoir un code SMS", "Send an SMS code")}</button><label hidden class="sms-code">${translate("Code SMS", "SMS code")}<input name="smsCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label><button class="add sms-verify" type="button" hidden>${translate("Vérifier le code SMS", "Verify SMS code")}</button></div><p class="auth-error" role="alert"></p><button class="primary" type="submit">${translate("Se connecter", "Sign in")}</button><button class="add auth-signup" type="button">${translate("Créer mon accès YAVIYA", "Create my YAVIYA login")}</button></form>`;
       const method = dialog.querySelector('[name="loginMethod"]');
       const phoneCountry = dialog.querySelector('[name="phoneCountry"]');
       const login = dialog.querySelector('[name="login"]');
@@ -59,7 +59,6 @@
           "Saisissez le code de votre application d’authentification ou un code de secours. La connexion expire après 5 minutes.",
           "Enter your authenticator code or a recovery code. Sign-in expires after 5 minutes.",
         );
-        dialog.querySelector("a")?.remove();
         dialog.querySelector("form").innerHTML =
           `<label>${translate("Code d’authentification ou de secours", "Authenticator or recovery code")}<input name="code" required maxlength="32" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"></label><p class="auth-error" role="alert"></p><button class="primary" type="submit">${translate("Vérifier et se connecter", "Verify and sign in")}</button>`;
         dialog.querySelector("input").focus();
@@ -158,16 +157,6 @@
     }
     return response;
   };
-  if (typeof showRegister === "function") {
-    const previous = showRegister;
-    showRegister = function () {
-      previous();
-      const google = document.querySelector(".google-registration");
-      if (google)
-        google.innerHTML =
-          '<a class="add" href="/api/auth/google">Continuer avec Google / Gmail</a>';
-    };
-  }
   window.ensureYaviyaSignedIn = ensureSignedIn;
   window.yaviyaAuthRequest = authRequest;
   if (new URLSearchParams(location.search).get("mfa") === "1") {

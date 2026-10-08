@@ -38,6 +38,8 @@ test("phone selection offers the correct country prefix and switches back to ema
     w.eval(await readFile("frontend/src/auth-independent.js", "utf8"));
     const pending = w.ensureYaviyaSignedIn().catch(() => {});
     for (let n=0; n<30 && !w.document.querySelector('dialog'); n++) await new Promise(resolve => setTimeout(resolve, 10));
+    assert.equal(w.document.querySelector('[name="password"]').minLength, 8);
+    assert.equal(w.document.querySelector('a[href="/api/auth/google"]'), null);
     const method = w.document.querySelector('[name="loginMethod"]');
     method.value = "phone"; method.dispatchEvent(new w.Event("change"));
     assert.equal(w.document.querySelector('[name="login"]').value, prefix);

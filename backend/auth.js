@@ -163,12 +163,19 @@ export async function handleAuth(request, db) {
   }
   const login = normalizeLogin(body.login),
     password = body.password;
+  const validPassword =
+    typeof password === "string" &&
+    password.length >= 8 &&
+    password.length <= 128 &&
+    (action === "login" ||
+      (/[a-z]/.test(password) &&
+        /[A-Z]/.test(password) &&
+        /[0-9]/.test(password) &&
+        /[^A-Za-z0-9]/.test(password)));
   if (
     !login ||
     login.length > 150 ||
-    typeof password !== "string" ||
-    password.length < 12 ||
-    password.length > 128 ||
+    !validPassword ||
     !(
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(login) || /^\+?[0-9]{7,15}$/.test(login)
     )
@@ -176,7 +183,9 @@ export async function handleAuth(request, db) {
     return json(
       {
         error:
-          "E-mail ou téléphone valide et mot de passe de 12 à 128 caractères requis",
+          action === "signup"
+            ? "E-mail ou téléphone valide et mot de passe de 8 à 128 caractères avec majuscule, minuscule, chiffre et caractère spécial requis"
+            : "E-mail ou téléphone valide et mot de passe de 8 à 128 caractères requis",
       },
       400,
     );

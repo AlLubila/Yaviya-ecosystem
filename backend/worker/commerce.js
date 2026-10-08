@@ -470,7 +470,7 @@ async function saveProduct(env, ctx, p) {
 function deliveryFee(country, mode, city, commune, count) {
   if (country === "CD" && !marketConfig.deliverableCities.includes(city))
     fail(
-      "Les commandes sont ouvertes uniquement à Kinshasa et Lubumbashi. Cette ville sera disponible lors de l’extension.",
+      "Les commandes sont ouvertes à Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma. Cette ville sera disponible lors de l’extension.",
     );
   const cities = country === "CG" ? deliveryCommunesCG : deliveryCommunes;
   if (!cities[city] || !["home", "express", "hand", "relay"].includes(mode))

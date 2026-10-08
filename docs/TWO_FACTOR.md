@@ -10,13 +10,13 @@
 
 2. Placer cette valeur hexadécimale de 64 caractères dans `MFA_ENCRYPTION_KEY`, côté serveur uniquement : `.env` pour le local, paramètres du projet Vercel pour le déploiement. Ne pas la copier dans GitHub, une variable frontend, un ticket ou des journaux. La conserver dans un gestionnaire de secrets avec une sauvegarde sécurisée. Chaque environnement et sa base doivent utiliser leur propre clé stable.
 3. Exécuter `npm run db:migrate` sur la base cible avant de déployer cette version ; la migration `0014_two_factor_auth.sql` ajoute les tables et colonnes nécessaires. Le serveur local applique les migrations au démarrage.
-4. Déployer le code, ouvrir le site et cliquer sur **Sécurité · 2FA** dans l'en-tête. Sans la clé, l'activation est indisponible ; aucun secret n'est enregistré en clair. Si la clé est perdue ou incorrecte, les codes de l’application ne peuvent plus être validés. Un code de secours valide reste utilisable après le premier facteur pour accéder au compte et désactiver la 2FA.
+4. Déployer le code, ouvrir le site et ouvrir **Profil → Paramètres → Sécurité du compte**. Sans la clé, l'activation est indisponible ; aucun secret n'est enregistré en clair. Si la clé est perdue ou incorrecte, les codes de l’application ne peuvent plus être validés. Un code de secours valide reste utilisable après le premier facteur pour accéder au compte et désactiver la 2FA.
 
 La clé doit rester identique pour déchiffrer les secrets existants. Une rotation exige un outil de migration sécurisé déchiffrant avec l'ancienne clé puis rechiffrant avec la nouvelle ; changer simplement la variable verrouillerait les utilisateurs. Cet outil n'est pas inclus.
 
 ## Parcours utilisateur
 
-- Se connecter, ouvrir **Sécurité · 2FA**, confirmer son mot de passe, puis activer. Pour Google, confirmer une connexion Google récente (moins de 5 minutes).
+- Se connecter, ouvrir **Profil → Paramètres → Sécurité du compte**, confirmer son mot de passe, puis activer.
 - Scanner le QR code avec Google Authenticator, Microsoft Authenticator ou une application TOTP compatible. Une clé manuelle est aussi disponible. Le QR code est généré localement côté serveur, sans service tiers.
 - Saisir un code à 6 chiffres pour terminer l'activation sous 10 minutes. Avant cette validation, la 2FA reste désactivée. La fermeture permet de recommencer.
 - Télécharger les **8 codes de secours**, affichés une seule fois. Chaque code est utilisable une fois et remplace le second facteur après le mot de passe ou Google.

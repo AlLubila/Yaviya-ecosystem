@@ -97,7 +97,7 @@
     "Yangambi",
     "Zongo"
   ],
-  "deliverableCities": ["Kinshasa", "Lubumbashi"],
+  "deliverableCities": ["Kinshasa", "Lubumbashi", "Kolwezi", "Matadi", "Boma"],
   "categorySections": [
     [
       "Alimentation & épicerie",
@@ -2412,6 +2412,20 @@
       "Kenya": 7500,
       "Lubumbashi": 7500,
       "Ruashi": 7500
+    },
+    "Kolwezi": {
+      "Dilala": 9000,
+      "Manika": 9000
+    },
+    "Matadi": {
+      "Matadi": 8500,
+      "Mvuzi": 8500,
+      "Nzanza": 8500
+    },
+    "Boma": {
+      "Kabondo": 8500,
+      "Kalamu": 8500,
+      "Nzadi": 8500
     }
   },
   "categoryAliases": {

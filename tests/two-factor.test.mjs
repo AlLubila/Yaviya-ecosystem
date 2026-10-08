@@ -9,7 +9,7 @@ import { primaryAuthenticated } from "../backend/two-factor.js";
 import { googleAuth } from "../backend/google-auth.js";
 import { startSession } from "../backend/auth.js";
 process.env.MFA_ENCRYPTION_KEY = randomBytes(32).toString("hex");
-const password = "test-password-two-factor-2026";
+const password = "Test-password-two-factor-2026!";
 const cookie = (response) =>
   response.headers
     .getSetCookie()

@@ -8,7 +8,7 @@ import { createDatabase } from "../backend/database.js";
 import { createApplication } from "../backend/application.js";
 import { migrate } from "../scripts/migrate.mjs";
 process.env.MFA_ENCRYPTION_KEY = randomBytes(32).toString("hex");
-const password = "frontend-test-password-2026";
+const password = "Frontend-test-password-2026!";
 async function waitFor(check) {
   for (let n = 0; n < 150; n++) {
     if (check()) return;

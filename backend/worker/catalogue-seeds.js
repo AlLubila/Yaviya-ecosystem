@@ -755,6 +755,9 @@ export const deliveryCommunes = {
     "Lubumbashi",
     "Ruashi",
   ],
+  Kolwezi: ["Dilala", "Manika"],
+  Matadi: ["Matadi", "Mvuzi", "Nzanza"],
+  Boma: ["Kabondo", "Kalamu", "Nzadi"],
 };
 export const seedCatalogueCG = [
   {

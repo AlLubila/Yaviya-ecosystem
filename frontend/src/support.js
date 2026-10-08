@@ -5,7 +5,7 @@ const helpTopics = [
   ],
   [
     "Livraison",
-    "Le formulaire propose les communes de Kinshasa et Lubumbashi. La présence d’une commune ne garantit pas une livraison active : livraison estimée sous 24 à 48 heures après validation, selon la zone. Les frais restent à confirmer au lancement.",
+    "Le formulaire propose les communes de Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma. La présence d’une commune ne garantit pas une livraison active : livraison estimée sous 24 à 48 heures après validation, selon la zone. Les frais restent à confirmer au lancement.",
   ],
   [
     "Paiement",

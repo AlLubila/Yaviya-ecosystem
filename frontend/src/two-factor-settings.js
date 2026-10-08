@@ -133,15 +133,6 @@
       if (!dialog) opened = false;
     }
   }
-  const button = document.createElement("button");
-  button.className = "add account-security";
-  button.type = "button";
-  button.textContent = t("Sécurité · 2FA", "Security · 2FA");
-  button.onclick = showSecurity;
-  (
-    document.querySelector(".header-actions") ||
-    document.querySelector("header")
-  )?.append(button);
   window.showYaviyaSecurity = showSecurity;
   const query = new URLSearchParams(location.search);
   if (query.get("security") === "1") {

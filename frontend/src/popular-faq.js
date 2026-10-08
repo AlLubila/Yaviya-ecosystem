@@ -47,11 +47,11 @@ const popularQuestions = [
     id: "delivery",
     fr: [
       "Dans quelles villes de RDC puis-je commander ?",
-      "Le parcours accepte actuellement Kinshasa et Lubumbashi, avec sélection de la commune. Les autres villes du sélecteur sont indiquées « bientôt disponible » et restent bloquées jusqu’à l’ouverture de la livraison. Vous savez ainsi avant de confirmer si votre adresse est éligible.",
+      "Le parcours accepte actuellement Kinshasa, Lubumbashi, Kolwezi, Matadi et Boma, avec sélection de la commune. Les autres villes du sélecteur sont indiquées « bientôt disponible » et restent bloquées jusqu’à l’ouverture de la livraison. Vous savez ainsi avant de confirmer si votre adresse est éligible.",
     ],
     en: [
       "Which DRC cities can I order from?",
-      "Checkout currently accepts Kinshasa and Lubumbashi, with commune selection. Other cities in the selector are marked “coming soon” and blocked until delivery opens there. You can check address eligibility before confirming.",
+      "Checkout currently accepts Kinshasa, Lubumbashi, Kolwezi, Matadi and Boma, with commune selection. Other cities in the selector are marked “coming soon” and blocked until delivery opens there. You can check address eligibility before confirming.",
     ],
   },
   {
