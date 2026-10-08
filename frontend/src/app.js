@@ -142,7 +142,7 @@ const paymentMethods = [
     name: "Carte bancaire",
     type: "Carte",
     mark: "CB",
-    color: "#6136dd",
+    color: "#f26a21",
   },
 ];
 const communes = {

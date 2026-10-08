@@ -53,7 +53,7 @@ if (window.YAVIYA_COUNTRY === "CG") {
       name: "Mobile Money local · prestataire à confirmer",
       type: "Démonstration",
       mark: "MM",
-      color: "#6136dd",
+      color: "#f26a21",
     },
     {
       id: "card",
