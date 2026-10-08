@@ -1684,6 +1684,46 @@ body[data-demo-role="admin"] > footer {
 .dashboard-main {
   min-width: 0;
 }
+.dashboard-main,
+.business-workspace,
+.courier-workspace {
+  overflow-wrap: anywhere;
+}
+.dashboard-sidebar {
+  background: linear-gradient(155deg, #34251e, #1f1915);
+  border: 1px solid #49342a;
+  box-shadow: 0 12px 30px rgba(52, 37, 30, 0.12);
+}
+.dashboard-sidebar button[aria-pressed="true"] {
+  background: var(--orange);
+  font-weight: 700;
+}
+.dashboard-panel,
+.dashboard-kpis > div,
+.courier-kpis > div,
+.shared-order {
+  min-width: 0;
+  border-radius: 16px;
+  border: 1px solid #f0e4dc;
+  box-shadow: 0 6px 22px rgba(52, 37, 30, 0.05);
+}
+.dashboard-kpis > div {
+  background: linear-gradient(145deg, #fff, #fff6ef);
+  border-top: 3px solid var(--orange);
+}
+.dashboard-main table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.dashboard-main th {
+  background: #fff5ed;
+  text-align: left;
+}
+.dashboard-main th,
+.dashboard-main td {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+}
 #dashboard-common h2 {
   font-size: 24px;
 }

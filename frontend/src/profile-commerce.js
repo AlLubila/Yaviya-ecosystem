@@ -105,17 +105,30 @@ showRegister = function () {
     "Vendeur ou livreur : identité à vérifier manuellement par l’admin. Une petite entreprise non enregistrée peut déclarer qu’elle n’a pas de numéro RCCM.",
     "Seller or courier: identity is manually checked by the administrator. An unregistered small business may declare it has no RCCM number.",
   );
-  form.elements.address
-    .closest("label")
-    .insertAdjacentHTML("afterend", profilePreferencesFields());
+  const addressLabel = form.elements.address.closest("label");
+  addressLabel.insertAdjacentHTML("afterend", `<label class="privacy-consent professional-address-confirmation" hidden><input type="checkbox" name="professionalAddressConfirmed"><span></span></label>`);
+  const addressConfirmation = form.elements.professionalAddressConfirmed;
   const company = $("#company-fields");
   company.insertAdjacentHTML(
     "beforeend",
     `<label>${T("Abonnement vendeur *", "Seller plan *")}<select name="sellerPlan" required>${sellerPlans.map((p) => `<option value="${p.id}" ${verificationState.check?.sellerPlan === p.id ? "selected" : ""}>${T(p.name, p.en)} · ${p.monthly === null ? T("sur mesure", "custom") : money(p.monthly) + " / " + T("mois", "month")}</option>`).join("")}</select></label><p class="demo-note">${T("Choix enregistré dans le dossier. Tarifs provisoires, aucun abonnement facturé.", "Selection saved with your request. Provisional prices, no subscription billed.")}</p><details class="onboarding-benefits"><summary>${T("Comparer les avantages des abonnements", "Compare plan benefits")}</summary>${sellerPlansTable()}<div class="info-grid">${sellerPlans.map((p) => `<article><h3>${T(p.name, p.en)}</h3><p>${T(...p.target)}</p><p>${T("Commission : ", "Commission: ")}${sellerPlanCommission(p)}</p><p>${p.monthly === null ? T("Sur mesure · commission négociée", "Custom · negotiated commission") : money(p.monthly) + " / " + T("mois", "month") + " · " + money(p.annual) + " / " + T("an", "year")}</p><ul>${p.features.map((f) => `<li>${T(...f)}</li>`).join("")}</ul></article>`).join("")}</div></details>`,
   );
   function sync() {
-    const seller =
-      form.querySelector("[name=accountType]:checked")?.value === "seller";
+    const type = form.querySelector("[name=accountType]:checked")?.value || "buyer";
+    const seller = type === "seller";
+    const professional = type !== "buyer";
+    addressLabel.firstChild.textContent = seller
+      ? T("Adresse complète de la boutique / point de retrait *", "Full shop / pickup address *")
+      : type === "courier"
+        ? T("Adresse de départ / base opérationnelle *", "Starting address / operational base *")
+        : T("Adresse *", "Address *");
+    form.elements.address.placeholder = T("Ville, commune, quartier, avenue, numéro et repère", "City, municipality, district, street, number and landmark");
+    addressConfirmation.closest("label").hidden = !professional;
+    addressConfirmation.disabled = !professional;
+    addressConfirmation.required = professional;
+    addressConfirmation.nextElementSibling.textContent = seller
+      ? T("Je confirme que cette adresse est le lieu exact de retrait des colis. *", "I confirm this is the exact parcel pickup location. *")
+      : T("Je confirme mon adresse opérationnelle et vérifierai le retrait, le destinataire et la remise pour chaque mission. *", "I confirm my operational address and will verify pickup, recipient and handover for each assignment. *");
     form.elements.sellerPlan.disabled = !seller;
     form.elements.sellerPlan.required = seller;
   }
@@ -158,7 +171,7 @@ function showSellerOnboarding() {
 function profileAction(action) {
   const pages = {
     home: showMyYaviya,
-    settings: () => open(`<h2>${T("Paramètres", "Settings")}</h2><div class="profile-grid">${profileLink("edit", "Pays, devise, langue et coordonnées", "Country, currency, language and contact details")}${profileLink("security", "Sécurité et double authentification", "Security and two-factor authentication")}${profileLink("privacy", "Confidentialité", "Privacy")}</div>`),
+    settings: showAccountSettings,
     security: () => window.showYaviyaSecurity?.(),
     edit: showRegister,
     orders: showTracking,
@@ -660,6 +673,29 @@ if (modal.open) {
   syncFullWindow();
 }
 
+function showAccountSettings() {
+  if (!customerProfile) return showBuyerRegistration();
+  open(`<h2>${T("Paramètres du compte", "Account settings")}</h2><form id="account-preferences-form" class="editor">${profilePreferencesFields()}<p role="status" id="preferences-status"></p><button class="primary">${T("Enregistrer mes préférences", "Save preferences")}</button></form><div class="profile-grid">${profileLink("edit", "Adresse et coordonnées", "Address and contact details")}${profileLink("security", "Sécurité et double authentification", "Security and two-factor authentication")}${profileLink("privacy", "Confidentialité", "Privacy")}</div>`);
+  const form = document.querySelector("#account-preferences-form");
+  form.onsubmit = async (event) => {
+    event.preventDefault();
+    const button = form.querySelector("button");
+    button.disabled = true;
+    try {
+      const preferences = Object.fromEntries(new FormData(form));
+      await profileBeforeVerification({ ...customerProfile, ...preferences });
+      customerProfile = { ...customerProfile, ...preferences };
+      language = preferences.preferredLanguage;
+      try { localStorage.setItem("yaviya-language", language); } catch {}
+      applyLanguage();
+      const selector = document.querySelector("#site-language");
+      if (selector) selector.value = language;
+      document.querySelector("#preferences-status").textContent = T("Préférences enregistrées.", "Preferences saved.");
+    } catch (error) {
+      document.querySelector("#preferences-status").textContent = error.message;
+    } finally { button.disabled = false; }
+  };
+}
 function profilePreferencesFields() {
   const p = customerProfile || {};
   const country = p.residenceCountry || window.YAVIYA_COUNTRY;

@@ -630,7 +630,9 @@ test("buyer country, currency and language survive reload without changing check
   try {
     await until(() => f.run("marketReady"));
     f.run("showRegister()");
-    const form = f.w.document.querySelector("#register-form");
+    assert.equal(f.w.document.querySelector("#register-form").elements.residenceCountry, undefined);
+    f.run("showAccountSettings()");
+    const form = f.w.document.querySelector("#account-preferences-form");
     assert.equal(form.elements.residenceCountry.options.length, 250);
     assert.equal(form.elements.currency.options.length, 4);
     const original = await (
@@ -654,9 +656,9 @@ test("buyer country, currency and language survive reload without changing check
     await f.run(`customerAPI(${JSON.stringify(body)})`);
     assert.equal(f.run("language"), "en");
     await f.run("loadMarket(false)");
-    f.run("showRegister()");
+    f.run("showAccountSettings()");
     assert.equal(
-      f.w.document.querySelector("#register-form").elements.currency.value,
+      f.w.document.querySelector("#account-preferences-form").elements.currency.value,
       "USD",
     );
     assert.equal(f.run("window.YAVIYA_COUNTRY"), "CD");
