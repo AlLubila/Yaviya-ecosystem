@@ -3591,13 +3591,17 @@ body.chat-open > :not(#chat-panel):not(#toast) {
   justify-content: space-between;
   align-items: center;
   gap: 14px;
-  position: sticky;
-  bottom: 0;
+  position: static;
+  flex-wrap: wrap;
   background: #fff;
   padding: 18px 0;
   border-top: 1px solid var(--line);
   margin-top: 24px;
-  z-index: 2;
+}
+.registration-navigation > button {
+  min-height: 48px;
+  max-width: 100%;
+  border-radius: 12px;
 }
 .registration-navigation > .primary {
   margin-left: auto;
