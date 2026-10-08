@@ -47,6 +47,16 @@ function sessionToken(request) {
   );
 }
 export async function authenticatedUser(request, db) {
+  if (request.headers.has("authorization")) {
+    const { supabaseIdentity } = await import("./supabase-auth.js");
+    const identity = await supabaseIdentity(request);
+    if (!identity) return null;
+    const user = await db.prepare("SELECT id,login FROM auth_users WHERE login=?").bind(identity.login).first();
+    if (!user) return null;
+    const mfa = await db.prepare("SELECT enabled FROM auth_mfa WHERE user_id=?").bind(user.id).first();
+    // A Supabase token must not bypass the existing enrolled YAVIYA second factor.
+    return mfa?.enabled ? null : user;
+  }
   const token = sessionToken(request);
   if (!/^[a-f0-9]{64}$/.test(token)) return null;
   return db
@@ -92,6 +102,16 @@ export async function handleAuth(request, db) {
   if (["phone-send", "phone-verify"].includes(action)) {
     const { handlePhoneAuth } = await import("./phone-auth.js");
     return handlePhoneAuth(request, db, action);
+  }
+  if (action === "supabase-session") {
+    if (request.method !== "POST" || request.headers.get("origin") !== new URL(request.url).origin)
+      return json({ error: "Origine ou méthode refusée" }, 403);
+    const { supabaseIdentity, bridgeSupabaseUser } = await import("./supabase-auth.js");
+    const identity = await supabaseIdentity(request);
+    if (!identity) return json({ error: "Identité Supabase non vérifiée" }, 401);
+    const user = await bridgeSupabaseUser(db, identity);
+    const { primaryAuthenticated } = await import("./two-factor.js");
+    return primaryAuthenticated(request, db, user);
   }
   if (action.startsWith("mfa-")) {
     const { handleTwoFactor } = await import("./two-factor.js");

@@ -48,3 +48,13 @@ test("phone selection offers the correct country prefix and switches back to ema
     w.document.querySelector('.close').click(); await pending; dom.window.close();
   }
 });
+
+test("Supabase JWT bridge rejects unconfirmed identities and invalid bearer tokens", async () => {
+  const { supabaseIdentity } = await import("../backend/supabase-auth.js");
+  const req = new Request("https://yaviya.test", { headers: { Authorization: "Bearer a.b.c" } });
+  const config = { SUPABASE_URL: "https://supabase.test", SUPABASE_ANON_KEY: "test-only" };
+  const id = "12345678-1234-1234-1234-123456789012";
+  assert.equal(await supabaseIdentity(req, config, async () => Response.json({ id, email: "someone@example.invalid" })), null);
+  assert.equal(await supabaseIdentity(req, config, async () => Response.json({}, { status: 401 })), null);
+  assert.deepEqual(await supabaseIdentity(req, config, async () => Response.json({ id, email: "someone@example.invalid", email_confirmed_at: "today" })), { id, login: "someone@example.invalid" });
+});

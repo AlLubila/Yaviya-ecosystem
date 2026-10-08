@@ -1,11 +1,13 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { passwordHash } from "./auth.js";
+import { supabaseConfig } from "./supabase-auth.js";
 import { primaryAuthenticated } from "./two-factor.js";
 const json = (value, status = 200) => Response.json(value, { status, headers: { "Cache-Control": "no-store" } });
 export async function handlePhoneAuth(request, db, action, config = process.env, fetcher = fetch) {
   if (request.method !== "POST") return json({ error: "Méthode non autorisée" }, 405);
   if (request.headers.get("origin") !== new URL(request.url).origin) return json({ error: "Origine refusée" }, 403);
-  if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) return json({ error: "La connexion SMS sera disponible après activation du fournisseur. Utilisez votre e-mail ou la connexion par mot de passe." }, 503);
+  const provider = supabaseConfig(config);
+  if (!provider.url || !provider.key) return json({ error: "La connexion SMS sera disponible après activation du fournisseur. Utilisez votre e-mail ou la connexion par mot de passe." }, 503);
   let body;
   try { body = await request.json(); } catch { return json({ error: "Formulaire invalide" }, 400); }
   const phone = String(body.phone || "").replace(/[\s()-]/g, "");
@@ -16,12 +18,12 @@ export async function handlePhoneAuth(request, db, action, config = process.env,
   const now = Date.now(), until = now + 15 * 60 * 1000;
   await db.batch(keys.map(key => db.prepare("INSERT INTO auth_limits (key,count,expires_at) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN auth_limits.expires_at<? THEN 1 ELSE auth_limits.count+1 END,expires_at=CASE WHEN auth_limits.expires_at<? THEN excluded.expires_at ELSE auth_limits.expires_at END").bind(key, until, now, now)));
   for (const key of keys) if ((await db.prepare("SELECT count FROM auth_limits WHERE key=?").bind(key).first()).count > 5) return json({ error: "Trop de tentatives SMS. Réessayez dans 15 minutes." }, 429);
-  const endpoint = new URL(config.SUPABASE_URL);
+  const endpoint = new URL(provider.url);
   if (endpoint.protocol !== "https:") return json({ error: "Configuration SMS indisponible" }, 503);
   try {
     const response = await fetcher(new URL(`/auth/v1/${action === "phone-send" ? "otp" : "verify"}`, endpoint), {
       method: "POST", signal: AbortSignal.timeout(10000),
-      headers: { apikey: config.SUPABASE_ANON_KEY, "Content-Type": "application/json" },
+      headers: { apikey: provider.key, "Content-Type": "application/json" },
       body: JSON.stringify(action === "phone-send" ? { phone, create_user: true, channel: "sms" } : { phone, token: body.code, type: "sms" }),
     });
     const value = await response.json();
