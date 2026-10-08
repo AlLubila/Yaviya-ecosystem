@@ -2823,7 +2823,7 @@ body[data-demo-role="courier"] > .demo-role-bar {
 }
 .header-actions > [data-action="account"],
 .header-actions > [data-action="cart"] {
-  display: none !important;
+  display: flex !important;
 }
 body {
   padding-bottom: 82px;
@@ -4387,3 +4387,8 @@ body.chat-open #chat-panel {
 .order-confirmation h2 {
   margin-top: 0;
 }
+
+.header-actions [data-action="cart"] { order: 1; }
+.header-actions [data-profile="wishlist"] { order: 2; }
+.header-actions [data-action="account"] { order: 3; }
+@media(max-width: 720px) { header .header-actions { display:flex; flex-wrap:wrap; } .header-actions .icon-btn { min-width:40px; } }

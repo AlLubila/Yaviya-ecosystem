@@ -31,7 +31,23 @@
     pendingLogin = new Promise((resolve, reject) => {
       const dialog = document.createElement("dialog");
       dialog.className = "independent-auth";
-      dialog.innerHTML = `<button type="button" class="close" aria-label="${translate("Fermer", "Close")}">×</button><h2>${translate("Mon compte YAVIYA", "My YAVIYA account")}</h2><p>${translate("Connectez-vous ou créez votre accès personnel.", "Sign in or create your personal account.")}</p><a class="add" href="/api/auth/google">Continuer avec Google / Gmail</a><form class="editor"><label>${translate("E-mail ou téléphone", "Email or phone")}<input name="login" required maxlength="150" autocomplete="username"></label><label>${translate("Mot de passe · 12 caractères minimum", "Password · minimum 12 characters")}<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="current-password"></label><p class="auth-error" role="alert"></p><button class="primary" type="submit">${translate("Se connecter", "Sign in")}</button><button class="add auth-signup" type="button">${translate("Créer mon accès YAVIYA", "Create my YAVIYA login")}</button></form>`;
+      dialog.innerHTML = `<button type="button" class="close" aria-label="${translate("Fermer", "Close")}">×</button><h2>${translate("Mon compte YAVIYA", "My YAVIYA account")}</h2><p>${translate("Connectez-vous ou créez votre accès personnel.", "Sign in or create your personal account.")}</p><a class="add" href="/api/auth/google">Continuer avec Google / Gmail</a><form class="editor"><label>${translate("Mode de connexion", "Sign-in method")}<select name="loginMethod"><option value="email">E-mail</option><option value="phone">${translate("Téléphone", "Phone")}</option></select></label><label class="auth-country" hidden>${translate("Pays du numéro", "Phone country")}<select name="phoneCountry"><option value="CD">RD Congo (+243)</option><option value="CG">République du Congo (+242)</option></select></label><label><span class="auth-login-label">E-mail</span><input name="login" required maxlength="150" autocomplete="username" type="email"></label><label>${translate("Mot de passe · 12 caractères minimum", "Password · minimum 12 characters")}<input name="password" type="password" required minlength="12" maxlength="128" autocomplete="current-password"></label><div class="sms-access" hidden><button class="add sms-send" type="button">${translate("Recevoir un code SMS", "Send an SMS code")}</button><label hidden class="sms-code">${translate("Code SMS", "SMS code")}<input name="smsCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label><button class="add sms-verify" type="button" hidden>${translate("Vérifier le code SMS", "Verify SMS code")}</button></div><p class="auth-error" role="alert"></p><button class="primary" type="submit">${translate("Se connecter", "Sign in")}</button><button class="add auth-signup" type="button">${translate("Créer mon accès YAVIYA", "Create my YAVIYA login")}</button></form>`;
+      const method = dialog.querySelector('[name="loginMethod"]');
+      const phoneCountry = dialog.querySelector('[name="phoneCountry"]');
+      const login = dialog.querySelector('[name="login"]');
+      phoneCountry.value = window.YAVIYA_COUNTRY === "CG" ? "CG" : "CD";
+      const updateMethod = () => {
+        const phone = method.value === "phone";
+        dialog.querySelector(".auth-country").hidden = !phone;
+        dialog.querySelector(".sms-access").hidden = !phone;
+        dialog.querySelector(".auth-login-label").textContent = phone ? translate("Téléphone", "Phone") : "E-mail";
+        login.type = phone ? "tel" : "email";
+        login.inputMode = phone ? "tel" : "email";
+        login.value = phone ? (phoneCountry.value === "CG" ? "+242" : "+243") : "";
+        login.pattern = phone ? "\\+[0-9]{7,15}" : ".*";
+      };
+      method.onchange = updateMethod;
+      phoneCountry.onchange = updateMethod;
       document.body.append(dialog);
       dialog.showModal();
       const showFactor = () => {
@@ -83,6 +99,31 @@
       form.onsubmit = (event) => {
         event.preventDefault();
         submit(factor ? "mfa-verify" : "login");
+      };
+      const smsSend = dialog.querySelector(".sms-send");
+      if (smsSend) smsSend.onclick = async (event) => {
+        const button = event.currentTarget;
+        button.disabled = true;
+        try {
+          await authRequest("phone-send", { phone: login.value });
+          dialog.querySelector(".sms-code").hidden = false;
+          dialog.querySelector(".sms-verify").hidden = false;
+          dialog.querySelector(".auth-error").textContent = translate("Code envoyé. Consultez vos SMS.", "Code sent. Check your SMS.");
+        } catch (error) { dialog.querySelector(".auth-error").textContent = error.message; }
+        finally { button.disabled = false; }
+      };
+      const smsVerify = dialog.querySelector(".sms-verify");
+      if (smsVerify) smsVerify.onclick = async (event) => {
+        const button = event.currentTarget;
+        button.disabled = true;
+        try {
+          const value = await authRequest("phone-verify", { phone: login.value, code: form.elements.smsCode.value });
+          if (value.requiresTwoFactor) { factor = true; showFactor(); return; }
+          if (!value.user) throw Error(translate("Connexion incomplète", "Incomplete sign-in"));
+          completed = true; dialog.close(); resolve(value.user);
+          window.dispatchEvent(new Event("yaviya-authenticated"));
+        } catch (error) { dialog.querySelector(".auth-error").textContent = error.message; }
+        finally { button.disabled = false; }
       };
       const signup = dialog.querySelector(".auth-signup");
       if (signup) signup.onclick = () => submit("signup");

@@ -89,6 +89,10 @@ export async function startSession(request, db, user, mfaGeneration = null) {
 
 export async function handleAuth(request, db) {
   const action = new URL(request.url).pathname.split("/").at(-1);
+  if (["phone-send", "phone-verify"].includes(action)) {
+    const { handlePhoneAuth } = await import("./phone-auth.js");
+    return handlePhoneAuth(request, db, action);
+  }
   if (action.startsWith("mfa-")) {
     const { handleTwoFactor } = await import("./two-factor.js");
     return handleTwoFactor(request, db, action);
