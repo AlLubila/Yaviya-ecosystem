@@ -64,7 +64,7 @@ export async function startSession(request, db, user, mfaGeneration = null) {
     maxAge = 7 * 24 * 3600;
   const inserted = await db
     .prepare(
-      "INSERT INTO auth_sessions (token_hash,user_id,expires_at,issued_at,mfa_generation) SELECT ?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM auth_mfa WHERE user_id=? AND enabled=1 AND (generation<>? OR ? IS NULL)) RETURNING token_hash",
+      "INSERT INTO auth_sessions (token_hash,user_id,expires_at,issued_at,mfa_generation) SELECT ?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM auth_mfa WHERE user_id=? AND enabled=1 AND (generation<>? OR CAST(? AS TEXT) IS NULL)) RETURNING token_hash",
     )
     .bind(
       digest(token),
