@@ -1121,6 +1121,7 @@ footer a.logo {
     grid-template-columns: 1fr;
   }
 }
+
 .hero {
   min-height: 210px;
 }
@@ -4507,5 +4508,61 @@ header .header-actions {
   .market-navigation #all {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* Mobile : marque et raccourcis ensemble, puis recherche et langue. */
+@media (max-width: 650px) {
+  header {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "logo actions"
+      "search language";
+    column-gap: 10px;
+    row-gap: 12px;
+    padding: 14px;
+  }
+  header .logo {
+    align-self: center;
+    justify-self: start;
+    font-size: 27px;
+  }
+  header .header-actions {
+    width: auto;
+    min-width: 0;
+    justify-self: end;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+  header .header-actions .icon-btn {
+    flex: 0 1 auto;
+    min-width: 0;
+    min-height: 42px;
+    padding: 6px 5px;
+    gap: 4px;
+    font-size: 11px;
+  }
+  header .header-actions .icon-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  header #notification-bell {
+    display: none !important;
+  }
+  header #search {
+    grid-area: search;
+    width: 100%;
+    min-width: 0;
+  }
+  header .header-language {
+    grid-area: language;
+    align-self: stretch;
+    display: flex;
+    margin-left: 0;
+  }
+  header .header-language select {
+    height: 100%;
+    min-width: 54px;
   }
 }
