@@ -215,6 +215,7 @@ test("new buyer returns to the selected purchase after completing the real regis
     await until(() => f.w.document.querySelector("#register-form"));
     const form = f.w.document.querySelector("#register-form"),
       buyer = form.querySelector('[name="accountType"][value="buyer"]');
+    assert.equal(f.w.document.querySelector(".google-registration"), null);
     assert.equal(
       form.querySelector('[value="seller"][name="accountType"]').disabled,
       true,

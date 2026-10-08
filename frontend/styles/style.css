@@ -2423,12 +2423,6 @@ body[data-demo-role="admin"] > footer {
 .mobile-footbar {
   display: none;
 }
-.google-registration {
-  margin: 16px 0;
-}
-.google-registration button {
-  width: 100%;
-}
 .mobile-category-list {
   display: grid;
   grid-template-columns: 1fr 1fr;
