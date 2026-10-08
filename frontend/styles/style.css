@@ -4505,7 +4505,7 @@ header .header-actions {
     padding-inline: 14px;
   }
   .market-navigation #all {
-    width: auto;
-    justify-content: flex-start;
+    width: 100%;
+    justify-content: center;
   }
 }
