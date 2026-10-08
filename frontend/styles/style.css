@@ -4466,6 +4466,54 @@ header .header-actions {
   line-height: 1.5;
 }
 
+/* Profile preferences: intrinsic select widths must not stretch the dialog. */
+#register-form,
+#register-form > label {
+  min-width: 0;
+  max-width: 100%;
+}
+.profile-preferences {
+  min-inline-size: 0;
+  width: 100%;
+  margin: 0;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 16px;
+  border: 1px solid #ffd8bf;
+  border-radius: 14px;
+  background: #fff9f5;
+}
+.profile-preferences legend {
+  padding: 0 8px;
+  font-weight: 700;
+  color: #b8490c;
+}
+.profile-preferences label {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+}
+.profile-preferences select,
+#register-form input:not([type="checkbox"]):not([type="radio"]),
+#register-form textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.profile-preferences select {
+  min-height: 46px;
+  background: #fff;
+}
+.profile-preferences .demo-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 900px) {
   header {
     grid-template-columns: 1fr;
