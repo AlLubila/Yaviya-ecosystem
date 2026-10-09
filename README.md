@@ -1,5 +1,7 @@
 # YAVIYA — nouvelle version complète (1.9.0)
 
+Le site fonctionne désormais avec **Next.js 16 et React 19**, via l’App Router. Les cinq pages sont pré-rendues, l’API utilise un Route Handler Next.js et les anciennes URL en `.html` redirigent vers leurs routes canoniques. Les scripts métier historiques sont chargés dans leur ordre d’origine par une couche de compatibilité React afin de conserver tous les parcours pendant la migration.
+
 Version 1.9.0 : adaptateur PostgreSQL activable sur Vercel, schéma d’exécution privé et rôle Supabase à privilèges minimaux. SQLite reste disponible uniquement pour le développement et les tests locaux.
 
 Version 1.7.0 : [12 catégories, coupons et préférences de profil](docs/PROFILE_CATEGORIES_COUPONS.md). La devise préférée ne convertit pas les prix.
@@ -33,7 +35,7 @@ npm start
 
 ## Activer l'installation Vercel
 
-Le projet GitHub doit être relié au projet Vercel `yaviyaecosystem`, avec la racine du dépôt comme Root Directory. `vercel.json` configure `npm run build`, le dossier `dist` et la fonction API indépendante. Utiliser Node.js 24.
+Le projet GitHub doit être relié au projet Vercel `yaviya-ecosystem`, avec la racine du dépôt comme Root Directory. `vercel.json` sélectionne explicitement le preset Next.js ; Vercel utilise automatiquement `npm run build` et la sortie `.next`. Utiliser Node.js 24.
 
 1. Utiliser le projet Supabase `yaviya-production` et sa connexion **Transaction pooler** sur le port 6543.
 2. Ajouter `POSTGRES_URL` comme Secret Vercel côté serveur. La valeur utilise le rôle limité `yaviya_runtime` et ne doit jamais être préfixée par `NEXT_PUBLIC_`.
@@ -47,17 +49,18 @@ Le projet GitHub doit être relié au projet Vercel `yaviyaecosystem`, avec la r
 
 | Emplacement                  | Rôle                                                                                      |
 | ---------------------------- | ----------------------------------------------------------------------------------------- |
-| `frontend/pages/`            | Cinq pages HTML, dont les portails RDC et Congo                                           |
+| `app/`                       | Routes Next.js, métadonnées, compatibilité frontend et Route Handler API                   |
+| `frontend/pages/`            | Sources HTML historiques des cinq pages, rendues à la compilation par Next.js              |
 | `frontend/src/`              | Scripts classiques du catalogue, comptes et parcours métier                               |
 | `frontend/styles/`           | Styles responsive                                                                         |
 | `frontend/assets/images/`    | 34 images originales et 30 vues produits supplémentaires                                                           |
-| `api/handler.js`             | Fonction Vercel : conversion HTTP vers les gestionnaires existants                        |
+| `app/api/[...path]/route.js` | Route Handler Next.js qui transmet les requêtes aux gestionnaires existants                |
 | `backend/application.js`     | Session indépendante et identité injectée côté serveur                                    |
 | `backend/auth.js`            | Comptes, mots de passe scrypt, sessions serveur, déconnexion et limitation des tentatives |
 | `backend/database.js`        | Adaptation D1 vers PostgreSQL en production et SQLite pour le développement local          |
 | `backend/worker/`            | Gestionnaires métier de la version 31, avec identités YAVIYA indépendantes                |
 | `database/migrations/`       | Migrations originales et tables des accès indépendants                                    |
-| `scripts/`                   | Serveur local, build, migrations, création propriétaire et contrôles                      |
+| `scripts/`                   | Ressources publiques Next.js, migrations, création propriétaire et contrôles              |
 | `tests/independent.test.mjs` | Tests des accès privés et du parcours partagé à quatre comptes distincts                  |
 
 Les documents privés sont enregistrés en BLOB dans la base, avec leurs types MIME. Ils ne sont pas copiés dans `dist`, ni exposés sous une URL publique ; les routes conservent les contrôles du backend original. Pour un volume important, un stockage de fichiers privé séparé devra remplacer cet adaptateur. Les limites de téléversement de la plateforme et de la base devront être vérifiées sur le projet actif avant l'ouverture publique ; les contrôles existants de 8 Mo et de signature des fichiers sont conservés.

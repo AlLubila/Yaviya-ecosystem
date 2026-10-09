@@ -3,9 +3,11 @@
   "version": "1.9.0",
   "private": true,
   "scripts": {
-    "dev": "npm run build && node --env-file-if-exists=.env scripts/dev.mjs --dist",
-    "start": "node --env-file-if-exists=.env scripts/dev.mjs --dist",
-    "build": "node scripts/build.mjs",
+    "predev": "node --env-file-if-exists=.env scripts/migrate.mjs && node scripts/prepare-next-assets.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/prepare-next-assets.mjs",
+    "build": "next build",
+    "start": "next start",
     "check": "node scripts/check.mjs",
     "test": "npm run check && node --test tests/*.test.mjs",
     "db:migrate": "node --env-file-if-exists=.env scripts/migrate.mjs",
@@ -18,9 +20,12 @@
   "dependencies": {
     "@libsql/client": "^0.18.0",
     "jose": "^6.2.12",
+    "next": "^16.4.0",
     "otpauth": "^9.5.2",
     "postgres": "3.4.9",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
     "jsdom": "^30.1.2"

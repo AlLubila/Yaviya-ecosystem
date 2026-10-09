@@ -1,4 +1,4 @@
-import { readFile, readdir } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 const folders = [
@@ -20,7 +20,6 @@ for (const directory of [
   "frontend/src",
   "backend",
   "backend/worker",
-  "api",
   "scripts",
   "tests",
 ]) {
@@ -35,6 +34,14 @@ for (const directory of [
     assert.equal(result.status, 0, `${directory}/${file}: ${result.stderr}`);
   }
 }
+for (const file of [
+  "app/layout.js",
+  "app/page.js",
+  "app/api/[...path]/route.js",
+  "next.config.mjs",
+  "scripts/prepare-next-assets.mjs",
+])
+  await access(file);
 for (const page of [
   "index.html",
   "congo.html",
@@ -50,10 +57,14 @@ for (const page of [
   }
 }
 assert.ok(html.includes("auth-independent.js"));
+const packageJson = JSON.parse(await readFile("package.json", "utf8"));
+assert.ok(packageJson.dependencies.next);
+assert.ok(packageJson.dependencies.react);
+assert.equal(packageJson.scripts.build, "next build");
 assert.equal(
-  JSON.parse(await readFile("vercel.json", "utf8")).outputDirectory,
-  "dist",
+  JSON.parse(await readFile("vercel.json", "utf8")).framework,
+  "nextjs",
 );
 console.log(
-  "Sources originales, fichiers référencés et configuration Vercel vérifiés.",
+  "Sources originales, routes Next.js et configuration Vercel vérifiées.",
 );

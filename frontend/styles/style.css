@@ -5,6 +5,10 @@
   --line: #f0e4dc;
   --orange: #f26a21;
 }
+
+.next-page-shell {
+  display: contents;
+}
 * {
   box-sizing: border-box;
 }
